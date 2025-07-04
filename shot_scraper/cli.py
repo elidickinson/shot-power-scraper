@@ -12,12 +12,18 @@ import yaml
 import click
 import nodriver as uc
 import asyncio
-import warnings
 
 
 from shot_scraper.utils import filename_for_url, load_github_script, url_or_file_path
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
+
+
+async def run_with_browser_cleanup(coro):
+    """Run an async function and give nodriver time to cleanup afterwards."""
+    result = await coro
+    await asyncio.sleep(0.5)  # Give nodriver time to cleanup background processes
+    return result
 
 
 def console_log(msg):
@@ -400,11 +406,7 @@ def shot(
                     # Browser cleanup can be flaky with event loops - just ignore it
                     pass
     
-    # Simple and clean - suppress subprocess cleanup warnings
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", message=".*BaseSubprocessTransport.*")
-        warnings.filterwarnings("ignore", message=".*Event loop is closed.*")
-        asyncio.run(run_shot())
+    asyncio.run(run_with_browser_cleanup(run_shot()))
 
 
 async def _browser_context(
@@ -427,8 +429,9 @@ async def _browser_context(
         browser_args=browser_args or []
     )
     
+    # Add user agent to browser args if specified
     if user_agent:
-        browser_kwargs["user_agent"] = user_agent
+        browser_kwargs["browser_args"].append(f"--user-agent={user_agent}")
     
     browser_obj = await uc.start(**browser_kwargs)
     
@@ -658,15 +661,7 @@ def multi(
             if har_file and not silent:
                 click.echo(f"Wrote to HAR file: {har_file}", err=True)
     
-    # Use asyncio.run with proper cleanup
-    try:
-        asyncio.run(run_multi())
-    except Exception as e:
-        if "object NoneType can't be used in 'await' expression" in str(e):
-            # This is a cleanup issue, operation was likely successful
-            pass
-        else:
-            raise
+    asyncio.run(run_with_browser_cleanup(run_multi()))
 
 
 @cli.command()
@@ -737,13 +732,7 @@ def accessibility(
             pass
         return snapshot
     
-    try:
-        snapshot = asyncio.run(run_accessibility())
-    except Exception as e:
-        if "object NoneType can't be used in 'await' expression" in str(e):
-            snapshot = {"message": "Accessibility tree dumping completed with cleanup warnings"}
-        else:
-            raise
+    snapshot = asyncio.run(run_with_browser_cleanup(run_accessibility()))
     output.write(json.dumps(snapshot, indent=4))
     output.write("\n")
 
@@ -841,7 +830,7 @@ def har(
     
     # Note: HAR recording not yet fully implemented with nodriver
     click.echo("HAR recording not yet fully supported with nodriver", err=True)
-    asyncio.run(run_har())
+    asyncio.run(run_with_browser_cleanup(run_har()))
 
 
 @cli.command()
@@ -963,7 +952,7 @@ def javascript(
             pass
         return result
     
-    result = asyncio.run(run_javascript())
+    result = asyncio.run(run_with_browser_cleanup(run_javascript()))
     if raw:
         output.write(str(result))
         return
@@ -1176,7 +1165,7 @@ def html(
             pass
         return html
     
-    html = asyncio.run(run_html())
+    html = asyncio.run(run_with_browser_cleanup(run_html()))
     
     if output == "-":
         sys.stdout.write(html)
@@ -1258,7 +1247,7 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
             pass
         return context_state
     
-    context_state = asyncio.run(run_auth())
+    context_state = asyncio.run(run_with_browser_cleanup(run_auth()))
     context_json = json.dumps(context_state, indent=2) + "\n"
     if context_file == "-":
         click.echo(context_json)
