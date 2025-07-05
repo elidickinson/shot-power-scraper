@@ -110,7 +110,7 @@ This fork has significant differences from the original shot-scraper. **Several 
 
 ### ✅ **Commands That Work Fully**
 - `shot-scraper` (screenshots) - Full functionality
-- `shot-scraper javascript` - Full functionality  
+- `shot-scraper javascript` - Full functionality
 - `shot-scraper html` - Full functionality
 - `shot-scraper multi` - Full functionality
 - `shot-scraper auth` - Works with some limitations
@@ -155,6 +155,16 @@ This user agent (with "Chrome" instead of "HeadlessChrome") will be used for all
 **Note**: Config file uses `user_agent` (underscore) while command line uses `--user-agent` (hyphen). This is the standard convention for Python CLI tools.
 
 📖 **See [CONFIG.md](CONFIG.md) for a complete reference of all configuration options.**
+
+## Code Structure
+
+The codebase has been refactored for better maintainability and clarity:
+
+- **`shot_scraper/cli.py`** - Main CLI interface with all command definitions and decorators
+- **`shot_scraper/browser.py`** - Browser management and initialization
+- **`shot_scraper/screenshot.py`** - Core screenshot functionality and element selection
+- **`shot_scraper/page_utils.py`** - Page interaction utilities (JavaScript evaluation, Cloudflare bypass, DOM ready detection)
+- **`shot_scraper/utils.py`** - General utility functions
 
 ## Examples
 

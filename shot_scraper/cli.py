@@ -1,7 +1,5 @@
-import secrets
 import subprocess
 import sys
-import textwrap
 import time
 import json
 import os
@@ -13,28 +11,37 @@ import click
 import nodriver as uc
 import asyncio
 
-
-from shot_scraper.utils import filename_for_url, load_github_script, url_or_file_path, get_default_user_agent, set_default_user_agent
+from shot_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent
+from shot_scraper.browser import Config, create_browser_context
+from shot_scraper.screenshot import take_shot
+from shot_scraper.page_utils import evaluate_js, wait_for_condition
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
-
-# Global config
-class Config:
-    verbose = False
-    silent = False
 
 
 async def run_with_browser_cleanup(coro):
     """Run an async function and give nodriver time to cleanup afterwards."""
     result = await coro
-    await asyncio.sleep(0.5)  # Give nodriver time to cleanup background processes
+    await asyncio.sleep(0.25)  # Give nodriver time to cleanup background processes
     return result
 
 
 
 
+# Small utility functions stay here
 def console_log(msg):
     click.echo(msg, err=True)
+
+
+def _check_and_absolutize(filepath):
+    try:
+        path = pathlib.Path(filepath)
+        if path.exists():
+            return path.absolute()
+        return False
+    except OSError:
+        # On Windows, instantiating a Path object on `http://` or `https://` will raise an exception
+        return False
 
 
 def browser_option(fn):
@@ -362,7 +369,7 @@ def shot(
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
-    
+
     if output is None:
         ext = "jpg" if quality else None
         output = filename_for_url(url, ext=ext, file_exists=os.path.exists)
@@ -398,8 +405,8 @@ def shot(
         use_existing_page = False
         browser_obj = None
         try:
-            browser_obj = await _browser_context(
-                auth,
+            browser_obj = await create_browser_context(
+                auth=auth,
                 interactive=interactive,
                 devtools=devtools,
                 scale_factor=scale_factor,
@@ -465,62 +472,6 @@ def shot(
     asyncio.run(run_with_browser_cleanup(run_shot()))
 
 
-async def _browser_context(
-    auth,
-    interactive=False,
-    devtools=False,
-    scale_factor=None,
-    browser="chromium",
-    browser_args=None,
-    user_agent=None,
-    timeout=None,
-    reduced_motion=False,
-    bypass_csp=False,
-    auth_username=None,
-    auth_password=None,
-    record_har_path=None,
-):
-    # Convert browser_args tuple to list and add user agent if needed
-    browser_args_list = list(browser_args) if browser_args else []
-    
-    # Use stored default user agent if no explicit user agent is provided
-    if not user_agent:
-        user_agent = get_default_user_agent()
-
-    # Add user agent to browser args if specified or found in config
-    if user_agent:
-        browser_args_list.append(f"--user-agent={user_agent}")
-
-    browser_kwargs = dict(
-        headless=not interactive,
-        browser_args=browser_args_list
-    )
-
-    # Show browser args in verbose mode
-    if Config.verbose and browser_args_list:
-        click.echo(f"Browser args: {browser_args_list}", err=True)
-
-    browser_obj = await uc.start(**browser_kwargs)
-
-    if browser_obj is None:
-        raise click.ClickException("Failed to initialize browser")
-
-    # Handle auth state if provided
-    if auth:
-        storage_state = json.load(auth)
-        # nodriver doesn't have direct storage_state support,
-        # but we can set cookies manually
-        if "cookies" in storage_state:
-            page = await browser_obj.get("about:blank")
-            for cookie in storage_state["cookies"]:
-                try:
-                    await page.add_handler("Network.enable", lambda event: None)
-                    await page.send(uc.cdp.network.set_cookie(**cookie))
-                except Exception:
-                    # Ignore cookie setting errors for now
-                    pass
-
-    return browser_obj
 
 
 @cli.command()
@@ -635,7 +586,7 @@ def multi(
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
-    
+
     if (har or har_zip) and not har_file:
         har_file = filename_for_url(
             "trace", ext="har.zip" if har_zip else "har", file_exists=os.path.exists
@@ -656,8 +607,8 @@ def multi(
     if not isinstance(shots, list):
         raise click.ClickException("YAML file must contain a list")
     async def run_multi():
-        browser_obj = await _browser_context(
-            auth,
+        browser_obj = await create_browser_context(
+            auth=auth,
             scale_factor=scale_factor,
             browser=browser,
             browser_args=browser_args,
@@ -788,7 +739,7 @@ def accessibility(
     url = url_or_file_path(url, _check_and_absolutize)
 
     async def run_accessibility():
-        browser_obj = await _browser_context(
+        browser_obj = await create_browser_context(
             auth,
             timeout=timeout,
             bypass_csp=bypass_csp,
@@ -798,7 +749,7 @@ def accessibility(
         page = await browser_obj.get(url)
         # nodriver doesn't have console event handling by default
         if javascript:
-            await _evaluate_js(page, javascript)
+            await evaluate_js(page, javascript)
         # nodriver doesn't have accessibility.snapshot(), we'll implement a basic alternative
         # or note that this feature is not available
         snapshot = {"message": "Accessibility tree dumping not yet supported with nodriver"}
@@ -880,7 +831,7 @@ def har(
     url = url_or_file_path(url, _check_and_absolutize)
 
     async def run_har():
-        browser_obj = await _browser_context(
+        browser_obj = await create_browser_context(
             auth,
             timeout=timeout,
             bypass_csp=bypass_csp,
@@ -894,7 +845,7 @@ def har(
             time.sleep(wait / 1000)
 
         if javascript:
-            await _evaluate_js(page, javascript)
+            await evaluate_js(page, javascript)
 
         if wait_for:
             await page.wait_for_function(wait_for)
@@ -1010,7 +961,7 @@ def javascript(
     url = url_or_file_path(url, _check_and_absolutize)
 
     async def run_javascript():
-        browser_obj = await _browser_context(
+        browser_obj = await create_browser_context(
             auth,
             browser=browser,
             browser_args=browser_args,
@@ -1021,7 +972,7 @@ def javascript(
             auth_password=auth_password,
         )
         page = await browser_obj.get(url)
-        result = await _evaluate_js(page, javascript)
+        result = await evaluate_js(page, javascript)
         try:
             await browser_obj.stop()
         except Exception:
@@ -1210,7 +1161,7 @@ def html(
         output = filename_for_url(url, ext="html", file_exists=os.path.exists)
 
     async def run_html():
-        browser_obj = await _browser_context(
+        browser_obj = await create_browser_context(
             auth,
             browser=browser,
             browser_args=browser_args,
@@ -1224,7 +1175,7 @@ def html(
         if wait:
             time.sleep(wait / 1000)
         if javascript:
-            await _evaluate_js(page, javascript)
+            await evaluate_js(page, javascript)
 
         if selector:
             element = await page.select(selector)
@@ -1360,7 +1311,7 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
         shot-scraper auth https://github.com/ auth.json
     """
     async def run_auth():
-        browser_obj = await _browser_context(
+        browser_obj = await create_browser_context(
             auth=None,
             interactive=True,
             devtools=devtools,
@@ -1395,451 +1346,3 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
             fp.write(context_json)
         # chmod 600 to avoid other users on the shared machine reading it
         pathlib.Path(context_file).chmod(0o600)
-
-
-def _check_and_absolutize(filepath):
-    try:
-        path = pathlib.Path(filepath)
-        if path.exists():
-            return path.absolute()
-        return False
-    except OSError:
-        # On Windows, instantiating a Path object on `http://` or `https://` will raise an exception
-        return False
-
-
-def _get_viewport(width, height):
-    if width or height:
-        return {
-            "width": width or 1280,
-            "height": height or 720,
-        }
-    else:
-        return {}
-
-
-async def take_shot(
-    context_or_page,
-    shot,
-    return_bytes=False,
-    use_existing_page=False,
-    log_requests=None,
-    log_console=False,
-    skip=False,
-    fail=False,
-    silent=False,
-):
-    url = shot.get("url") or ""
-    if not url:
-        raise click.ClickException("url is required")
-
-    if skip and fail:
-        raise click.ClickException("--skip and --fail cannot be used together")
-
-    url = url_or_file_path(url, file_exists=_check_and_absolutize)
-
-    output = (shot.get("output") or "").strip()
-    if not output and not return_bytes:
-        output = filename_for_url(url, ext="png", file_exists=os.path.exists)
-    quality = shot.get("quality")
-    omit_background = shot.get("omit_background")
-    wait = shot.get("wait")
-    wait_for = shot.get("wait_for")
-    padding = shot.get("padding") or 0
-    skip_cloudflare_check = shot.get("skip_cloudflare_check", False)
-    wait_for_dom_ready_timeout = shot.get("wait_for_dom_ready_timeout", 10000)
-    skip_wait_for_dom_ready = shot.get("skip_wait_for_dom_ready", False)
-
-    selectors = list(shot.get("selectors") or [])
-    selectors_all = list(shot.get("selectors_all") or [])
-    js_selectors = list(shot.get("js_selectors") or [])
-    js_selectors_all = list(shot.get("js_selectors_all") or [])
-    # If a single 'selector' append to 'selectors' array (and 'js_selectors' etc)
-    if shot.get("selector"):
-        selectors.append(shot["selector"])
-    if shot.get("selector_all"):
-        selectors_all.append(shot["selector_all"])
-    if shot.get("js_selector"):
-        js_selectors.append(shot["js_selector"])
-    if shot.get("js_selector_all"):
-        js_selectors_all.append(shot["js_selector_all"])
-
-    if not use_existing_page:
-        if Config.verbose:
-            click.echo(f"Loading page: {url}", err=True)
-        page = await context_or_page.get(url)
-        if Config.verbose:
-            click.echo(f"Page loaded: {url}", err=True)
-        if log_requests:
-            # nodriver doesn't have direct response events like Playwright
-            # We can implement this later using CDP if needed
-            pass
-
-        # Automatic Cloudflare detection and waiting
-        if not skip_cloudflare_check and await _detect_cloudflare_challenge(page):
-            if not silent:
-                click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
-            success = await _wait_for_cloudflare_bypass(page)
-            if not success:
-                if not silent:
-                    click.echo("Warning: Cloudflare challenge may still be active", err=True)
-
-        # Wait for DOM ready unless explicitly skipped or wait_for is specified
-        if not skip_wait_for_dom_ready and not wait_for:
-            dom_ready = await _wait_for_dom_ready(page, wait_for_dom_ready_timeout)
-            if not dom_ready and not silent:
-                click.echo(f"DOM ready timeout after {wait_for_dom_ready_timeout}ms", err=True)
-    else:
-        page = context_or_page
-
-    if log_console:
-        # nodriver doesn't have direct console event handling
-        # We can implement this later using CDP if needed
-        pass
-
-    viewport = _get_viewport(shot.get("width"), shot.get("height"))
-    if viewport:
-        # nodriver doesn't have set_viewport_size, we'll use window size instead
-        await page.set_window_size(viewport["width"], viewport["height"])
-
-    # Use explicit full_page if provided, otherwise default to True if no height is specified
-    full_page = shot.get("full_page", not shot.get("height"))
-
-    if not use_existing_page:
-        # nodriver automatically handles page loading and doesn't return response status
-        # We'll assume the page loaded successfully unless we get an exception
-        pass
-
-    if wait:
-        if Config.verbose:
-            click.echo(f"Waiting {wait}ms before processing...", err=True)
-        time.sleep(wait / 1000)
-
-    javascript = shot.get("javascript")
-    if javascript:
-        if Config.verbose:
-            click.echo(f"Executing JavaScript: {javascript[:50]}{'...' if len(javascript) > 50 else ''}", err=True)
-        await _evaluate_js(page, javascript)
-
-    if wait_for:
-        if Config.verbose:
-            click.echo(f"Waiting for condition: {wait_for}", err=True)
-        # nodriver wait_for equivalent using evaluate in a loop
-        timeout_seconds = 30  # default timeout
-        start_time = time.time()
-        while time.time() - start_time < timeout_seconds:
-            result = await page.evaluate(wait_for)
-            if result:
-                if Config.verbose:
-                    elapsed = int((time.time() - start_time) * 1000)
-                    click.echo(f"Wait condition met after {elapsed}ms", err=True)
-                break
-            await asyncio.sleep(0.1)
-        else:
-            raise click.ClickException(f"Timeout waiting for condition: {wait_for}")
-
-    screenshot_args = {}
-    if quality:
-        screenshot_args.update({"quality": quality, "type": "jpeg"})
-    if omit_background:
-        screenshot_args.update({"omit_background": True})
-    if not return_bytes:
-        screenshot_args["path"] = output
-
-    if (
-        not selectors
-        and not js_selectors
-        and not selectors_all
-        and not js_selectors_all
-    ):
-        screenshot_args["full_page"] = full_page
-
-    if js_selectors or js_selectors_all:
-        # Evaluate JavaScript adding classes we can select on
-        (
-            js_selector_javascript,
-            extra_selectors,
-            extra_selectors_all,
-        ) = _js_selector_javascript(js_selectors, js_selectors_all)
-        selectors.extend(extra_selectors)
-        selectors_all.extend(extra_selectors_all)
-        await _evaluate_js(page, js_selector_javascript)
-
-    if selectors or selectors_all:
-        # Use JavaScript to create a box around those elements
-        selector_javascript, selector_to_shoot = _selector_javascript(
-            selectors, selectors_all, padding
-        )
-        await _evaluate_js(page, selector_javascript)
-        try:
-            # nodriver element screenshot with selector
-            element = await page.select(selector_to_shoot)
-            if element:
-                if return_bytes:
-                    # For bytes output, save to temp file then read
-                    import tempfile
-                    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-                        await page.save_screenshot(tmp.name, full_page=screenshot_args.get("full_page", True))
-                        with open(tmp.name, 'rb') as f:
-                            bytes_data = f.read()
-                        os.unlink(tmp.name)
-                        return bytes_data
-                else:
-                    if Config.verbose:
-                        click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
-                    result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
-                    # save_screenshot might return None, that's OK
-                    message = "Screenshot of '{}' on '{}' written to '{}'".format(
-                        ", ".join(list(selectors) + list(selectors_all)), url, output
-                    )
-            else:
-                raise click.ClickException(f"Could not find element matching selector: {selector_to_shoot}")
-        except Exception as e:
-            raise click.ClickException(
-                f"Timed out while waiting for element to become available.\n\n{e}"
-            )
-    else:
-        if shot.get("skip_shot"):
-            message = "Skipping screenshot of '{}'".format(url)
-        else:
-            # Whole page
-            if return_bytes:
-                # For bytes output, save to temp file then read
-                import tempfile
-                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-                    await page.save_screenshot(tmp.name, full_page=screenshot_args.get("full_page", True))
-                    with open(tmp.name, 'rb') as f:
-                        bytes_data = f.read()
-                    os.unlink(tmp.name)
-                    return bytes_data
-            else:
-                if Config.verbose:
-                    click.echo(f"Taking screenshot (full_page={screenshot_args.get('full_page', True)})", err=True)
-                result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
-                # save_screenshot might return None, that's OK
-                message = f"Screenshot of '{url}' written to '{output}'"
-
-    # Save HTML if requested
-    if shot.get("save_html") and not return_bytes:
-        try:
-            # Get the HTML content
-            html_content = await page.get_content()
-            
-            # Determine HTML filename from screenshot output
-            if output and output != "-":
-                # Get the base name without extension
-                output_path = pathlib.Path(output)
-                html_filename = output_path.with_suffix('.html')
-                
-                # Write HTML content to file
-                with open(html_filename, 'w', encoding='utf-8') as f:
-                    f.write(html_content)
-                
-                if not silent:
-                    click.echo(f"HTML content saved to '{html_filename}'", err=True)
-            else:
-                if not silent:
-                    click.echo("Cannot save HTML when output is stdout", err=True)
-                    
-        except Exception as e:
-            if not silent:
-                click.echo(f"Failed to save HTML: {e}", err=True)
-
-    if not silent:
-        click.echo(message, err=True)
-
-    # Always return something for consistency
-    return None
-
-
-def _js_selector_javascript(js_selectors, js_selectors_all):
-    extra_selectors = []
-    extra_selectors_all = []
-    js_blocks = []
-    for js_selector in js_selectors:
-        klass = f"js-selector-{secrets.token_hex(16)}"
-        extra_selectors.append(f".{klass}")
-        js_blocks.append(
-            textwrap.dedent(
-                f"""
-        Array.from(
-          document.getElementsByTagName('*')
-        ).find(el => {js_selector}).classList.add("{klass}");
-        """
-            )
-        )
-    for js_selector_all in js_selectors_all:
-        klass = f"js-selector-all-{secrets.token_hex(16)}"
-        extra_selectors_all.append(f".{klass}")
-        js_blocks.append(
-            textwrap.dedent(
-                """
-        Array.from(
-          document.getElementsByTagName('*')
-        ).filter(el => {}).forEach(el => el.classList.add("{}"));
-        """.format(
-                    js_selector_all, klass
-                )
-            )
-        )
-    js_selector_javascript = "() => {" + "\n".join(js_blocks) + "}"
-    return js_selector_javascript, extra_selectors, extra_selectors_all
-
-
-def _selector_javascript(selectors, selectors_all, padding=0):
-    selector_to_shoot = f"shot-scraper-{secrets.token_hex(8)}"
-    selector_javascript = textwrap.dedent(
-        """
-    new Promise(takeShot => {
-        let padding = %s;
-        let minTop = 100000000;
-        let minLeft = 100000000;
-        let maxBottom = 0;
-        let maxRight = 0;
-        let els = %s.map(s => document.querySelector(s));
-        // Add the --selector-all elements
-        %s.map(s => els.push(...document.querySelectorAll(s)));
-        els.forEach(el => {
-            let rect = el.getBoundingClientRect();
-            if (rect.top < minTop) {
-                minTop = rect.top;
-            }
-            if (rect.left < minLeft) {
-                minLeft = rect.left;
-            }
-            if (rect.bottom > maxBottom) {
-                maxBottom = rect.bottom;
-            }
-            if (rect.right > maxRight) {
-                maxRight = rect.right;
-            }
-        });
-        // Adjust them based on scroll position
-        let top = minTop + window.scrollY;
-        let bottom = maxBottom + window.scrollY;
-        let left = minLeft + window.scrollX;
-        let right = maxRight + window.scrollX;
-        // Apply padding
-        top = top - padding;
-        bottom = bottom + padding;
-        left = left - padding;
-        right = right + padding;
-        let div = document.createElement('div');
-        div.style.position = 'absolute';
-        div.style.top = top + 'px';
-        div.style.left = left + 'px';
-        div.style.width = (right - left) + 'px';
-        div.style.height = (bottom - top) + 'px';
-        div.style.maxWidth = 'none';
-        div.setAttribute('id', %s);
-        document.body.appendChild(div);
-        setTimeout(() => {
-            takeShot();
-        }, 300);
-    });
-    """
-        % (
-            padding,
-            json.dumps(selectors),
-            json.dumps(selectors_all),
-            json.dumps(selector_to_shoot),
-        )
-    )
-    return selector_javascript, "#" + selector_to_shoot
-
-
-async def _evaluate_js(page, javascript):
-    try:
-        return await page.evaluate(javascript)
-    except Exception as error:
-        raise click.ClickException(str(error))
-
-
-async def _detect_cloudflare_challenge(page):
-    """Detect if the current page is showing a Cloudflare challenge"""
-    try:
-        return await page.evaluate("""
-        (() => {
-            return document.title === 'Just a moment...' ||
-                   !!window._cf_chl_opt ||
-                   !!document.querySelector('script[src*="/cdn-cgi/challenge-platform/"]') ||
-                   (!!document.querySelector('meta[http-equiv="refresh"]') && document.title.includes('moment'));
-        })()
-        """)
-    except Exception:
-        return False
-
-
-async def _wait_for_cloudflare_bypass(page, max_wait_seconds=8):
-    """Wait for Cloudflare challenge to complete"""
-    start_time = time.time()
-
-    if Config.verbose:
-        click.echo(f"Waiting for Cloudflare challenge bypass (max {max_wait_seconds}s)...", err=True)
-
-    check_count = 0
-    while time.time() - start_time < max_wait_seconds:
-        try:
-            elapsed_seconds = time.time() - start_time
-            check_count += 1
-
-            cf_detected = await _detect_cloudflare_challenge(page)
-
-            if verbose and not silent and check_count % 10 == 0:  # Log every 10 checks
-                click.echo(f"Cloudflare check #{check_count}: challenge_detected={cf_detected}, elapsed={elapsed_seconds:.1f}s", err=True)
-
-            if not cf_detected:
-                # Wait minimum 1 second for page stability after challenge clears
-                if elapsed_seconds >= 1:
-                    if Config.verbose:
-                        click.echo(f"Cloudflare challenge bypassed in {elapsed_seconds:.1f}s", err=True)
-                    return True
-            await asyncio.sleep(0.3)  # Check more frequently
-        except Exception as e:
-            if Config.verbose:
-                click.echo(f"Cloudflare bypass check failed: {e}", err=True)
-            await asyncio.sleep(0.3)
-
-    if Config.verbose:
-        click.echo(f"Cloudflare bypass timeout after {max_wait_seconds}s", err=True)
-    return False
-
-
-async def _wait_for_dom_ready(page, timeout_ms=10000):
-    """Wait for DOM to be ready or timeout"""
-    try:
-        start_time = time.time()
-        timeout_seconds = timeout_ms / 1000
-
-        if Config.verbose:
-            click.echo(f"Waiting for DOM ready state (timeout: {timeout_ms}ms)...", err=True)
-
-        check_count = 0
-        while time.time() - start_time < timeout_seconds:
-            elapsed_ms = int((time.time() - start_time) * 1000)
-
-            # Get current state for verbose logging
-            ready_state = await page.evaluate("document.readyState")
-
-            if Config.verbose:
-                check_count += 1
-                if check_count % 10 == 0:  # Log every 10 checks (roughly every second)
-                    click.echo(f"DOM ready check #{check_count}: readyState='{ready_state}', elapsed={elapsed_ms}ms", err=True)
-
-            if ready_state == 'complete':
-                if Config.verbose:
-                    click.echo(f"DOM ready achieved in {elapsed_ms}ms (readyState: {ready_state})", err=True)
-                return True
-
-            await asyncio.sleep(0.1)
-
-        # Timeout reached
-        if Config.verbose:
-            final_state = await page.evaluate("document.readyState")
-            click.echo(f"DOM ready timeout after {timeout_ms}ms (final readyState: {final_state})", err=True)
-
-        return False  # Timed out
-    except Exception as e:
-        if Config.verbose:
-            click.echo(f"DOM ready check failed with exception: {e}", err=True)
-        return False
