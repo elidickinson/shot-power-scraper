@@ -274,6 +274,11 @@ def cli():
     is_flag=True,
     help="Capture the full scrollable page (overrides --height)"
 )
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose logging to stdout"
+)
 def shot(
     url,
     auth,
@@ -311,6 +316,7 @@ def shot(
     wait_for_dom_ready_timeout,
     skip_wait_for_dom_ready,
     full_page,
+    verbose,
 ):
     """
     Take a single screenshot of a page or portion of a page.
@@ -368,6 +374,7 @@ def shot(
         "wait_for_dom_ready_timeout": wait_for_dom_ready_timeout,
         "skip_wait_for_dom_ready": skip_wait_for_dom_ready,
         "full_page": full_page,
+        "verbose": verbose,
     }
     interactive = interactive or devtools
 
@@ -415,6 +422,7 @@ def shot(
                     log_requests=log_requests,
                     log_console=log_console,
                     silent=silent,
+                    verbose=verbose,
                 )
                 sys.stdout.buffer.write(shot_bytes)
             else:
@@ -428,6 +436,7 @@ def shot(
                     skip=skip,
                     fail=fail,
                     silent=silent,
+                    verbose=verbose,
                 )
         except Exception as e:
             raise click.ClickException(str(e))
@@ -555,6 +564,11 @@ async def _browser_context(
     type=click.Path(file_okay=True, writable=True, dir_okay=False),
     help="Path to HAR file to save all requests",
 )
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose logging including DOM Ready timing"
+)
 def multi(
     config,
     auth,
@@ -578,6 +592,7 @@ def multi(
     har,
     har_zip,
     har_file,
+    verbose,
 ):
     """
     Take multiple screenshots, defined by a YAML file
@@ -671,6 +686,7 @@ def multi(
                             skip=skip,
                             fail=fail,
                             silent=silent,
+                            verbose=verbose,
                         )
                     except Exception as e:
                         if fail or fail_on_error:
@@ -1388,6 +1404,7 @@ async def take_shot(
     skip=False,
     fail=False,
     silent=False,
+    verbose=False,
 ):
     url = shot.get("url") or ""
     if not url:
@@ -1425,7 +1442,11 @@ async def take_shot(
         js_selectors_all.append(shot["js_selector_all"])
 
     if not use_existing_page:
+        if verbose and not silent:
+            click.echo(f"Loading page: {url}", err=True)
         page = await context_or_page.get(url)
+        if verbose and not silent:
+            click.echo(f"Page loaded: {url}", err=True)
         if log_requests:
             # nodriver doesn't have direct response events like Playwright
             # We can implement this later using CDP if needed
@@ -1435,14 +1456,14 @@ async def take_shot(
         if not skip_cloudflare_check and await _detect_cloudflare_challenge(page):
             if not silent:
                 click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
-            success = await _wait_for_cloudflare_bypass(page)
+            success = await _wait_for_cloudflare_bypass(page, verbose=verbose, silent=silent)
             if not success:
                 if not silent:
                     click.echo("Warning: Cloudflare challenge may still be active", err=True)
 
         # Wait for DOM ready unless explicitly skipped or wait_for is specified
         if not skip_wait_for_dom_ready and not wait_for:
-            dom_ready = await _wait_for_dom_ready(page, wait_for_dom_ready_timeout)
+            dom_ready = await _wait_for_dom_ready(page, wait_for_dom_ready_timeout, verbose=verbose, silent=silent)
             if not dom_ready and not silent:
                 click.echo(f"DOM ready timeout after {wait_for_dom_ready_timeout}ms", err=True)
     else:
@@ -1467,19 +1488,28 @@ async def take_shot(
         pass
 
     if wait:
+        if verbose and not silent:
+            click.echo(f"Waiting {wait}ms before processing...", err=True)
         time.sleep(wait / 1000)
 
     javascript = shot.get("javascript")
     if javascript:
+        if verbose and not silent:
+            click.echo(f"Executing JavaScript: {javascript[:50]}{'...' if len(javascript) > 50 else ''}", err=True)
         await _evaluate_js(page, javascript)
 
     if wait_for:
+        if verbose and not silent:
+            click.echo(f"Waiting for condition: {wait_for}", err=True)
         # nodriver wait_for equivalent using evaluate in a loop
         timeout_seconds = 30  # default timeout
         start_time = time.time()
         while time.time() - start_time < timeout_seconds:
             result = await page.evaluate(wait_for)
             if result:
+                if verbose and not silent:
+                    elapsed = int((time.time() - start_time) * 1000)
+                    click.echo(f"Wait condition met after {elapsed}ms", err=True)
                 break
             await asyncio.sleep(0.1)
         else:
@@ -1532,6 +1562,8 @@ async def take_shot(
                         os.unlink(tmp.name)
                         return bytes_data
                 else:
+                    if verbose and not silent:
+                        click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
                     result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
                     # save_screenshot might return None, that's OK
                     message = "Screenshot of '{}' on '{}' written to '{}'".format(
@@ -1558,6 +1590,8 @@ async def take_shot(
                     os.unlink(tmp.name)
                     return bytes_data
             else:
+                if verbose and not silent:
+                    click.echo(f"Taking screenshot (full_page={screenshot_args.get('full_page', True)})", err=True)
                 result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
                 # save_screenshot might return None, that's OK
                 message = f"Screenshot of '{url}' written to '{output}'"
@@ -1687,47 +1721,76 @@ async def _detect_cloudflare_challenge(page):
         return False
 
 
-async def _wait_for_cloudflare_bypass(page, max_wait_seconds=8):
+async def _wait_for_cloudflare_bypass(page, max_wait_seconds=8, verbose=False, silent=False):
     """Wait for Cloudflare challenge to complete"""
     start_time = time.time()
 
+    if verbose and not silent:
+        click.echo(f"Waiting for Cloudflare challenge bypass (max {max_wait_seconds}s)...", err=True)
+
+    check_count = 0
     while time.time() - start_time < max_wait_seconds:
         try:
-            if not await _detect_cloudflare_challenge(page):
+            elapsed_seconds = time.time() - start_time
+            check_count += 1
+
+            cf_detected = await _detect_cloudflare_challenge(page)
+
+            if verbose and not silent and check_count % 10 == 0:  # Log every 10 checks
+                click.echo(f"Cloudflare check #{check_count}: challenge_detected={cf_detected}, elapsed={elapsed_seconds:.1f}s", err=True)
+
+            if not cf_detected:
                 # Wait minimum 1 second for page stability after challenge clears
-                if time.time() - start_time >= 1:
+                if elapsed_seconds >= 1:
+                    if verbose and not silent:
+                        click.echo(f"Cloudflare challenge bypassed in {elapsed_seconds:.1f}s", err=True)
                     return True
             await asyncio.sleep(0.3)  # Check more frequently
-        except Exception:
+        except Exception as e:
+            if verbose and not silent:
+                click.echo(f"Cloudflare bypass check failed: {e}", err=True)
             await asyncio.sleep(0.3)
 
+    if verbose and not silent:
+        click.echo(f"Cloudflare bypass timeout after {max_wait_seconds}s", err=True)
     return False
 
 
-async def _wait_for_dom_ready(page, timeout_ms=10000):
+async def _wait_for_dom_ready(page, timeout_ms=10000, verbose=False, silent=False):
     """Wait for DOM to be ready or timeout"""
     try:
-        # Create a JavaScript expression that checks for DOM ready
-        dom_ready_check = """
-        new Promise((resolve) => {
-            if (document.readyState === 'complete') {
-                resolve(true);
-            } else {
-                window.addEventListener('load', () => resolve(true));
-            }
-        })
-        """
-
-        # Use page.wait_for_function equivalent with timeout
         start_time = time.time()
         timeout_seconds = timeout_ms / 1000
 
+        if verbose and not silent:
+            click.echo(f"Waiting for DOM ready state (timeout: {timeout_ms}ms)...", err=True)
+
+        check_count = 0
         while time.time() - start_time < timeout_seconds:
-            ready = await page.evaluate("document.readyState === 'complete'")
-            if ready:
+            elapsed_ms = int((time.time() - start_time) * 1000)
+
+            # Get current state for verbose logging
+            ready_state = await page.evaluate("document.readyState")
+
+            if verbose and not silent:
+                check_count += 1
+                if check_count % 10 == 0:  # Log every 10 checks (roughly every second)
+                    click.echo(f"DOM ready check #{check_count}: readyState='{ready_state}', elapsed={elapsed_ms}ms", err=True)
+
+            if ready_state == 'complete':
+                if verbose and not silent:
+                    click.echo(f"DOM ready achieved in {elapsed_ms}ms (readyState: {ready_state})", err=True)
                 return True
+
             await asyncio.sleep(0.1)
 
+        # Timeout reached
+        if verbose and not silent:
+            final_state = await page.evaluate("document.readyState")
+            click.echo(f"DOM ready timeout after {timeout_ms}ms (final readyState: {final_state})", err=True)
+
         return False  # Timed out
-    except Exception:
+    except Exception as e:
+        if verbose and not silent:
+            click.echo(f"DOM ready check failed with exception: {e}", err=True)
         return False
