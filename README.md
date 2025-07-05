@@ -1,14 +1,14 @@
-# shot-scraper
+# shot-scraper (nodriver fork)
 
-[![PyPI](https://img.shields.io/pypi/v/shot-scraper.svg)](https://pypi.org/project/shot-scraper/)
-[![Changelog](https://img.shields.io/github/v/release/simonw/shot-scraper?include_prereleases&label=changelog)](https://github.com/simonw/shot-scraper/releases)
-[![Tests](https://github.com/simonw/shot-scraper/workflows/Test/badge.svg)](https://github.com/simonw/shot-scraper/actions?query=workflow%3ATest)
+> ⚠️ **This is a fork** of Simon Willison's [original shot-scraper](https://github.com/simonw/shot-scraper). Some commands don't work - see [differences section](#️-important-differences-from-original-shot-scraper) below.
+
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/shot-scraper/blob/master/LICENSE)
-[![discord](https://img.shields.io/discord/823971286308356157?label=discord)](https://discord.gg/EE7Hx4Kbny)
 
-A command-line utility for taking automated screenshots of websites
+*Original project badges: [PyPI](https://pypi.org/project/shot-scraper/) | [Changelog](https://github.com/simonw/shot-scraper/releases) | [Tests](https://github.com/simonw/shot-scraper/actions?query=workflow%3ATest) | [Discord](https://discord.gg/EE7Hx4Kbny)*
 
-For background on this project see [shot-scraper: automated screenshots for documentation, built on Playwright](https://simonwillison.net/2022/Mar/10/shot-scraper/).
+A command-line utility for taking automated screenshots of websites, now powered by **nodriver** for enhanced stealth and anti-detection capabilities.
+
+⚠️ **This is a fork of the original [shot-scraper](https://github.com/simonw/shot-scraper)** that has been migrated from Playwright to [nodriver](https://github.com/ultrafunkamsterdam/nodriver), providing built-in bypass capabilities for CAPTCHAs and Cloudflare bot detection.
 
 ## Documentation
 
@@ -20,13 +20,34 @@ For background on this project see [shot-scraper: automated screenshots for docu
 
 To get started without installing any software, use the [shot-scraper-template](https://github.com/simonw/shot-scraper-template) template to create your own GitHub repository which takes screenshots of a page using `shot-scraper`. See [Instantly create a GitHub repository to take screenshots of a web page](https://simonwillison.net/2022/Mar/14/shot-scraper-template/) for details.
 
-## Quick installation
+## Installation
 
-You can install the `shot-scraper` CLI tool using [pip](https://pip.pypa.io/):
+Since this is a fork and not published to PyPI, you need to install it from this repository:
 
-    pip install shot-scraper
-    # Now install the browser it needs:
-    shot-scraper install
+### Option 1: Clone and run directly
+```bash
+git clone [YOUR_REPOSITORY_URL]
+cd shot-scraper
+pip install click pyyaml nodriver click-default-group
+python3 main.py --help
+```
+
+### Option 2: Install with uv (recommended)
+```bash
+git clone [YOUR_REPOSITORY_URL]
+cd shot-scraper
+uv run python3 main.py --help
+```
+
+### Option 3: Install as editable package
+```bash
+git clone [YOUR_REPOSITORY_URL]
+cd shot-scraper
+pip install -e .
+shot-scraper --help
+```
+
+**Requirements**: Chrome or Chromium must be installed on your system. No driver installation required!
 
 ## Taking your first screenshot
 
@@ -36,7 +57,104 @@ You can take a screenshot of a web page like this:
 
 This will create a screenshot in a file called `datasette-io.png`.
 
+> **Note**: If you haven't installed the package, use `python3 main.py` instead of `shot-scraper` in all commands.
+
+## Anti-Detection Features
+
+This version includes several anti-detection capabilities:
+
+### Stealth User Agent
+
+By default, Chrome in headless mode identifies itself as "HeadlessChrome" in its user agent string, which many sites detect and block. This feature makes your browser look exactly like a normal Chrome browser:
+
+    shot-scraper set-default-user-agent
+
+What this does:
+1. Launches Chrome in headless mode to detect your system's actual user agent
+2. Finds something like: `Mozilla/5.0 ... HeadlessChrome/129.0.0.0 ...`
+3. Changes "HeadlessChrome" to just "Chrome"
+4. Saves this as your default user agent in `~/.shot-scraper/config.json`
+
+Now all your screenshots will use this normal-looking user agent automatically:
+
+    shot-scraper https://example.com  # Looks like regular Chrome, not headless
+    shot-scraper --user-agent "Custom" https://example.com  # Override when needed
+
+**Why this matters**: Many sites block or serve different content to headless browsers. With this setting, your automated screenshots appear to come from a regular user's browser.
+
+### Cloudflare Bypass
+Automatic detection and bypassing of Cloudflare challenges:
+
+    shot-scraper https://cloudflare-protected-site.com
+
+The tool automatically:
+- Detects Cloudflare "Just a moment..." pages
+- Waits for challenges to complete
+- Continues with screenshot capture
+
 Many more options are available, see [Taking a screenshot](https://shot-scraper.datasette.io/en/stable/screenshots.html) for details.
+
+## ⚠️ Important: Differences from Original shot-scraper
+
+This fork has significant differences from the original shot-scraper. **Several commands do not work or have limited functionality.**
+
+### 🚫 **Commands That Don't Work**
+- `shot-scraper pdf` - PDF generation not implemented with nodriver
+- `shot-scraper accessibility` - Accessibility tree dumping not available in nodriver
+- `shot-scraper har` - HAR file recording not implemented with nodriver
+
+### 🔄 **Commands With Limited Functionality**
+- Console logging (`--log-console`) - Limited support compared to Playwright
+- Request/response monitoring - Limited compared to Playwright
+- Browser selection (`--browser`) - Only Chrome/Chromium supported (no Firefox/WebKit)
+
+### ✅ **Commands That Work Fully**
+- `shot-scraper` (screenshots) - Full functionality
+- `shot-scraper javascript` - Full functionality  
+- `shot-scraper html` - Full functionality
+- `shot-scraper multi` - Full functionality
+- `shot-scraper auth` - Works with some limitations
+- `shot-scraper install` - Now just shows info message (no installation needed)
+
+### 🆕 **New Commands**
+- `shot-scraper set-default-user-agent` - Configure stealth user agent
+
+### 🎯 **Why This Fork? Benefits of nodriver Migration**
+- **No driver management** - Uses your installed Chrome/Chromium directly
+- **Anti-detection capabilities** - Bypasses CAPTCHAs and Cloudflare automatically
+- **Better performance** - Async architecture throughout
+- **Stealth mode** - Undetected automation that doesn't reveal "HeadlessChrome"
+- **Simplified setup** - No separate browser or driver downloads needed
+
+**Trade-off**: Some original shot-scraper functionality is lost, but you gain powerful anti-detection capabilities for web scraping scenarios.
+
+### 🤔 **Should You Use This Fork?**
+- **Use this fork if**: You need to bypass Cloudflare, avoid CAPTCHA challenges, or require stealth browsing for web scraping
+- **Use the original if**: You need PDF generation, HAR recording, accessibility features, or multi-browser support
+
+
+## Configuration & Defaults
+
+shot-scraper stores default settings in `~/.shot-scraper/config.json` that apply to all commands unless overridden with command-line options.
+
+### How It Works
+- Settings in the config file become the new defaults for all commands
+- Command-line options always override config file settings
+- Currently supports setting a default user agent (more defaults may be added in the future)
+
+### Example Config File
+After running `shot-scraper set-default-user-agent`, your config file will look like:
+```json
+{
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+}
+```
+
+This user agent (with "Chrome" instead of "HeadlessChrome") will be used for all screenshots automatically.
+
+**Note**: Config file uses `user_agent` (underscore) while command line uses `--user-agent` (hyphen). This is the standard convention for Python CLI tools.
+
+📖 **See [CONFIG.md](CONFIG.md) for a complete reference of all configuration options.**
 
 ## Examples
 

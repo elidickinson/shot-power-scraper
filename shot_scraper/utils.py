@@ -1,5 +1,8 @@
 import urllib.parse
 import re
+import json
+import os
+import pathlib
 
 disallowed_re = re.compile("[^a-zA-Z0-9_-]")
 
@@ -72,3 +75,49 @@ def load_github_script(github_path: str) -> str:
                 )
     except urllib.error.URLError as e:
         raise ValueError(f"Error fetching from GitHub: {e}")
+
+
+def get_config_dir():
+    """Get the shot-scraper config directory path"""
+    return pathlib.Path.home() / ".shot-scraper"
+
+
+def get_config_file():
+    """Get the shot-scraper config file path"""
+    return get_config_dir() / "config.json"
+
+
+def load_config():
+    """Load configuration from the config file"""
+    config_file = get_config_file()
+    if not config_file.exists():
+        return {}
+    
+    try:
+        with open(config_file, 'r') as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def save_config(config):
+    """Save configuration to the config file"""
+    config_dir = get_config_dir()
+    config_dir.mkdir(exist_ok=True)
+    
+    config_file = get_config_file()
+    with open(config_file, 'w') as f:
+        json.dump(config, f, indent=2)
+
+
+def get_default_user_agent():
+    """Get the default user agent from config"""
+    config = load_config()
+    return config.get('user_agent')
+
+
+def set_default_user_agent(user_agent):
+    """Set the default user agent in config"""
+    config = load_config()
+    config['user_agent'] = user_agent
+    save_config(config)

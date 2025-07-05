@@ -14,7 +14,7 @@ import nodriver as uc
 import asyncio
 
 
-from shot_scraper.utils import filename_for_url, load_github_script, url_or_file_path
+from shot_scraper.utils import filename_for_url, load_github_script, url_or_file_path, get_default_user_agent, set_default_user_agent
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -370,7 +370,7 @@ def shot(
         "full_page": full_page,
     }
     interactive = interactive or devtools
-    
+
     async def run_shot():
         use_existing_page = False
         browser_obj = None
@@ -389,10 +389,10 @@ def shot(
                 auth_username=auth_username,
                 auth_password=auth_password,
             )
-        
+
             if not browser_obj:
                 raise click.ClickException("Browser initialization failed")
-            
+
             if interactive or devtools:
                 use_existing_page = True
                 page = await browser_obj.get(url)
@@ -438,7 +438,7 @@ def shot(
                 except Exception:
                     # Browser cleanup can be flaky with event loops - just ignore it
                     pass
-    
+
     asyncio.run(run_with_browser_cleanup(run_shot()))
 
 
@@ -461,20 +461,24 @@ async def _browser_context(
         headless=not interactive,
         browser_args=browser_args or []
     )
-    
-    # Add user agent to browser args if specified
+
+    # Use stored default user agent if no explicit user agent is provided
+    if not user_agent:
+        user_agent = get_default_user_agent()
+
+    # Add user agent to browser args if specified or found in config
     if user_agent:
         browser_kwargs["browser_args"].append(f"--user-agent={user_agent}")
-    
+
     browser_obj = await uc.start(**browser_kwargs)
-    
+
     if browser_obj is None:
         raise click.ClickException("Failed to initialize browser")
-    
+
     # Handle auth state if provided
     if auth:
         storage_state = json.load(auth)
-        # nodriver doesn't have direct storage_state support, 
+        # nodriver doesn't have direct storage_state support,
         # but we can set cookies manually
         if "cookies" in storage_state:
             page = await browser_obj.get("about:blank")
@@ -485,7 +489,7 @@ async def _browser_context(
                 except Exception:
                     # Ignore cookie setting errors for now
                     pass
-    
+
     return browser_obj
 
 
@@ -693,7 +697,7 @@ def multi(
                         process.kill()
             if har_file and not silent:
                 click.echo(f"Wrote to HAR file: {har_file}", err=True)
-    
+
     asyncio.run(run_with_browser_cleanup(run_multi()))
 
 
@@ -742,7 +746,7 @@ def accessibility(
         shot-scraper accessibility https://datasette.io/
     """
     url = url_or_file_path(url, _check_and_absolutize)
-    
+
     async def run_accessibility():
         browser_obj = await _browser_context(
             auth,
@@ -764,7 +768,7 @@ def accessibility(
             # Browser cleanup can be flaky - just ignore it
             pass
         return snapshot
-    
+
     snapshot = asyncio.run(run_with_browser_cleanup(run_accessibility()))
     output.write(json.dumps(snapshot, indent=4))
     output.write("\n")
@@ -834,7 +838,7 @@ def har(
         )
 
     url = url_or_file_path(url, _check_and_absolutize)
-    
+
     async def run_har():
         browser_obj = await _browser_context(
             auth,
@@ -845,7 +849,7 @@ def har(
             record_har_path=str(output),
         )
         page = await browser_obj.get(url)
-        
+
         if wait:
             time.sleep(wait / 1000)
 
@@ -860,7 +864,7 @@ def har(
         except Exception:
             # Browser cleanup can be flaky - just ignore it
             pass
-    
+
     # Note: HAR recording not yet fully implemented with nodriver
     click.echo("HAR recording not yet fully supported with nodriver", err=True)
     asyncio.run(run_with_browser_cleanup(run_har()))
@@ -964,7 +968,7 @@ def javascript(
                 raise click.ClickException(f"Failed to read file '{input}': {e}")
 
     url = url_or_file_path(url, _check_and_absolutize)
-    
+
     async def run_javascript():
         browser_obj = await _browser_context(
             auth,
@@ -984,7 +988,7 @@ def javascript(
             # Browser cleanup can be flaky - just ignore it
             pass
         return result
-    
+
     result = asyncio.run(run_with_browser_cleanup(run_javascript()))
     if raw:
         output.write(str(result))
@@ -1095,7 +1099,7 @@ def pdf(
     url = url_or_file_path(url, _check_and_absolutize)
     if output is None:
         output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
-    
+
     # PDF generation not yet supported with nodriver
     click.echo("PDF generation not yet supported with nodriver", err=True)
     click.echo("This feature may be added in a future version", err=True)
@@ -1164,7 +1168,7 @@ def html(
     url = url_or_file_path(url, _check_and_absolutize)
     if output is None:
         output = filename_for_url(url, ext="html", file_exists=os.path.exists)
-        
+
     async def run_html():
         browser_obj = await _browser_context(
             auth,
@@ -1176,7 +1180,7 @@ def html(
             auth_password=auth_password,
         )
         page = await browser_obj.get(url)
-        
+
         if wait:
             time.sleep(wait / 1000)
         if javascript:
@@ -1197,9 +1201,9 @@ def html(
             # Browser cleanup can be flaky - just ignore it
             pass
         return html
-    
+
     html = asyncio.run(run_with_browser_cleanup(run_html()))
-    
+
     if output == "-":
         sys.stdout.write(html)
     else:
@@ -1229,8 +1233,70 @@ def install(browser):
 
     No manual browser installation is required with nodriver.
     """
-    click.echo("nodriver automatically manages browser installation.")
-    click.echo("No manual installation is required.")
+    click.echo("nodriver... does not require any drivers.")
+    click.echo("Just needs Chrome or Chromium to be installed")
+
+
+@cli.command(name="set-default-user-agent")
+@click.option(
+    "--browser",
+    "-b",
+    default="chromium",
+    type=click.Choice(BROWSERS, case_sensitive=False),
+    help="Which browser to use",
+)
+@browser_args_option
+def set_default_user_agent_cmd(browser, browser_args):
+    """
+    Detect the browser's user agent, remove 'HeadlessChrome', and store as default.
+
+    Usage:
+
+        shot-scraper set-default-user-agent
+
+    This will launch a browser instance, detect its user agent, modify it to
+    remove 'HeadlessChrome' (replacing with 'Chrome'), and store it in the
+    config file for future use.
+    """
+    async def detect_and_set_user_agent():
+        # Create a browser instance to detect the user agent
+        browser_kwargs = dict(
+            headless=True,
+            browser_args=browser_args or []
+        )
+
+        browser_obj = await uc.start(**browser_kwargs)
+
+        if browser_obj is None:
+            raise click.ClickException("Failed to initialize browser")
+
+        try:
+            # Get a page to execute JavaScript
+            page = await browser_obj.get("about:blank")
+
+            # Get the user agent
+            user_agent = await page.evaluate("navigator.userAgent")
+
+            if not user_agent:
+                raise click.ClickException("Could not detect user agent")
+
+            # Remove 'HeadlessChrome' and replace with 'Chrome'
+            modified_user_agent = user_agent.replace("HeadlessChrome", "Chrome")
+
+            # Store in config
+            set_default_user_agent(modified_user_agent)
+
+            click.echo(f"Original user agent: {user_agent}")
+            click.echo(f"Modified user agent: {modified_user_agent}")
+            click.echo("Default user agent has been set successfully.")
+
+        finally:
+            try:
+                await browser_obj.stop()
+            except Exception:
+                pass
+
+    asyncio.run(run_with_browser_cleanup(detect_and_set_user_agent()))
 
 
 @cli.command()
@@ -1265,7 +1331,7 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
         page = await browser_obj.get(url)
         click.echo("Hit <enter> after you have signed in:", err=True)
         input()
-        
+
         # Get cookies and local storage for auth context
         # nodriver doesn't have direct storage_state equivalent
         cookies = await page.send(uc.cdp.network.get_cookies())
@@ -1279,7 +1345,7 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
             # Browser cleanup can be flaky - just ignore it
             pass
         return context_state
-    
+
     context_state = asyncio.run(run_with_browser_cleanup(run_auth()))
     context_json = json.dumps(context_state, indent=2) + "\n"
     if context_file == "-":
@@ -1364,7 +1430,7 @@ async def take_shot(
             # nodriver doesn't have direct response events like Playwright
             # We can implement this later using CDP if needed
             pass
-        
+
         # Automatic Cloudflare detection and waiting
         if not skip_cloudflare_check and await _detect_cloudflare_challenge(page):
             if not silent:
@@ -1373,7 +1439,7 @@ async def take_shot(
             if not success:
                 if not silent:
                     click.echo("Warning: Cloudflare challenge may still be active", err=True)
-        
+
         # Wait for DOM ready unless explicitly skipped or wait_for is specified
         if not skip_wait_for_dom_ready and not wait_for:
             dom_ready = await _wait_for_dom_ready(page, wait_for_dom_ready_timeout)
@@ -1498,7 +1564,7 @@ async def take_shot(
 
     if not silent:
         click.echo(message, err=True)
-    
+
     # Always return something for consistency
     return None
 
@@ -1621,10 +1687,10 @@ async def _detect_cloudflare_challenge(page):
         return False
 
 
-async def _wait_for_cloudflare_bypass(page, max_wait_seconds=30):
+async def _wait_for_cloudflare_bypass(page, max_wait_seconds=8):
     """Wait for Cloudflare challenge to complete"""
     start_time = time.time()
-    
+
     while time.time() - start_time < max_wait_seconds:
         try:
             if not await _detect_cloudflare_challenge(page):
@@ -1634,7 +1700,7 @@ async def _wait_for_cloudflare_bypass(page, max_wait_seconds=30):
             await asyncio.sleep(0.3)  # Check more frequently
         except Exception:
             await asyncio.sleep(0.3)
-    
+
     return False
 
 
@@ -1651,17 +1717,17 @@ async def _wait_for_dom_ready(page, timeout_ms=10000):
             }
         })
         """
-        
+
         # Use page.wait_for_function equivalent with timeout
         start_time = time.time()
         timeout_seconds = timeout_ms / 1000
-        
+
         while time.time() - start_time < timeout_seconds:
             ready = await page.evaluate("document.readyState === 'complete'")
             if ready:
                 return True
             await asyncio.sleep(0.1)
-        
+
         return False  # Timed out
     except Exception:
         return False
