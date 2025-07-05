@@ -164,14 +164,12 @@ def cli():
     help="Path to JSON authentication context file",
 )
 @click.option(
-    "-w",
     "--width",
     type=int,
     help="Width of browser window, defaults to 1280",
     default=1280,
 )
 @click.option(
-    "-h",
     "--height",
     type=int,
     help="Height of browser window and shot - defaults to the full height of the page",
@@ -255,6 +253,27 @@ def cli():
 @bypass_csp_option
 @silent_option
 @http_auth_options
+@click.option(
+    "--skip-cloudflare-check",
+    is_flag=True,
+    help="Skip Cloudflare challenge detection and waiting"
+)
+@click.option(
+    "--wait-for-dom-ready-timeout",
+    type=int,
+    default=10000,
+    help="Maximum milliseconds to wait for DOM ready (default: 10000)"
+)
+@click.option(
+    "--skip-wait-for-dom-ready",
+    is_flag=True,
+    help="Skip waiting for DOM ready state"
+)
+@click.option(
+    "--full-page",
+    is_flag=True,
+    help="Capture the full scrollable page (overrides --height)"
+)
 def shot(
     url,
     auth,
@@ -288,6 +307,10 @@ def shot(
     silent,
     auth_username,
     auth_password,
+    skip_cloudflare_check,
+    wait_for_dom_ready_timeout,
+    skip_wait_for_dom_ready,
+    full_page,
 ):
     """
     Take a single screenshot of a page or portion of a page.
@@ -314,6 +337,10 @@ def shot(
     one or more CSS selectors:
 
         shot-scraper https://simonwillison.net -s '#bighead'
+
+    Use --full-page to capture the entire scrollable page:
+
+        shot-scraper https://www.example.com/ --full-page -o full.png
     """
     if output is None:
         ext = "jpg" if quality else None
@@ -337,6 +364,10 @@ def shot(
         "padding": padding,
         "omit_background": omit_background,
         "scale_factor": scale_factor,
+        "skip_cloudflare_check": skip_cloudflare_check,
+        "wait_for_dom_ready_timeout": wait_for_dom_ready_timeout,
+        "skip_wait_for_dom_ready": skip_wait_for_dom_ready,
+        "full_page": full_page,
     }
     interactive = interactive or devtools
     
@@ -1309,6 +1340,9 @@ async def take_shot(
     wait = shot.get("wait")
     wait_for = shot.get("wait_for")
     padding = shot.get("padding") or 0
+    skip_cloudflare_check = shot.get("skip_cloudflare_check", False)
+    wait_for_dom_ready_timeout = shot.get("wait_for_dom_ready_timeout", 10000)
+    skip_wait_for_dom_ready = shot.get("skip_wait_for_dom_ready", False)
 
     selectors = shot.get("selectors") or []
     selectors_all = shot.get("selectors_all") or []
@@ -1331,20 +1365,20 @@ async def take_shot(
             # We can implement this later using CDP if needed
             pass
         
-        # Brief wait for DOM to stabilize
-        await asyncio.sleep(0.5)
-        
         # Automatic Cloudflare detection and waiting
-        if await _detect_cloudflare_challenge(page):
+        if not skip_cloudflare_check and await _detect_cloudflare_challenge(page):
             if not silent:
                 click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
             success = await _wait_for_cloudflare_bypass(page)
             if not success:
                 if not silent:
                     click.echo("Warning: Cloudflare challenge may still be active", err=True)
-        else:
-            # Even if no challenge detected initially, wait a bit more for dynamic content
-            await asyncio.sleep(1)
+        
+        # Wait for DOM ready unless explicitly skipped or wait_for is specified
+        if not skip_wait_for_dom_ready and not wait_for:
+            dom_ready = await _wait_for_dom_ready(page, wait_for_dom_ready_timeout)
+            if not dom_ready and not silent:
+                click.echo(f"DOM ready timeout after {wait_for_dom_ready_timeout}ms", err=True)
     else:
         page = context_or_page
 
@@ -1358,7 +1392,8 @@ async def take_shot(
         # nodriver doesn't have set_viewport_size, we'll use window size instead
         await page.set_window_size(viewport["width"], viewport["height"])
 
-    full_page = not shot.get("height")
+    # Use explicit full_page if provided, otherwise default to True if no height is specified
+    full_page = shot.get("full_page", not shot.get("height"))
 
     if not use_existing_page:
         # nodriver automatically handles page loading and doesn't return response status
@@ -1425,13 +1460,13 @@ async def take_shot(
                     # For bytes output, save to temp file then read
                     import tempfile
                     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-                        await page.save_screenshot(tmp.name)
+                        await page.save_screenshot(tmp.name, full_page=screenshot_args.get("full_page", True))
                         with open(tmp.name, 'rb') as f:
                             bytes_data = f.read()
                         os.unlink(tmp.name)
                         return bytes_data
                 else:
-                    result = await page.save_screenshot(output)
+                    result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
                     # save_screenshot might return None, that's OK
                     message = "Screenshot of '{}' on '{}' written to '{}'".format(
                         ", ".join(list(selectors) + list(selectors_all)), url, output
@@ -1451,13 +1486,13 @@ async def take_shot(
                 # For bytes output, save to temp file then read
                 import tempfile
                 with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-                    await page.save_screenshot(tmp.name)
+                    await page.save_screenshot(tmp.name, full_page=screenshot_args.get("full_page", True))
                     with open(tmp.name, 'rb') as f:
                         bytes_data = f.read()
                     os.unlink(tmp.name)
                     return bytes_data
             else:
-                result = await page.save_screenshot(output)
+                result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
                 # save_screenshot might return None, that's OK
                 message = f"Screenshot of '{url}' written to '{output}'"
 
@@ -1593,11 +1628,40 @@ async def _wait_for_cloudflare_bypass(page, max_wait_seconds=30):
     while time.time() - start_time < max_wait_seconds:
         try:
             if not await _detect_cloudflare_challenge(page):
-                # Wait minimum 3 seconds for page stability
-                if time.time() - start_time >= 3:
+                # Wait minimum 1 second for page stability after challenge clears
+                if time.time() - start_time >= 1:
                     return True
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.3)  # Check more frequently
         except Exception:
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.3)
     
     return False
+
+
+async def _wait_for_dom_ready(page, timeout_ms=10000):
+    """Wait for DOM to be ready or timeout"""
+    try:
+        # Create a JavaScript expression that checks for DOM ready
+        dom_ready_check = """
+        new Promise((resolve) => {
+            if (document.readyState === 'complete') {
+                resolve(true);
+            } else {
+                window.addEventListener('load', () => resolve(true));
+            }
+        })
+        """
+        
+        # Use page.wait_for_function equivalent with timeout
+        start_time = time.time()
+        timeout_seconds = timeout_ms / 1000
+        
+        while time.time() - start_time < timeout_seconds:
+            ready = await page.evaluate("document.readyState === 'complete'")
+            if ready:
+                return True
+            await asyncio.sleep(0.1)
+        
+        return False  # Timed out
+    except Exception:
+        return False
