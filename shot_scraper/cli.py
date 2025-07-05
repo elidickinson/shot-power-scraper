@@ -284,6 +284,11 @@ def cli():
     is_flag=True,
     help="Enable verbose logging to stdout"
 )
+@click.option(
+    "--save-html",
+    is_flag=True,
+    help="Save HTML content alongside the screenshot with the same base name"
+)
 def shot(
     url,
     auth,
@@ -322,6 +327,7 @@ def shot(
     skip_wait_for_dom_ready,
     full_page,
     verbose,
+    save_html,
 ):
     """
     Take a single screenshot of a page or portion of a page.
@@ -384,6 +390,7 @@ def shot(
         "skip_wait_for_dom_ready": skip_wait_for_dom_ready,
         "full_page": full_page,
         "verbose": verbose,
+        "save_html": save_html,
     }
     interactive = interactive or devtools
 
@@ -1611,6 +1618,32 @@ async def take_shot(
                 result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
                 # save_screenshot might return None, that's OK
                 message = f"Screenshot of '{url}' written to '{output}'"
+
+    # Save HTML if requested
+    if shot.get("save_html") and not return_bytes:
+        try:
+            # Get the HTML content
+            html_content = await page.get_content()
+            
+            # Determine HTML filename from screenshot output
+            if output and output != "-":
+                # Get the base name without extension
+                output_path = pathlib.Path(output)
+                html_filename = output_path.with_suffix('.html')
+                
+                # Write HTML content to file
+                with open(html_filename, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
+                
+                if not silent:
+                    click.echo(f"HTML content saved to '{html_filename}'", err=True)
+            else:
+                if not silent:
+                    click.echo("Cannot save HTML when output is stdout", err=True)
+                    
+        except Exception as e:
+            if not silent:
+                click.echo(f"Failed to save HTML: {e}", err=True)
 
     if not silent:
         click.echo(message, err=True)
