@@ -26,6 +26,8 @@ async def run_with_browser_cleanup(coro):
     return result
 
 
+
+
 def console_log(msg):
     click.echo(msg, err=True)
 
@@ -1328,6 +1330,21 @@ async def take_shot(
             # nodriver doesn't have direct response events like Playwright
             # We can implement this later using CDP if needed
             pass
+        
+        # Brief wait for DOM to stabilize
+        await asyncio.sleep(0.5)
+        
+        # Automatic Cloudflare detection and waiting
+        if await _detect_cloudflare_challenge(page):
+            if not silent:
+                click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
+            success = await _wait_for_cloudflare_bypass(page)
+            if not success:
+                if not silent:
+                    click.echo("Warning: Cloudflare challenge may still be active", err=True)
+        else:
+            # Even if no challenge detected initially, wait a bit more for dynamic content
+            await asyncio.sleep(1)
     else:
         page = context_or_page
 
@@ -1552,3 +1569,35 @@ async def _evaluate_js(page, javascript):
         return await page.evaluate(javascript)
     except Exception as error:
         raise click.ClickException(str(error))
+
+
+async def _detect_cloudflare_challenge(page):
+    """Detect if the current page is showing a Cloudflare challenge"""
+    try:
+        return await page.evaluate("""
+        (() => {
+            return document.title === 'Just a moment...' ||
+                   !!window._cf_chl_opt ||
+                   !!document.querySelector('script[src*="/cdn-cgi/challenge-platform/"]') ||
+                   (!!document.querySelector('meta[http-equiv="refresh"]') && document.title.includes('moment'));
+        })()
+        """)
+    except Exception:
+        return False
+
+
+async def _wait_for_cloudflare_bypass(page, max_wait_seconds=30):
+    """Wait for Cloudflare challenge to complete"""
+    start_time = time.time()
+    
+    while time.time() - start_time < max_wait_seconds:
+        try:
+            if not await _detect_cloudflare_challenge(page):
+                # Wait minimum 3 seconds for page stability
+                if time.time() - start_time >= 3:
+                    return True
+            await asyncio.sleep(1)
+        except Exception:
+            await asyncio.sleep(1)
+    
+    return False

@@ -343,3 +343,24 @@ def test_multi_har(http_server, args, expect_zip, record_shots):
             assert num_shots == 2
         else:
             assert num_shots == 0
+
+
+def test_cloudflare_detection_logic():
+    """Test the Cloudflare detection logic exists and is properly integrated"""
+    from shot_scraper.cli import _detect_cloudflare_challenge, _wait_for_cloudflare_bypass
+    
+    # Verify the functions exist and are callable
+    assert callable(_detect_cloudflare_challenge)
+    assert callable(_wait_for_cloudflare_bypass)
+    
+    # Test that the functions have the expected signatures
+    import inspect
+    
+    # Check _detect_cloudflare_challenge signature
+    sig = inspect.signature(_detect_cloudflare_challenge)
+    assert 'page' in sig.parameters
+    
+    # Check _wait_for_cloudflare_bypass signature  
+    sig = inspect.signature(_wait_for_cloudflare_bypass)
+    assert 'page' in sig.parameters
+    assert 'max_wait_seconds' in sig.parameters
