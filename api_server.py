@@ -5,17 +5,27 @@ Screenshot API Server
 A FastAPI server that provides REST endpoints for taking screenshots using shot-scraper.
 
 Usage:
-    python api_server.py
+    python api_server.py [--browser-arg ARG ...]
+
+Example server startup:
+    # Start server with custom browser arguments
+    python api_server.py --browser-arg --window-size=1920,1080 --browser-arg --disable-dev-shm-usage
+    
+    # Start server with proxy settings
+    python api_server.py --browser-arg "--proxy-server=http://localhost:8888"
+    
+    # Start server on different host/port
+    python api_server.py --host 0.0.0.0 --port 8080
 
 Example API calls:
     # Simple screenshot
-    curl -X POST http://localhost:8000/shot \
+    curl -X POST http://localhost:8123/shot \
         -H "Content-Type: application/json" \
         -d '{"url": "https://example.com"}' \
         -o screenshot.png
 
     # Screenshot with options
-    curl -X POST http://localhost:8000/shot \
+    curl -X POST http://localhost:8123/shot \
         -H "Content-Type: application/json" \
         -d '{
             "url": "https://example.com",
@@ -27,7 +37,7 @@ Example API calls:
         -o screenshot.png
 
     # Screenshot with selector
-    curl -X POST http://localhost:8000/shot \
+    curl -X POST http://localhost:8123/shot \
         -H "Content-Type: application/json" \
         -d '{
             "url": "https://example.com",
@@ -41,11 +51,13 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List
+from contextlib import asynccontextmanager
 import asyncio
 import io
 import os
 import sys
 from pathlib import Path
+import click
 
 # Add parent directory to path to import shot_scraper
 sys.path.insert(0, str(Path(__file__).parent))
@@ -53,12 +65,36 @@ sys.path.insert(0, str(Path(__file__).parent))
 from shot_scraper.browser import create_browser_context, Config
 from shot_scraper.screenshot import take_shot
 from shot_scraper.utils import url_or_file_path
-
-app = FastAPI(title="Shot Scraper API", version="1.0.0")
+from shot_scraper.cli import browser_args_option
 
 # Global browser instance for reuse
 browser_instance = None
 browser_lock = asyncio.Lock()
+# Global browser args from CLI - will be set before app creation
+global_browser_args = []
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan events"""
+    # Startup
+    global browser_instance
+    if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
+        await get_browser()
+    
+    yield
+    
+    # Shutdown
+    if browser_instance:
+        try:
+            await browser_instance.stop()
+        except:
+            pass
+        browser_instance = None
+
+
+# Create app after parsing CLI args (see main function)
+app = None
 
 class ShotRequest(BaseModel):
     """Request model for screenshot endpoint"""
@@ -103,39 +139,26 @@ class ShotRequest(BaseModel):
 
 async def get_browser():
     """Get or create a shared browser instance"""
-    global browser_instance
+    global browser_instance, global_browser_args
     async with browser_lock:
         if browser_instance is None:
             Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
             Config.silent = not Config.verbose
+            
+            # Debug logging
+            if global_browser_args:
+                print(f"Creating browser with args: {global_browser_args}", file=sys.stderr)
+            
             browser_instance = await create_browser_context(
                 browser="chromium",
-                browser_args=[],
+                browser_args=global_browser_args,
                 timeout=60000,
             )
         return browser_instance
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Initialize browser on startup for faster first request"""
-    if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
-        await get_browser()
 
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Clean up browser on shutdown"""
-    global browser_instance
-    if browser_instance:
-        try:
-            await browser_instance.stop()
-        except:
-            pass
-        browser_instance = None
-
-
-@app.get("/")
 async def root():
     """API documentation"""
     return {
@@ -148,13 +171,11 @@ async def root():
     }
 
 
-@app.get("/health")
 async def health():
     """Health check endpoint"""
     return {"status": "healthy"}
 
 
-@app.post("/shot")
 async def shot(request: ShotRequest):
     """Take a screenshot and return the image"""
     try:
@@ -227,25 +248,60 @@ async def shot(request: ShotRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-if __name__ == "__main__":
+@click.command()
+@browser_args_option
+@click.option(
+    "--host",
+    default=lambda: os.getenv("HOST", "127.0.0.1"),
+    help="Host to bind to (default: 127.0.0.1, can be overridden with HOST env var)"
+)
+@click.option(
+    "--port",
+    type=int,
+    default=lambda: int(os.getenv("PORT", "8123")),
+    help="Port to bind to (default: 8123, can be overridden with PORT env var)"
+)
+@click.option(
+    "--reload",
+    is_flag=True,
+    default=lambda: os.getenv("RELOAD", "false").lower() in ("true", "1", "yes"),
+    help="Enable auto-reload (default: false, can be overridden with RELOAD env var)"
+)
+def main(browser_args, host, port, reload):
+    """Start the Shot Scraper API Server"""
     import uvicorn
     
-    host = os.getenv("HOST", "127.0.0.1")
-    port = int(os.getenv("PORT", "8000"))
-    reload = os.getenv("RELOAD", "false").lower() in ("true", "1", "yes")
+    # Store browser args globally BEFORE creating the app
+    global global_browser_args, app
+    global_browser_args = list(browser_args)
     
-    print(f"Starting Shot Scraper API Server on {host}:{port}")
-    print(f"API documentation available at http://{host}:{port}/docs")
-    print("\nEnvironment variables:")
-    print(f"  HOST={host}")
-    print(f"  PORT={port}")
-    print(f"  RELOAD={reload}")
-    print(f"  VERBOSE={os.getenv('VERBOSE', 'false')}")
-    print(f"  PRELOAD_BROWSER={os.getenv('PRELOAD_BROWSER', 'true')}")
+    # Now create the FastAPI app with the browser args already set
+    app = FastAPI(title="Shot Scraper API", version="1.0.0", lifespan=lifespan)
+    
+    # Register routes
+    app.get("/")(root)
+    app.get("/health")(health)
+    app.post("/shot")(shot)
+    
+    click.echo(f"Starting Shot Scraper API Server on {host}:{port}")
+    click.echo(f"API documentation available at http://{host}:{port}/docs")
+    click.echo("\nConfiguration:")
+    click.echo(f"  HOST={host}")
+    click.echo(f"  PORT={port}")
+    click.echo(f"  RELOAD={reload}")
+    click.echo(f"  VERBOSE={os.getenv('VERBOSE', 'false')}")
+    click.echo(f"  PRELOAD_BROWSER={os.getenv('PRELOAD_BROWSER', 'true')}")
+    
+    if browser_args:
+        click.echo(f"  Browser args: {list(browser_args)}")
     
     uvicorn.run(
-        "api_server:app",
+        app,
         host=host,
         port=port,
         reload=reload
     )
+
+
+if __name__ == "__main__":
+    main()
