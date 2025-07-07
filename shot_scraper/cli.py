@@ -296,6 +296,11 @@ def cli():
     is_flag=True,
     help="Save HTML content alongside the screenshot with the same base name"
 )
+@click.option(
+    "--skip-annoyance-clearing",
+    is_flag=True,
+    help="Skip automatic annoyance clearing"
+)
 def shot(
     url,
     auth,
@@ -335,6 +340,7 @@ def shot(
     full_page,
     verbose,
     save_html,
+    skip_annoyance_clearing,
 ):
     """
     Take a single screenshot of a page or portion of a page.
@@ -398,6 +404,7 @@ def shot(
         "full_page": full_page,
         "verbose": verbose,
         "save_html": save_html,
+        "clear_annoyances": not skip_annoyance_clearing,
     }
     interactive = interactive or devtools
 

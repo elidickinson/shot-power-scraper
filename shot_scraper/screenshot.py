@@ -18,6 +18,7 @@ from shot_scraper.page_utils import (
     wait_for_condition,
     detect_navigation_error
 )
+from shot_scraper.annoyance_manager import clear_annoyances
 from shot_scraper.utils import filename_for_url, url_or_file_path
 
 
@@ -251,6 +252,14 @@ async def take_shot(
         if Config.verbose:
             click.echo(f"Waiting {wait}ms before processing...", err=True)
         time.sleep(wait / 1000)
+
+    # Clear annoyances after any wait period if enabled
+    if shot.get("clear_annoyances", True):
+        try:
+            await clear_annoyances(page, timeout_seconds=5)
+        except Exception as e:
+            if Config.verbose:
+                click.echo(f"Annoyance clearing failed: {e}", err=True)
 
     javascript = shot.get("javascript")
     if javascript:
