@@ -1,0 +1,31 @@
+[Unit]
+Description=Shot Scraper API Server
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/shot-scraper
+Environment="PATH=/opt/shot-scraper/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="HOST=127.0.0.1"
+Environment="PORT=8000"
+Environment="VERBOSE=false"
+Environment="PRELOAD_BROWSER=true"
+ExecStart=/opt/shot-scraper/venv/bin/python /opt/shot-scraper/api_server.py
+Restart=always
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/shot-scraper
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
