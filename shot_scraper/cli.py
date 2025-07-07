@@ -1172,6 +1172,19 @@ def html(
         )
         page = await browser_obj.get(url)
 
+        # Check if page failed to load
+        from shot_scraper.page_utils import detect_navigation_error
+        has_error, error_msg = await detect_navigation_error(page, url)
+        if has_error:
+            full_msg = f"Page failed to load: {error_msg}"
+            if skip:
+                click.echo(f"{full_msg}, skipping", err=True)
+                raise SystemExit
+            elif fail:
+                raise click.ClickException(full_msg)
+            elif not silent:
+                click.echo(f"Warning: {full_msg}", err=True)
+
         if wait:
             time.sleep(wait / 1000)
         if javascript:

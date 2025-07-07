@@ -15,7 +15,8 @@ from shot_scraper.page_utils import (
     detect_cloudflare_challenge,
     wait_for_cloudflare_bypass,
     wait_for_dom_ready,
-    wait_for_condition
+    wait_for_condition,
+    detect_navigation_error
 )
 from shot_scraper.utils import filename_for_url, url_or_file_path
 
@@ -207,6 +208,18 @@ async def take_shot(
             if not success:
                 if not silent:
                     click.echo("Warning: Cloudflare challenge may still be active", err=True)
+
+        # Check if page failed to load
+        has_error, error_msg = await detect_navigation_error(page, url)
+        if has_error:
+            full_msg = f"Page failed to load: {error_msg}"
+            if skip:
+                click.echo(f"{full_msg}, skipping", err=True)
+                raise SystemExit
+            elif fail:
+                raise click.ClickException(full_msg)
+            elif not silent:
+                click.echo(f"Warning: {full_msg}", err=True)
 
         # Wait for DOM ready unless explicitly skipped or wait_for is specified
         if not skip_wait_for_dom_ready and not wait_for:
