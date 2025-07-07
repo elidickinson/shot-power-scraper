@@ -262,6 +262,8 @@ async def take_shot(
         await wait_for_condition(page, wait_for)
 
     screenshot_args = {}
+    # Determine format based on quality parameter
+    format = "jpeg" if quality else "png"
     if quality:
         screenshot_args.update({"quality": quality, "type": "jpeg"})
     if omit_background:
@@ -300,8 +302,14 @@ async def take_shot(
             if element:
                 if return_bytes:
                     # For bytes output, save to temp file then read
-                    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-                        await page.save_screenshot(tmp.name, full_page=screenshot_args.get("full_page", True))
+                    # Use appropriate suffix based on format
+                    suffix = '.jpg' if format == "jpeg" else '.png'
+                    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+                        # Add quality parameter for JPEG format
+                        if format == "jpeg" and quality:
+                            await page.save_screenshot(tmp.name, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
+                        else:
+                            await page.save_screenshot(tmp.name, format=format, full_page=screenshot_args.get("full_page", True))
                         with open(tmp.name, 'rb') as f:
                             bytes_data = f.read()
                         os.unlink(tmp.name)
@@ -309,7 +317,11 @@ async def take_shot(
                 else:
                     if Config.verbose:
                         click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
-                    result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
+                    # Add quality parameter for JPEG format
+                    if format == "jpeg" and quality:
+                        result = await page.save_screenshot(output, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
+                    else:
+                        result = await page.save_screenshot(output, format=format, full_page=screenshot_args.get("full_page", True))
                     # save_screenshot might return None, that's OK
                     message = "Screenshot of '{}' on '{}' written to '{}'".format(
                         ", ".join(list(selectors) + list(selectors_all)), url, output
@@ -327,8 +339,14 @@ async def take_shot(
             # Whole page
             if return_bytes:
                 # For bytes output, save to temp file then read
-                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-                    await page.save_screenshot(tmp.name, full_page=screenshot_args.get("full_page", True))
+                # Use appropriate suffix based on format
+                suffix = '.jpg' if format == "jpeg" else '.png'
+                with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+                    # Add quality parameter for JPEG format
+                    if format == "jpeg" and quality:
+                        await page.save_screenshot(tmp.name, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
+                    else:
+                        await page.save_screenshot(tmp.name, format=format, full_page=screenshot_args.get("full_page", True))
                     with open(tmp.name, 'rb') as f:
                         bytes_data = f.read()
                     os.unlink(tmp.name)
@@ -336,7 +354,11 @@ async def take_shot(
             else:
                 if Config.verbose:
                     click.echo(f"Taking screenshot (full_page={screenshot_args.get('full_page', True)})", err=True)
-                result = await page.save_screenshot(output, full_page=screenshot_args.get("full_page", True))
+                # Add quality parameter for JPEG format
+                if format == "jpeg" and quality:
+                    result = await page.save_screenshot(output, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
+                else:
+                    result = await page.save_screenshot(output, format=format, full_page=screenshot_args.get("full_page", True))
                 # save_screenshot might return None, that's OK
                 message = f"Screenshot of '{url}' written to '{output}'"
 
