@@ -5,7 +5,8 @@
   "description": "Ad blocker for shot-scraper with customizable filter lists",
   "permissions": [
     "declarativeNetRequest",
-    "declarativeNetRequestFeedback"
+    "declarativeNetRequestFeedback",
+    "activeTab"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -20,8 +21,22 @@
       "path": "rules.json"
     }]
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["cosmetic_rules.json"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "action": {
     "default_title": "Shot Scraper Ad Blocker",
     "default_popup": "popup.html"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_start"
+    }
+  ]
 }

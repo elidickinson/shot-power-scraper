@@ -11,3 +11,4 @@ examples/
 *.png
 *.jpg
 *.pdf
+/extensions/shot-scraper-blocker/downloads

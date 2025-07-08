@@ -7,12 +7,39 @@ warn() { echo -e "\033[1;33m[WARN]\033[0m $1"; }
 success() { echo -e "\033[1;32m[SUCCESS]\033[0m $1"; }
 error() { echo -e "\033[1;31m[ERROR]\033[0m $1"; }
 
+# Parse command line arguments
+FORCE_DOWNLOAD=false
+if [[ "$1" == "--force" ]]; then
+    FORCE_DOWNLOAD=true
+    info "Force download enabled - will redownload all filter lists"
+fi
+
 # Filter lists to download (name:url pairs)
 FILTER_LISTS="
-EasyPrivacy:https://easylist.to/easylist/easyprivacy.txt
+adguard-base-optimized:https://filters.adtidy.org/extension/chromium/filters/2_optimized.txt
+adguard-popups-full:https://filters.adtidy.org/windows/filters/19.txt
+adguard-cookie-notices-full:https://filters.adtidy.org/windows/filters/18.txt
+easylist-newsletters-ubo:https://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt
 Anti-Adblock-Killer:https://raw.githubusercontent.com/reek/anti-adblock-killer/master/anti-adblock-killer-filters.txt
-Fanboy-Annoyances:https://secure.fanboy.co.nz/fanboy-annoyance.txt
 "
+# fanboy-annoyances:https://secure.fanboy.co.nz/fanboy-annoyance.txt
+# adguard-annoyances-full:https://filters.adtidy.org/extension/chromium/filters/14.txt
+#  Title: AdGuard Annoyances filter - Blocks irritating elements on web pages including cookie notices, third-party widgets and in-page pop-ups. Contains the following AdGuard filters: Cookie Notices, Popups, Mobile App Banners, Other Annoyances and Widgets.
+# other annoyances https://filters.adtidy.org/windows/filters/21.txt
+# easylist-newsletters-ubo:https://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt
+# ^ explicit site filters
+# fanboy-annoyance-abp:https://easylist-downloads.adblockplus.org/fanboy-annoyance.txt
+# AdGuard-popups:https://filters.adtidy.org/windows/filters/19.txt
+# Adguard-annoyances-optimized:https://filters.adtidy.org/extension/chromium/filters/14_optimized.txt
+# Fanboy-Annoyances-optimized:https://filters.adtidy.org/extension/ublock/filters/122_optimized.txt
+# Fanboy-Annoyances:https://secure.fanboy.co.nz/fanboy-annoyance.txt
+# Anti-Adblock-Killer:https://raw.githubusercontent.com/reek/anti-adblock-killer/master/anti-adblock-killer-filters.txt
+# https://easylist-downloads.adblockplus.org/fanboy-annoyance.txt
+# see readme on https://github.com/yokoffing/filterlists?tab=readme-ov-file#optimized-lists
+# cookie notices https://filters.adtidy.org/extension/chromium/filters/18_optimized.txt
+# dns filter https://filters.adtidy.org/extension/chromium/filters/15_optimized.txt
+# remove tracking params https://filters.adtidy.org/extension/chromium/filters/17_optimized.txt
+
 
 # Ensure abp2dnr is available
 ensure_abp2dnr() {
@@ -35,7 +62,16 @@ download_filter_list() {
     local name="$1"
     local url="$2"
     local name_lower=$(echo "$name" | tr '[:upper:]' '[:lower:]')
-    local filename="${name_lower}.txt"
+    local filename="downloads/${name_lower}.txt"
+
+    # Create downloads directory if it doesn't exist
+    mkdir -p downloads
+
+    # Check if file exists and --force not used
+    if [ -f "$filename" ] && [ "$FORCE_DOWNLOAD" = false ]; then
+        info "$name already exists (use --force to redownload)"
+        return 0
+    fi
 
     info "Downloading $name from $url..."
     if curl -s -o "$filename" "$url"; then
@@ -53,9 +89,9 @@ convert_filter_list() {
 
     info "Converting $input_file to $output_file..."
 
-    if node abp2dnr/abp2dnr.js < "$input_file" > "$output_file" 2>/dev/null; then
-        local rule_count=$(jq length "$output_file" 2>/dev/null || echo "unknown")
-        success "Generated $rule_count rules in $output_file"
+    if node abp2dnr/abp2dnr.js < "$input_file" > "downloads/$output_file" 2>/dev/null; then
+        local rule_count=$(jq length "downloads/$output_file" 2>/dev/null || echo "unknown")
+        success "Generated $rule_count rules in downloads/$output_file"
     else
         error "Failed to convert $input_file"
         return 1
@@ -63,11 +99,75 @@ convert_filter_list() {
 }
 
 # Add IDs to rules and combine
+# Extract cosmetic rules from filter lists
+extract_cosmetic_rules() {
+    info "Extracting cosmetic rules from filter lists..."
+
+    # Combine all .txt files into one for cosmetic rules
+    local combined_filters="downloads/combined_filters.txt"
+    local cosmetic_rules="cosmetic_rules.json"
+
+    # Create downloads directory if it doesn't exist
+    mkdir -p downloads
+
+    # Clear previous combined file
+    > "$combined_filters"
+
+    # Print statistics header
+    echo ""
+    info "Filter List Statistics:"
+    printf "%-25s %8s %8s %8s %8s %8s\n" "Name" "Total" "Network" "Cosmetic" "Valid" "Unsupported"
+    printf "%-25s %8s %8s %8s %8s %8s\n" "----" "-----" "-------" "--------" "-----" "-----------"
+
+    # Combine all downloaded .txt files and show statistics
+    echo "$FILTER_LISTS" | while IFS= read -r line; do
+        # Skip empty lines
+        [ -z "$line" ] && continue
+
+        # Parse name from line
+        name=$(echo "$line" | cut -d: -f1)
+        name_lower=$(echo "$name" | tr '[:upper:]' '[:lower:]')
+        local filter_file="downloads/${name_lower}.txt"
+
+        if [ -f "$filter_file" ]; then
+            # Get statistics for this filter file
+            local stats=$(node extract_cosmetic_rules.js --stats "$filter_file")
+            local total=$(echo "$stats" | jq -r '.totalLines')
+            local network=$(echo "$stats" | jq -r '.networkRules')
+            local cosmetic=$(echo "$stats" | jq -r '.cosmeticRules')
+            local valid=$(echo "$stats" | jq -r '.validCosmeticRules')
+            local unsupported=$(echo "$stats" | jq -r '.unsupportedRules')
+            
+            printf "%-25s %8s %8s %8s %8s %8s\n" "$name" "$total" "$network" "$cosmetic" "$valid" "$unsupported"
+            
+            info "Adding cosmetic rules from $filter_file..."
+            echo "" >> "$combined_filters"
+            echo "! === $name ===" >> "$combined_filters"
+            cat "$filter_file" >> "$combined_filters"
+        fi
+    done
+
+    # Extract cosmetic rules using our JavaScript processor
+    if [ -f "$combined_filters" ]; then
+        node extract_cosmetic_rules.js "$combined_filters" "$cosmetic_rules"
+        if [ -f "$cosmetic_rules" ]; then
+            success "Cosmetic rules extracted to $cosmetic_rules"
+        else
+            warn "Failed to extract cosmetic rules"
+        fi
+    else
+        warn "No filter files found for cosmetic rule extraction"
+    fi
+}
+
 combine_rules() {
     info "Combining all rules..."
 
     local rule_id=1
-    local temp_combined="temp_combined.json"
+    local temp_combined="downloads/temp_combined.json"
+
+    # Create downloads directory if it doesn't exist
+    mkdir -p downloads
 
     # Start with empty array
     echo "[]" > "$temp_combined"
@@ -79,7 +179,7 @@ combine_rules() {
         # Parse name from line
         name=$(echo "$line" | cut -d: -f1)
         name_lower=$(echo "$name" | tr '[:upper:]' '[:lower:]')
-        local rules_file="${name_lower}_rules.json"
+        local rules_file="downloads/${name_lower}_rules.json"
 
         if [ -f "$rules_file" ]; then
             info "Processing $rules_file..."
@@ -87,17 +187,17 @@ combine_rules() {
             # Add IDs and merge with existing rules
             jq --argjson start_id "$rule_id" '
                 [to_entries[] | .value.id = ($start_id + .key) | .value]
-            ' "$rules_file" > "temp_$rules_file"
+            ' "$rules_file" > "downloads/temp_$rules_file"
 
             # Update rule_id counter
             local count=$(jq length "$rules_file")
             rule_id=$((rule_id + count))
 
             # Merge with combined rules
-            jq -s '.[0] + .[1]' "$temp_combined" "temp_$rules_file" > "temp_new_combined.json"
-            mv "temp_new_combined.json" "$temp_combined"
+            jq -s '.[0] + .[1]' "$temp_combined" "downloads/temp_$rules_file" > "downloads/temp_new_combined.json"
+            mv "downloads/temp_new_combined.json" "$temp_combined"
 
-            rm "temp_$rules_file"
+            rm "downloads/temp_$rules_file"
         fi
     done
 
@@ -189,17 +289,23 @@ main() {
         if download_filter_list "$name" "$url"; then
             # Convert to DNR rules (make lowercase)
             name_lower=$(echo "$name" | tr '[:upper:]' '[:lower:]')
-            convert_filter_list "${name_lower}.txt" "${name_lower}_rules.json"
+            convert_filter_list "downloads/${name_lower}.txt" "${name_lower}_rules.json"
         fi
     done
+
+    # Extract cosmetic rules from filter lists
+    extract_cosmetic_rules
 
     # Combine all rules
     combine_rules
 
-    # Cleanup temp files
-    rm -f *_rules.json *.txt temp_*.json
+    # Cleanup temp files in downloads directory
+    rm -f downloads/temp_*.json downloads/combined_filters.txt
 
     success "Build complete! Extension ready to use."
+    success "Downloaded files preserved in: downloads/"
+    success "Cosmetic rules extracted: cosmetic_rules.json"
+    success "Network blocking rules: rules.json"
 }
 
 # Run main function
