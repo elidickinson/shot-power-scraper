@@ -862,61 +862,13 @@ def har(
     auth_password,
 ):
     """
-    Record a HAR file for the specified page
+    NOT IMPLEMENTED - Record a HAR file for the specified page
 
-    Usage:
-
-        shot-scraper har https://datasette.io/
-
-    This defaults to saving to datasette-io.har - use -o to specify a different filename:
-
-        shot-scraper har https://datasette.io/ -o trace.har
-
-    Use --zip to save as a .har.zip file instead, or specify a filename ending in .har.zip
+    This command is not yet implemented with nodriver.
     """
-    if output is None:
-        output = filename_for_url(
-            url, ext="har.zip" if zip_ else "har", file_exists=os.path.exists
-        )
-
-    url = url_or_file_path(url, _check_and_absolutize)
-
-    async def run_har():
-        browser_obj = await create_browser_context(
-            auth,
-            timeout=timeout,
-            bypass_csp=bypass_csp,
-            auth_username=auth_username,
-            auth_password=auth_password,
-            record_har_path=str(output),
-        )
-        
-        # Get a blank page first to set up console logging
-        page = await browser_obj.get("about:blank")
-        
-        # Set up console logging BEFORE navigating
-        if log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=False)
-            await console_logger.setup(page)
-        
-        # Now navigate to the actual URL
-        await page.get(url)
-
-        if wait:
-            time.sleep(wait / 1000)
-
-        if javascript:
-            await evaluate_js(page, javascript)
-
-        if wait_for:
-            await page.wait_for_function(wait_for)
-
-        await cleanup_browser(browser_obj)
-
-    # Note: HAR recording not yet fully implemented with nodriver
-    click.echo("HAR recording not yet fully supported with nodriver", err=True)
-    run_async(run_with_browser_cleanup(run_har()))
+    click.echo("Error: HAR recording is not implemented with nodriver", err=True)
+    click.echo("Use the screenshot commands instead for capturing page content.", err=True)
+    raise click.Abort()
 
 
 @cli.command()
@@ -1139,27 +1091,13 @@ def pdf(
     auth_password,
 ):
     """
-    Create a PDF of the specified page
+    NOT IMPLEMENTED - Create a PDF of the specified page
 
-    Usage:
-
-        shot-scraper pdf https://datasette.io/
-
-    Use -o to specify a filename:
-
-        shot-scraper pdf https://datasette.io/ -o datasette.pdf
-
-    You can pass a path to a file instead of a URL:
-
-        shot-scraper pdf invoice.html -o invoice.pdf
+    This command is not yet implemented with nodriver.
     """
-    url = url_or_file_path(url, _check_and_absolutize)
-    if output is None:
-        output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
-
-    # PDF generation not yet supported with nodriver
-    click.echo("PDF generation not yet supported with nodriver", err=True)
-    click.echo("This feature may be added in a future version", err=True)
+    click.echo("Error: PDF generation is not implemented with nodriver", err=True)
+    click.echo("Use the screenshot commands instead for capturing page content.", err=True)
+    raise click.Abort()
 
 
 @cli.command()
