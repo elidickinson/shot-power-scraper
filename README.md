@@ -61,11 +61,21 @@ This will create a screenshot in a file called `datasette-io.png`.
 
 ## Anti-Detection Features
 
-This version includes several anti-detection capabilities:
+This version includes comprehensive stealth capabilities that make it much harder to detect than standard automation tools:
 
-### Stealth User Agent
+### Enhanced Stealth with nodriver
 
-By default, Chrome in headless mode identifies itself as "HeadlessChrome" in its user agent string, which many sites detect and block. This feature makes your browser look exactly like a normal Chrome browser:
+Unlike Playwright and other automation frameworks, **nodriver** provides built-in anti-detection that bypasses most bot detection systems.
+
+**Why nodriver is stealthier:**
+- **No automation markers**: Removes `webdriver` properties and other automation signatures
+- **Natural behavior simulation**: Mimics human-like browsing patterns
+- **Advanced fingerprint masking**: Hides automation-specific JavaScript properties
+- **Evasion techniques**: Built-in methods to avoid detection by anti-bot services
+
+### Required: Set Up Stealth User Agent
+
+**For maximum stealth effectiveness, you must run this command once after installation:**
 
     shot-scraper set-default-user-agent
 
@@ -73,14 +83,14 @@ What this does:
 1. Launches Chrome in headless mode to detect your system's actual user agent
 2. Finds something like: `Mozilla/5.0 ... HeadlessChrome/129.0.0.0 ...`
 3. Changes "HeadlessChrome" to just "Chrome"
-4. Saves this as your default user agent in `~/.shot-scraper/config.json`
+4. Saves this as your default user agent in `~/.config/shot-scraper/config.json`
 
 Now all your screenshots will use this normal-looking user agent automatically:
 
-    shot-scraper https://example.com  # Looks like regular Chrome, not headless
+    shot-scraper https://example.com  # Uses stealth + custom user agent
     shot-scraper --user-agent "Custom" https://example.com  # Override when needed
 
-**Why this matters**: Many sites block or serve different content to headless browsers. With this setting, your automated screenshots appear to come from a regular user's browser.
+**The combination of nodriver's built-in stealth + proper user agent makes this tool significantly more effective than standard automation frameworks at bypassing bot detection.**
 
 ### Cloudflare Bypass
 Automatic detection and bypassing of Cloudflare challenges:
@@ -91,6 +101,31 @@ The tool automatically:
 - Detects Cloudflare "Just a moment..." pages
 - Waits for challenges to complete
 - Continues with screenshot capture
+
+### Ad Blocking
+Built-in ad blocking using Chrome extension technology:
+
+    shot-scraper --ad-block https://example.com
+
+Features:
+- Blocks ads, trackers, and other unwanted content
+- Uses filter lists to identify and block advertising elements
+- Works with both single screenshots and multi-shot configurations
+- Improves page load times and reduces visual clutter
+
+### Annoyance Manager
+Automatic removal of common webpage annoyances:
+
+    shot-scraper https://example.com  # Annoyance removal runs automatically
+
+The tool automatically:
+- Dismisses cookie consent banners
+- Closes newsletter signup popups
+- Removes overlay dialogs and modals
+- Clicks "No thanks" buttons on subscription prompts
+- Handles common UI elements that block content
+
+This ensures cleaner screenshots by removing elements that typically appear on first visit but wouldn't be present for regular users.
 
 Many more options are available, see [Taking a screenshot](https://shot-scraper.datasette.io/en/stable/screenshots.html) for details.
 

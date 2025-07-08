@@ -79,7 +79,7 @@ def load_github_script(github_path: str) -> str:
 
 def get_config_dir():
     """Get the shot-scraper config directory path"""
-    return pathlib.Path.home() / ".shot-scraper"
+    return pathlib.Path.home() / ".config" / "shot-scraper"
 
 
 def get_config_file():
