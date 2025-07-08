@@ -20,6 +20,7 @@ from shot_scraper.page_utils import (
 )
 from shot_scraper.annoyance_manager import clear_annoyances
 from shot_scraper.utils import filename_for_url, url_or_file_path
+from shot_scraper.console_logger import ConsoleLogger
 
 
 def _check_and_absolutize(filepath):
@@ -191,11 +192,28 @@ async def take_shot(
         js_selectors_all.append(shot["js_selector_all"])
 
     if not use_existing_page:
+        # Create a new tab first to set up console logging before navigation
+        if Config.verbose:
+            click.echo(f"Creating new page for: {url}", err=True)
+        
+        # Get a blank page first
+        page = await context_or_page.get("about:blank")
+        
+        # Set up console logging BEFORE navigating to the actual URL
+        console_logger = None
+        if log_console:
+            console_logger = ConsoleLogger(silent=silent)
+            await console_logger.setup(page)
+            if Config.verbose:
+                click.echo("Console logging enabled", err=True)
+        
+        # Now navigate to the actual URL
         if Config.verbose:
             click.echo(f"Loading page: {url}", err=True)
-        page = await context_or_page.get(url)
+        await page.get(url)
         if Config.verbose:
             click.echo(f"Page loaded: {url}", err=True)
+            
         if log_requests:
             # nodriver doesn't have direct response events like Playwright
             # We can implement this later using CDP if needed
@@ -229,11 +247,11 @@ async def take_shot(
                 click.echo(f"DOM ready timeout after {wait_for_dom_ready_timeout}ms", err=True)
     else:
         page = context_or_page
-
-    if log_console:
-        # nodriver doesn't have direct console event handling
-        # We can implement this later using CDP if needed
-        pass
+        # Set up console logging for existing page
+        console_logger = None
+        if log_console:
+            console_logger = ConsoleLogger(silent=silent)
+            await console_logger.setup(page)
 
     viewport = get_viewport(shot.get("width"), shot.get("height"))
     if viewport:

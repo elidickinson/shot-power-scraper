@@ -791,8 +791,19 @@ def accessibility(
             auth_username=auth_username,
             auth_password=auth_password,
         )
-        page = await browser_obj.get(url)
-        # nodriver doesn't have console event handling by default
+        
+        # Get a blank page first to set up console logging
+        page = await browser_obj.get("about:blank")
+        
+        # Set up console logging BEFORE navigating
+        if log_console:
+            from shot_scraper.console_logger import ConsoleLogger
+            console_logger = ConsoleLogger(silent=False)
+            await console_logger.setup(page)
+        
+        # Now navigate to the actual URL
+        await page.get(url)
+        
         if javascript:
             await evaluate_js(page, javascript)
         # nodriver doesn't have accessibility.snapshot(), we'll implement a basic alternative
@@ -884,7 +895,18 @@ def har(
             auth_password=auth_password,
             record_har_path=str(output),
         )
-        page = await browser_obj.get(url)
+        
+        # Get a blank page first to set up console logging
+        page = await browser_obj.get("about:blank")
+        
+        # Set up console logging BEFORE navigating
+        if log_console:
+            from shot_scraper.console_logger import ConsoleLogger
+            console_logger = ConsoleLogger(silent=False)
+            await console_logger.setup(page)
+        
+        # Now navigate to the actual URL
+        await page.get(url)
 
         if wait:
             time.sleep(wait / 1000)
@@ -1016,7 +1038,19 @@ def javascript(
             auth_username=auth_username,
             auth_password=auth_password,
         )
-        page = await browser_obj.get(url)
+        
+        # Get a blank page first to set up console logging
+        page = await browser_obj.get("about:blank")
+        
+        # Set up console logging BEFORE navigating
+        if log_console:
+            from shot_scraper.console_logger import ConsoleLogger
+            console_logger = ConsoleLogger(silent=False)
+            await console_logger.setup(page)
+        
+        # Now navigate to the actual URL
+        await page.get(url)
+        
         result = await evaluate_js(page, javascript)
         try:
             await browser_obj.stop()
@@ -1215,7 +1249,19 @@ def html(
             auth_username=auth_username,
             auth_password=auth_password,
         )
-        page = await browser_obj.get(url)
+        
+        # Get a blank page first to set up console logging
+        page = await browser_obj.get("about:blank")
+        
+        # Set up console logging BEFORE navigating
+        console_logger = None
+        if log_console:
+            from shot_scraper.console_logger import ConsoleLogger
+            console_logger = ConsoleLogger(silent=silent)
+            await console_logger.setup(page)
+        
+        # Now navigate to the actual URL
+        await page.get(url)
 
         # Check if page failed to load
         from shot_scraper.page_utils import detect_navigation_error
