@@ -1,8 +1,8 @@
 """Annoyance clearing functionality for shot-scraper"""
 import asyncio
 import click
-from shot_scraper.page_utils import evaluate_js
-from shot_scraper.browser import Config
+from shot_power_scraper.page_utils import evaluate_js
+from shot_power_scraper.browser import Config
 
 
 async def clear_annoyances(page, timeout_seconds=5):
@@ -18,6 +18,7 @@ async def clear_annoyances(page, timeout_seconds=5):
         ".popup-wrap a.close-popup",  # Popup wrap close button
         "a.modal1-close",  # Modal overlay close button
         ".modal-dialog button[data-dismiss='modal']",  # Modal dialog close button
+        "button[data-action='close-mc-modal']",
     ]
     for selector in buttons_to_click:
         element = await page.query_selector(selector)

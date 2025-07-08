@@ -2,7 +2,7 @@
 import time
 import asyncio
 import click
-from shot_scraper.browser import Config
+from shot_power_scraper.browser import Config
 
 
 async def evaluate_js(page, javascript):

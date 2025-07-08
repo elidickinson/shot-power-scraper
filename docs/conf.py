@@ -48,7 +48,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "shot-scraper"
+project = "shot-power-scraper"
 copyright = "2024, Simon Willison"
 author = "Simon Willison"
 
@@ -99,7 +99,7 @@ html_theme = "furo"
 # documentation.
 
 html_theme_options = {"light_css_variables": {"sidebar-item-line-height": "1.25rem"}}
-html_title = "shot-scraper"
+html_title = "shot-power-scraper"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -110,7 +110,7 @@ html_static_path = ["_static"]
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "shot-scraper-doc"
+htmlhelp_basename = "shot-power-scraper-doc"
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -136,8 +136,8 @@ latex_elements = {
 latex_documents = [
     (
         master_doc,
-        "shot-scraper.tex",
-        "shot-scraper documentation",
+        "shot-power-scraper.tex",
+        "shot-power-scraper documentation",
         "Simon Willison",
         "manual",
     )
@@ -151,8 +151,8 @@ latex_documents = [
 man_pages = [
     (
         master_doc,
-        "shot-scraper",
-        "shot-scraper documentation",
+        "shot-power-scraper",
+        "shot-power-scraper documentation",
         [author],
         1,
     )
@@ -167,10 +167,10 @@ man_pages = [
 texinfo_documents = [
     (
         master_doc,
-        "shot-scraper",
-        "shot-scraper documentation",
+        "shot-power-scraper",
+        "shot-power-scraper documentation",
         author,
-        "shot-scraper",
+        "shot-power-scraper",
         " Tools for taking automated screenshots of websites ",
         "Miscellaneous",
     )

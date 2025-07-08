@@ -9,8 +9,8 @@ import tempfile
 import pathlib
 import asyncio
 import click
-from shot_scraper.browser import Config
-from shot_scraper.page_utils import (
+from shot_power_scraper.browser import Config
+from shot_power_scraper.page_utils import (
     evaluate_js,
     detect_cloudflare_challenge,
     wait_for_cloudflare_bypass,
@@ -18,9 +18,9 @@ from shot_scraper.page_utils import (
     wait_for_condition,
     detect_navigation_error
 )
-from shot_scraper.annoyance_manager import clear_annoyances
-from shot_scraper.utils import filename_for_url, url_or_file_path
-from shot_scraper.console_logger import ConsoleLogger
+from shot_power_scraper.annoyance_manager import clear_annoyances
+from shot_power_scraper.utils import filename_for_url, url_or_file_path
+from shot_power_scraper.console_logger import ConsoleLogger
 
 
 def _check_and_absolutize(filepath):

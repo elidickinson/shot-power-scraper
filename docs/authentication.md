@@ -4,9 +4,9 @@
 
 If you want to take screenshots of a site that has some form of authentication, you will first need to authenticate with that website manually.
 
-You can do that using the `shot-scraper auth` command:
+You can do that using the `shot-power-scraper auth` command:
 ```bash
-shot-scraper auth \
+shot-power-scraper auth \
   https://datasette-auth-passwords-demo.datasette.io/-/login \
   auth.json
 ```
@@ -16,37 +16,37 @@ This will open a browser window on your computer showing the page you specified.
 
 You can then sign in using that browser window - including 2FA or CAPTCHAs or other more complex form of authentication.
 
-When you are finished, hit `<enter>` at the `shot-scraper` command-line prompt. The browser will close and the authentication credentials (usually cookies) for that browser session will be written out to the `auth.json` file.
+When you are finished, hit `<enter>` at the `shot-power-scraper` command-line prompt. The browser will close and the authentication credentials (usually cookies) for that browser session will be written out to the `auth.json` file.
 
 To take authenticated screenshots you can then use the `-a` or `--auth` options to point to the JSON file that you created:
 ```bash
-shot-scraper https://datasette-auth-passwords-demo.datasette.io/ \
+shot-power-scraper https://datasette-auth-passwords-demo.datasette.io/ \
   -a auth.json -o authed.png
 ```
-## `shot-scraper auth --help`
+## `shot-power-scraper auth --help`
 
-Full `--help` for `shot-scraper auth`:
+Full `--help` for `shot-power-scraper auth`:
 
 <!-- [[[cog
 import cog
-from shot_scraper import cli
+from shot_power_scraper import cli
 from click.testing import CliRunner
 runner = CliRunner()
 result = runner.invoke(cli.cli, ["auth", "--help"])
-help = result.output.replace("Usage: cli", "Usage: shot-scraper")
+help = result.output.replace("Usage: cli", "Usage: shot-power-scraper")
 cog.out(
     "```\n{}\n```\n".format(help.strip())
 )
 ]]] -->
 ```
-Usage: shot-scraper auth [OPTIONS] URL CONTEXT_FILE
+Usage: shot-power-scraper auth [OPTIONS] URL CONTEXT_FILE
 
   Open a browser so user can manually authenticate with the specified site, then
   save the resulting authentication context to a file.
 
   Usage:
 
-      shot-scraper auth https://github.com/ auth.json
+      shot-power-scraper auth https://github.com/ auth.json
 
 Options:
   -b, --browser [chromium|firefox|webkit|chrome|chrome-beta]

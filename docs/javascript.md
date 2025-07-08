@@ -2,13 +2,13 @@
 
 # Scraping pages using JavaScript
 
-The `shot-scraper javascript` command can be used to execute JavaScript directly against a page and return the result as JSON.
+The `shot-power-scraper javascript` command can be used to execute JavaScript directly against a page and return the result as JSON.
 
 This command doesn't produce a screenshot, but has interesting applications for scraping.
 
 To retrieve a string title of a document:
 ```bash
-shot-scraper javascript https://datasette.io/ "document.title"
+shot-power-scraper javascript https://datasette.io/ "document.title"
 ```
 This returns a JSON string:
 ```json
@@ -16,7 +16,7 @@ This returns a JSON string:
 ```
 To return a raw string instead, use the `-r` or `--raw` options:
 ```bash
-shot-scraper javascript https://datasette.io/ "document.title" -r
+shot-power-scraper javascript https://datasette.io/ "document.title" -r
 ```
 Output:
 ```
@@ -24,7 +24,7 @@ Datasette: An open source multi-tool for exploring and publishing data
 ```
 To return a JSON object, wrap an object literal in parenthesis:
 ```bash
-shot-scraper javascript https://datasette.io/ "({
+shot-power-scraper javascript https://datasette.io/ "({
   title: document.title,
   tagline: document.querySelector('.tagline').innerText
 })"
@@ -43,7 +43,7 @@ You can use `() => { ... }` function syntax to run multiple statements, returnin
 This example raises an error if no paragraphs are found.
 
 ```bash
-shot-scraper javascript https://www.example.com/ "
+shot-power-scraper javascript https://www.example.com/ "
 () => {
   var paragraphs = document.querySelectorAll('p');
   if (paragraphs.length == 0) {
@@ -58,8 +58,8 @@ shot-scraper javascript https://www.example.com/ "
 You can pass an `async` function if you want to use `await`, including to import modules from external URLs. This example loads the [Readability.js](https://github.com/mozilla/readability) library from [jsdelivr](https://www.jsdelivr.com/) and uses it to extract the core content of a page:
 
 ```bash
-shot-scraper javascript \
-  https://simonwillison.net/2022/Mar/14/scraping-web-pages-shot-scraper/ "
+shot-power-scraper javascript \
+  https://simonwillison.net/2022/Mar/14/scraping-web-pages-shot-power-scraper/ "
 async () => {
   const readability = await import('https://cdn.jsdelivr.net/npm/@mozilla/readability@0.6.0/+esm');
   return (new readability.Readability(document)).parse();
@@ -68,7 +68,7 @@ async () => {
 
 To use functions such as `setInterval()`, for example if you need to delay the shot for a second to allow an animation to finish running, return a promise:
 ```bash
-shot-scraper javascript datasette.io "
+shot-power-scraper javascript datasette.io "
 new Promise(done => setInterval(
   () => {
     done({
@@ -83,9 +83,9 @@ new Promise(done => setInterval(
 
 Some websites use [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) (CSP) headers to prevent additional JavaScript from executing on the page, as a security measure.
 
-When using `shot-scraper` this can prevent some JavaScript features from working. You might see error messages that look like this:
+When using `shot-power-scraper` this can prevent some JavaScript features from working. You might see error messages that look like this:
 ```bash
-shot-scraper javascript github.com "
+shot-power-scraper javascript github.com "
   async () => {
     await import('https://cdn.jsdelivr.net/npm/left-pad/+esm');
     return 'content-security-policy ignored' }
@@ -96,9 +96,9 @@ Output:
 Error: TypeError: Failed to fetch dynamically imported module:
 https://cdn.jsdelivr.net/npm/left-pad/+esm
 ```
-You can use the `--bypass-csp` option to have `shot-scraper` run the browser in a mode that ignores these headers:
+You can use the `--bypass-csp` option to have `shot-power-scraper` run the browser in a mode that ignores these headers:
 ```bash
-shot-scraper javascript github.com "
+shot-power-scraper javascript github.com "
   async () => {
     await import('https://cdn.jsdelivr.net/npm/left-pad/+esm');
     return 'content-security-policy ignored' }
@@ -119,7 +119,7 @@ This example [uses GitHub Actions](https://docs.github.com/en/actions/quickstart
 ```yaml
 - name: Test page title
   run: |-
-    shot-scraper javascript datasette.io "
+    shot-power-scraper javascript datasette.io "
       if (document.title != 'Datasette') {
         throw 'Wrong title detected';
       }"
@@ -129,15 +129,15 @@ This example [uses GitHub Actions](https://docs.github.com/en/actions/quickstart
 
 You can also save JavaScript to a file and execute it like this:
 ```bash
-shot-scraper javascript datasette.io -i script.js
+shot-power-scraper javascript datasette.io -i script.js
 ```
 Or read it from standard input like this:
 ```bash
-echo "document.title" | shot-scraper javascript datasette.io
+echo "document.title" | shot-power-scraper javascript datasette.io
 ```
 Or read it from standard input like this:
 ```bash
-echo "document.title" | shot-scraper javascript datasette.io
+echo "document.title" | shot-power-scraper javascript datasette.io
 ```
 
 ## Running JavaScript from GitHub
@@ -147,14 +147,14 @@ A special `gh:` prefix can be used to load scripts from GitHub.
 You can use this with a full path to a `script.js` file in a public GitHub repository like this:
 
 ```bash
-shot-scraper javascript datasette.io -i gh:simonw/shot-scraper-scripts/readability.js
+shot-power-scraper javascript datasette.io -i gh:simonw/shot-power-scraper-scripts/readability.js
 ```
-Or by convention if the script lives in a repo called `shot-scraper-scripts` you can omit that (and the `.js` extension too) like this:
+Or by convention if the script lives in a repo called `shot-power-scraper-scripts` you can omit that (and the `.js` extension too) like this:
 
 ```bash
-shot-scraper javascript datasette.io -i gh:simonw/readability
+shot-power-scraper javascript datasette.io -i gh:simonw/readability
 ```
-Both of these examples will execute [readability.js](https://github.com/simonw/shot-scraper-scripts/blob/main/readability.js), explained in the next section.
+Both of these examples will execute [readability.js](https://github.com/simonw/shot-power-scraper-scripts/blob/main/readability.js), explained in the next section.
 
 ## Example: Extracting page content with Readability.js
 
@@ -163,7 +163,7 @@ Both of these examples will execute [readability.js](https://github.com/simonw/s
 The following recipe imports the library from the [jsdelivr CDN](https://www.jsdelivr.com/), runs it against the current page and returns the results to the console as JSON:
 
 ```bash
-shot-scraper javascript https://simonwillison.net/2022/Mar/24/datasette-061/ "
+shot-power-scraper javascript https://simonwillison.net/2022/Mar/24/datasette-061/ "
 async () => {
   const readability = await import('https://cdn.jsdelivr.net/npm/@mozilla/readability@0.6.0/+esm');
   return (new readability.Readability(document)).parse();
@@ -182,31 +182,31 @@ The output looks like this:
     "siteName": null
 }
 ```
-See [Extracting web page content using Readability.js and shot-scraper](https://til.simonwillison.net/shot-scraper/readability) for more.
+See [Extracting web page content using Readability.js and shot-power-scraper](https://til.simonwillison.net/shot-power-scraper/readability) for more.
 
-## shot-scraper javascript \-\-help
+## shot-power-scraper javascript \-\-help
 
 Full `--help` for this command:
 
 <!-- [[[cog
 import cog
-from shot_scraper import cli
+from shot_power_scraper import cli
 from click.testing import CliRunner
 runner = CliRunner()
 result = runner.invoke(cli.cli, ["javascript", "--help"])
-help = result.output.replace("Usage: cli", "Usage: shot-scraper")
+help = result.output.replace("Usage: cli", "Usage: shot-power-scraper")
 cog.out(
     "```\n{}\n```\n".format(help.strip())
 )
 ]]] -->
 ```
-Usage: shot-scraper javascript [OPTIONS] URL [JAVASCRIPT]
+Usage: shot-power-scraper javascript [OPTIONS] URL [JAVASCRIPT]
 
   Execute JavaScript against the page and return the result as JSON
 
   Usage:
 
-      shot-scraper javascript https://datasette.io/ "document.title"
+      shot-power-scraper javascript https://datasette.io/ "document.title"
 
   To return a JSON object, use this:
 
@@ -228,7 +228,7 @@ Usage: shot-scraper javascript [OPTIONS] URL [JAVASCRIPT]
 Options:
   -i, --input TEXT                Read input JavaScript from this file or use
                                   gh:username/script to load from
-                                  github.com/username/shot-scraper-
+                                  github.com/username/shot-power-scraper-
                                   scripts/script.js
   -a, --auth FILENAME             Path to JSON authentication context file
   -o, --output FILENAME           Save output JSON to this file

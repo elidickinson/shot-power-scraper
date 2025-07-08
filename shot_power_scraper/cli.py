@@ -11,10 +11,10 @@ import click
 import nodriver as uc
 import asyncio
 
-from shot_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent
-from shot_scraper.browser import Config, create_browser_context
-from shot_scraper.screenshot import take_shot
-from shot_scraper.page_utils import evaluate_js, wait_for_condition
+from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent
+from shot_power_scraper.browser import Config, create_browser_context
+from shot_power_scraper.screenshot import take_shot
+from shot_power_scraper.page_utils import evaluate_js, wait_for_condition
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -797,7 +797,7 @@ def accessibility(
         
         # Set up console logging BEFORE navigating
         if log_console:
-            from shot_scraper.console_logger import ConsoleLogger
+            from shot_power_scraper.console_logger import ConsoleLogger
             console_logger = ConsoleLogger(silent=False)
             await console_logger.setup(page)
         
@@ -901,7 +901,7 @@ def har(
         
         # Set up console logging BEFORE navigating
         if log_console:
-            from shot_scraper.console_logger import ConsoleLogger
+            from shot_power_scraper.console_logger import ConsoleLogger
             console_logger = ConsoleLogger(silent=False)
             await console_logger.setup(page)
         
@@ -1044,7 +1044,7 @@ def javascript(
         
         # Set up console logging BEFORE navigating
         if log_console:
-            from shot_scraper.console_logger import ConsoleLogger
+            from shot_power_scraper.console_logger import ConsoleLogger
             console_logger = ConsoleLogger(silent=False)
             await console_logger.setup(page)
         
@@ -1256,7 +1256,7 @@ def html(
         # Set up console logging BEFORE navigating
         console_logger = None
         if log_console:
-            from shot_scraper.console_logger import ConsoleLogger
+            from shot_power_scraper.console_logger import ConsoleLogger
             console_logger = ConsoleLogger(silent=silent)
             await console_logger.setup(page)
         
@@ -1264,7 +1264,7 @@ def html(
         await page.get(url)
 
         # Check if page failed to load
-        from shot_scraper.page_utils import detect_navigation_error
+        from shot_power_scraper.page_utils import detect_navigation_error
         has_error, error_msg = await detect_navigation_error(page, url)
         if has_error:
             full_msg = f"Page failed to load: {error_msg}"
@@ -1380,10 +1380,13 @@ def set_default_user_agent_cmd(browser, browser_args):
 
             # Store in config
             set_default_user_agent(modified_user_agent)
+            
+            # Import here to avoid circular imports
+            from shot_power_scraper.utils import get_config_file
 
             click.echo(f"Original user agent: {user_agent}")
             click.echo(f"Modified user agent: {modified_user_agent}")
-            click.echo("Default user agent has been set successfully.")
+            click.echo(f"Saved default user agent to: {get_config_file()}")
 
         finally:
             try:

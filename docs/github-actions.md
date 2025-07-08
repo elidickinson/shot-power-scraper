@@ -1,14 +1,14 @@
-# Using shot-scraper with GitHub Actions
+# Using shot-power-scraper with GitHub Actions
 
-`shot-scraper` was designed with GitHub Actions for screenshot automation in mind.
+`shot-power-scraper` was designed with GitHub Actions for screenshot automation in mind.
 
-## shot-scraper-template
+## shot-power-scraper-template
 
-The [shot-scraper-template](https://github.com/simonw/shot-scraper-template) template repository can be used to quickly create your own GitHub repository with GitHub Actions configured to take screenshots of a page and write it back to the repository. Read [Instantly create a GitHub repository to take screenshots of a web page](https://simonwillison.net/2022/Mar/14/shot-scraper-template/) for details.
+The [shot-power-scraper-template](https://github.com/simonw/shot-power-scraper-template) template repository can be used to quickly create your own GitHub repository with GitHub Actions configured to take screenshots of a page and write it back to the repository. Read [Instantly create a GitHub repository to take screenshots of a web page](https://simonwillison.net/2022/Mar/14/shot-power-scraper-template/) for details.
 
 ## Building a workflow from scratch
 
-This Actions workflow can be used to install `shot-scraper` and its dependencies, take screenshots defined in the `shots.yml` file in that repository and then write the resulting screenshots back to the same repository:
+This Actions workflow can be used to install `shot-power-scraper` and its dependencies, take screenshots defined in the `shots.yml` file in that repository and then write the resulting screenshots back to the same repository:
 
 ```yaml
 name: Take screenshots
@@ -21,7 +21,7 @@ permissions:
   contents: write
 
 jobs:
-  shot-scraper:
+  shot-power-scraper:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -41,11 +41,11 @@ jobs:
         key: ${{ runner.os }}-playwright
     - name: Install dependencies
       run: |
-        pip install shot-scraper
-        shot-scraper install
+        pip install shot-power-scraper
+        shot-power-scraper install
     - name: Take shots
       run: |
-        shot-scraper multi shots.yml
+        shot-power-scraper multi shots.yml
     - name: Commit and push
       run: |-
         git config user.name "Automated"
@@ -60,7 +60,7 @@ The `actions/cache@v3` steps set up [caching](https://github.com/actions/cache),
 
 ## Optimizing PNGs using Oxipng
 
-You can losslessy compress the PNGs generated using `shot-scraper` by running them through [Oxipng](https://github.com/shssoichiro/oxipng). Add the following steps to the beginning of your workflow to install Oxing:
+You can losslessy compress the PNGs generated using `shot-power-scraper` by running them through [Oxipng](https://github.com/shssoichiro/oxipng). Add the following steps to the beginning of your workflow to install Oxing:
 
 ```yaml
     - name: Cache Oxipng
@@ -73,7 +73,7 @@ You can losslessy compress the PNGs generated using `shot-scraper` by running th
         which oxipng || cargo install oxipng
 ```
 
-Then after running `shot-scraper` add this step to compress the images:
+Then after running `shot-power-scraper` add this step to compress the images:
 
 ```yaml
     - name: Optimize PNGs

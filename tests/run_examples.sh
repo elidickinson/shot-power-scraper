@@ -5,66 +5,66 @@ set -e
 
 mkdir -p examples
 # Without the -o option should produce www-example-com.png
-(cd examples && shot-scraper https://www.example.com/)
+(cd examples && shot-power-scraper https://www.example.com/)
 # Run again should produce www-example-com.1.png
-(cd examples && shot-scraper https://www.example.com/)
-shot-scraper https://www.example.com/ -o - > examples/from-stdout-example.png
+(cd examples && shot-power-scraper https://www.example.com/)
+shot-power-scraper https://www.example.com/ -o - > examples/from-stdout-example.png
 # HTML page
 echo '<html><h1>This is a page on disk</h1><p>...</p></html>' > examples/local.html
-shot-scraper examples/local.html -o examples/local.png
+shot-power-scraper examples/local.html -o examples/local.png
 # Full page
-shot-scraper https://github.com/ -o examples/github.com.png --log-requests examples/github-log.txt
+shot-power-scraper https://github.com/ -o examples/github.com.png --log-requests examples/github-log.txt
 # Using a selector
-shot-scraper https://simonwillison.net/ -s '#bighead' -o examples/bighead.png
+shot-power-scraper https://simonwillison.net/ -s '#bighead' -o examples/bighead.png
 # Selector and JavaScript
-shot-scraper https://simonwillison.net/ -s '#bighead' \
+shot-power-scraper https://simonwillison.net/ -s '#bighead' \
   --javascript "document.body.style.backgroundColor = 'pink';" \
   -o examples/bighead-pink.png
 # Multiple selectors
-shot-scraper https://simonwillison.net/ \
+shot-power-scraper https://simonwillison.net/ \
   -s '#bighead' -s .overband --padding 20 \
   -o examples/bighead-multi-selector.png
 # --selector-all
-shot-scraper https://simonwillison.net/ \
+shot-power-scraper https://simonwillison.net/ \
   --selector-all '#secondary li:nth-child(-n+5)' \
   --padding 20 \
   -o examples/selector-all.png
 # Height and width
-shot-scraper https://simonwillison.net/ -w 400 -h 800 -o examples/simon-narrow.png
+shot-power-scraper https://simonwillison.net/ -w 400 -h 800 -o examples/simon-narrow.png
 # Omit background
-shot-scraper https://simonwillison.net/ \
+shot-power-scraper https://simonwillison.net/ \
   -h 800 -o examples/simonwillison-transparent.png \
   --javascript "document.querySelector('body').style.backgroundColor='transparent'" \
   --omit-background
 # JPEG quality
-shot-scraper https://simonwillison.net/ \
+shot-power-scraper https://simonwillison.net/ \
   -h 800 -o examples/simonwillison-quality-80.jpg --quality 80
 # Selector with a wait for remote page element
-shot-scraper 'https://www.owlsnearme.com/?place=127871' \
+shot-power-scraper 'https://www.owlsnearme.com/?place=127871' \
   --selector 'section.secondary' \
   -o examples/owlsnearme-wait.jpg \
   --wait-for "!!document.querySelector('section.secondary')"
 # Accessibility
-shot-scraper accessibility https://datasette.io/ \
+shot-power-scraper accessibility https://datasette.io/ \
   > examples/datasette-accessibility.json
-shot-scraper accessibility https://simonwillison.net \
+shot-power-scraper accessibility https://simonwillison.net \
   --javascript "document.getElementById('wrapper').style.display='none'" \
   > examples/simonwillison-accessibility-javascript.json
-shot-scraper accessibility https://simonwillison.net \
+shot-power-scraper accessibility https://simonwillison.net \
   --javascript "document.getElementById('wrapper').style.display='none'" \
   --output examples/simonwillison-accessibility-javascript-and-dash-output.json
-shot-scraper accessibility examples/local.html -o examples/local-accessibility.json
+shot-power-scraper accessibility examples/local.html -o examples/local-accessibility.json
 # PDF
-(cd examples && shot-scraper pdf https://datasette.io/tools)
-shot-scraper pdf https://datasette.io \
+(cd examples && shot-power-scraper pdf https://datasette.io/tools)
+shot-power-scraper pdf https://datasette.io \
   --landscape -o examples/datasette-landscape.pdf
-shot-scraper pdf https://datasette.io/tutorials/learn-sql \
+shot-power-scraper pdf https://datasette.io/tutorials/learn-sql \
   -o - > examples/learn-sql.pdf
-shot-scraper pdf examples/local.html -o examples/local.pdf
+shot-power-scraper pdf examples/local.html -o examples/local.pdf
 ## JavaScript
-shot-scraper javascript https://datasette.io/ "document.title" \
+shot-power-scraper javascript https://datasette.io/ "document.title" \
   > examples/datasette-io-title.json
-shot-scraper javascript datasette.io "
+shot-power-scraper javascript datasette.io "
 new Promise(done => setInterval(
   () => {
     done({
@@ -74,17 +74,17 @@ new Promise(done => setInterval(
   }, 1000
 ));" -o examples/datasette-io-title-tagline-from-promise.json
 # Different browsers
-shot-scraper https://tools.simonwillison.net/user-agent \
+shot-power-scraper https://tools.simonwillison.net/user-agent \
   -o examples/useragent-default-chromium.png -h 400 -w 800
-shot-scraper https://tools.simonwillison.net/user-agent \
+shot-power-scraper https://tools.simonwillison.net/user-agent \
   -o examples/useragent-firefox.png -h 400 -w 800 -b firefox
-shot-scraper https://tools.simonwillison.net/user-agent \
+shot-power-scraper https://tools.simonwillison.net/user-agent \
   -o examples/useragent-webkit.png -h 400 -w 800 -b webkit
 # Default font-render-hinting
-shot-scraper https://shot-scraper.datasette.io/en/stable/screenshots.html \
+shot-power-scraper https://shot-power-scraper.datasette.io/en/stable/screenshots.html \
   -w 800 -h 600 -o examples/font-hinting-default.png
 # Add browser argument for font-render-hinting
-shot-scraper https://shot-scraper.datasette.io/en/stable/screenshots.html \
+shot-power-scraper https://shot-power-scraper.datasette.io/en/stable/screenshots.html \
   -w 800 -h 600 -o examples/font-hinting-none.png \
   --browser-arg "--font-render-hinting=none"
 # --wait-for
@@ -99,19 +99,19 @@ setTimeout(() => {
 </script>
 </body>
 </html>' > examples/div-after-2-seconds.html
-shot-scraper examples/div-after-2-seconds.html \
+shot-power-scraper examples/div-after-2-seconds.html \
   -o examples/no-wait.png -w 300 -h 200
-shot-scraper examples/div-after-2-seconds.html \
+shot-power-scraper examples/div-after-2-seconds.html \
   -o examples/wait-for.png -w 300 -h 200 \
   --wait-for "document.querySelector('div')"
 # Selector with a wait
-shot-scraper examples/div-after-2-seconds.html \
+shot-power-scraper examples/div-after-2-seconds.html \
   --selector 'div' \
   -o examples/wait.png -w 300 -h 200 \
   --wait 2100
 # And using multi
 echo '# empty file' > empty.yml
-shot-scraper multi empty.yml
+shot-power-scraper multi empty.yml
 (cd examples && echo '
 - server: python -m http.server 9043
 - output: example.com.png
@@ -151,9 +151,9 @@ shot-scraper multi empty.yml
   padding: 20
 # js_selector
 - output: js-selector-from-multi.png
-  url: https://github.com/simonw/shot-scraper
+  url: https://github.com/simonw/shot-power-scraper
   js_selector: |-
-    el.tagName == "P" && el.innerText.includes("shot-scraper")
+    el.tagName == "P" && el.innerText.includes("shot-power-scraper")
   padding: 20
 # Local page on disk
 - url: local.html
@@ -174,12 +174,12 @@ shot-scraper multi empty.yml
 # Screenshot from the server
 - url: http://localhost:9043/
   output: from-server.png
-' | shot-scraper multi - --fail)
+' | shot-power-scraper multi - --fail)
 # --bypass-csp
-shot-scraper javascript github.com "async () => { await import('https://cdn.jsdelivr.net/npm/left-pad/+esm'); return 'content-security-policy ignored' }" -o examples/github-csp.json --bypass-csp
+shot-power-scraper javascript github.com "async () => { await import('https://cdn.jsdelivr.net/npm/left-pad/+esm'); return 'content-security-policy ignored' }" -o examples/github-csp.json --bypass-csp
 # --retina
-shot-scraper https://simonwillison.net/ -h 400 -w 800 \
+shot-power-scraper https://simonwillison.net/ -h 400 -w 800 \
   -o examples/simonwillison-retina.png --retina
 # --scale-factor
-shot-scraper https://simonwillison.net/ -h 915 -w 412 \
+shot-power-scraper https://simonwillison.net/ -h 915 -w 412 \
   -o examples/simonwillison-scale-factor-pixel-six.png --scale-factor 2.625

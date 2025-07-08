@@ -49,7 +49,7 @@ def load_github_script(github_path: str) -> str:
     if len(parts) == 2:
         # Short form: username/file.js
         username, file_name = parts
-        parts = [username, "shot-scraper-scripts", file_name]
+        parts = [username, "shot-power-scraper-scripts", file_name]
 
     if len(parts) < 3:
         raise ValueError(
@@ -78,12 +78,12 @@ def load_github_script(github_path: str) -> str:
 
 
 def get_config_dir():
-    """Get the shot-scraper config directory path"""
-    return pathlib.Path.home() / ".config" / "shot-scraper"
+    """Get the shot-power-scraper config directory path"""
+    return pathlib.Path.home() / ".config" / "shot-power-scraper"
 
 
 def get_config_file():
-    """Get the shot-scraper config file path"""
+    """Get the shot-power-scraper config file path"""
     return get_config_dir() / "config.json"
 
 

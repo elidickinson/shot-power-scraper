@@ -4,13 +4,13 @@
 
 Install this tool using `pip`:
 ```bash
-pip install shot-scraper
+pip install shot-power-scraper
 ```
 This tool depends on Playwright, which first needs to install its own dedicated Chromium browser.
 
-Run `shot-scraper install` once to install that:
+Run `shot-power-scraper install` once to install that:
 ```bash
-shot-scraper install
+shot-power-scraper install
 ```
 Which outputs:
 ```
@@ -21,35 +21,35 @@ Playwright build of ffmpeg v1007 downloaded to /Users/simon/Library/Caches/ms-pl
 ```
 If you want to use other browsers such as Firefox you should install those too:
 ```bash
-shot-scraper install -b firefox
+shot-power-scraper install -b firefox
 ```
 
-## `shot-scraper install --help`
+## `shot-power-scraper install --help`
 
-Full `--help` for the `shot-scraper install` command:
+Full `--help` for the `shot-power-scraper install` command:
 <!-- [[[cog
 import cog
-from shot_scraper import cli
+from shot_power_scraper import cli
 from click.testing import CliRunner
 runner = CliRunner()
 result = runner.invoke(cli.cli, ["install", "--help"])
-help = result.output.replace("Usage: cli", "Usage: shot-scraper")
+help = result.output.replace("Usage: cli", "Usage: shot-power-scraper")
 cog.out(
     "```\n{}\n```\n".format(help.strip())
 )
 ]]] -->
 ```
-Usage: shot-scraper install [OPTIONS]
+Usage: shot-power-scraper install [OPTIONS]
 
   Install the Playwright browser needed by this tool.
 
   Usage:
 
-      shot-scraper install
+      shot-power-scraper install
 
   Or for browsers other than the Chromium default:
 
-      shot-scraper install -b firefox
+      shot-power-scraper install -b firefox
 
 Options:
   -b, --browser [chromium|firefox|webkit|chrome|chrome-beta]

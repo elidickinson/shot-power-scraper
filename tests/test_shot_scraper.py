@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 import textwrap
 from click.testing import CliRunner
 import pytest
-from shot_scraper.cli import cli
+from shot_power_scraper.cli import cli
 import zipfile
 import json
 
@@ -82,7 +82,7 @@ def test_multi_error_on_non_list(input):
     ),
 )
 def test_multi_noclobber(mocker, args, expected_shot_count):
-    take_shot = mocker.patch("shot_scraper.cli.take_shot")
+    take_shot = mocker.patch("shot_power_scraper.cli.take_shot")
     runner = CliRunner()
     with runner.isolated_filesystem():
         yaml = textwrap.dedent(
@@ -162,7 +162,7 @@ def test_javascript_input_github():
             assert result.exit_code == 0, str(result.exception)
             assert result.output == '"Test title"\n'
             mock_context.assert_called_once_with(
-                "https://raw.githubusercontent.com/simonw/shot-scraper-scripts/main/title.js"
+                "https://raw.githubusercontent.com/simonw/shot-power-scraper-scripts/main/title.js"
             )
 
 
@@ -347,7 +347,7 @@ def test_multi_har(http_server, args, expect_zip, record_shots):
 
 def test_cloudflare_detection_logic():
     """Test the Cloudflare detection logic exists and is properly integrated"""
-    from shot_scraper.cli import _detect_cloudflare_challenge, _wait_for_cloudflare_bypass
+    from shot_power_scraper.cli import _detect_cloudflare_challenge, _wait_for_cloudflare_bypass
     
     # Verify the functions exist and are callable
     assert callable(_detect_cloudflare_challenge)

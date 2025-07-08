@@ -2,50 +2,50 @@
 
 # Saving a web page to PDF
 
-The `shot-scraper pdf` command saves a PDF version of a web page - the equivalent of using `Print -> Save to PDF` in Chromium.
+The `shot-power-scraper pdf` command saves a PDF version of a web page - the equivalent of using `Print -> Save to PDF` in Chromium.
 
-    shot-scraper pdf https://datasette.io/
+    shot-power-scraper pdf https://datasette.io/
 
 This will save to `datasette-io.pdf`. You can use `-o` to specify a filename:
 
-    shot-scraper pdf https://datasette.io/tutorials/learn-sql \
+    shot-power-scraper pdf https://datasette.io/tutorials/learn-sql \
       -o learn-sql.pdf
 
 You can pass the path to a local file on disk instead of a URL:
 
-    shot-scraper pdf invoice.html -o invoice.pdf
+    shot-power-scraper pdf invoice.html -o invoice.pdf
 
-## `shot-scraper pdf --help`
+## `shot-power-scraper pdf --help`
 
 Full `--help` for this command:
 
 <!-- [[[cog
 import cog
-from shot_scraper import cli
+from shot_power_scraper import cli
 from click.testing import CliRunner
 runner = CliRunner()
 result = runner.invoke(cli.cli, ["pdf", "--help"])
-help = result.output.replace("Usage: cli", "Usage: shot-scraper")
+help = result.output.replace("Usage: cli", "Usage: shot-power-scraper")
 cog.out(
     "```\n{}\n```\n".format(help.strip())
 )
 ]]] -->
 ```
-Usage: shot-scraper pdf [OPTIONS] URL
+Usage: shot-power-scraper pdf [OPTIONS] URL
 
   Create a PDF of the specified page
 
   Usage:
 
-      shot-scraper pdf https://datasette.io/
+      shot-power-scraper pdf https://datasette.io/
 
   Use -o to specify a filename:
 
-      shot-scraper pdf https://datasette.io/ -o datasette.pdf
+      shot-power-scraper pdf https://datasette.io/ -o datasette.pdf
 
   You can pass a path to a file instead of a URL:
 
-      shot-scraper pdf invoice.html -o invoice.pdf
+      shot-power-scraper pdf invoice.html -o invoice.pdf
 
 Options:
   -a, --auth FILENAME             Path to JSON authentication context file

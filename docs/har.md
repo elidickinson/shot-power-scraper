@@ -4,13 +4,13 @@
 
 An HTTP Archive file captures the full details of a series of HTTP requests and responses as JSON.
 
-The `shot-scraper har` command can save a `*.har.zip` file that contains both that JSON data and the content of any assets that were loaded by the page.
+The `shot-power-scraper har` command can save a `*.har.zip` file that contains both that JSON data and the content of any assets that were loaded by the page.
 ```bash
-shot-scraper har https://datasette.io/
+shot-power-scraper har https://datasette.io/
 ```
 This will save to `datasette-io.har`. You can use `-o` to specify a filename:
 ```bash
-shot-scraper har https://datasette.io/tutorials/learn-sql \
+shot-power-scraper har https://datasette.io/tutorials/learn-sql \
   -o learn-sql.har
 ```
 A `.har` file is JSON. You can view it using the [Google HAR Analyzer](https://toolbox.googleapps.com/apps/har_analyzer/) tool.
@@ -20,11 +20,11 @@ HTTP Archives can also be created as `.har.zip` files. These have a slightly dif
 To create one of these, either add the `--zip` flag:
 
 ```bash
-shot-scraper har https://datasette.io/ --zip
+shot-power-scraper har https://datasette.io/ --zip
 ```
 Or specify a filename that ends in `.har.zip`:
 ```bash
-shot-scraper har https://datasette.io/ -o datasette-io.har.zip
+shot-power-scraper har https://datasette.io/ -o datasette-io.har.zip
 ```
 
 You can view the contents of a HAR zip file using `unzip -l`:
@@ -53,36 +53,36 @@ Archive:  datasette-io.har.zip
    154803                     14 files
 ```
 
-You can record multiple pages to a single HTTP Archive using the {ref}`shot-scraper multi --har option<multi-har>`.
+You can record multiple pages to a single HTTP Archive using the {ref}`shot-power-scraper multi --har option<multi-har>`.
 
-## `shot-scraper har --help`
+## `shot-power-scraper har --help`
 
 Full `--help` for this command:
 
 <!-- [[[cog
 import cog
-from shot_scraper import cli
+from shot_power_scraper import cli
 from click.testing import CliRunner
 runner = CliRunner()
 result = runner.invoke(cli.cli, ["har", "--help"])
-help = result.output.replace("Usage: cli", "Usage: shot-scraper")
+help = result.output.replace("Usage: cli", "Usage: shot-power-scraper")
 cog.out(
     "```\n{}\n```\n".format(help.strip())
 )
 ]]] -->
 ```
-Usage: shot-scraper har [OPTIONS] URL
+Usage: shot-power-scraper har [OPTIONS] URL
 
   Record a HAR file for the specified page
 
   Usage:
 
-      shot-scraper har https://datasette.io/
+      shot-power-scraper har https://datasette.io/
 
   This defaults to saving to datasette-io.har - use -o to specify a different
   filename:
 
-      shot-scraper har https://datasette.io/ -o trace.har
+      shot-power-scraper har https://datasette.io/ -o trace.har
 
   Use --zip to save as a .har.zip file instead, or specify a filename ending in
   .har.zip

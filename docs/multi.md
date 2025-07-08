@@ -12,19 +12,19 @@ You can configure multiple screenshots using a YAML file. Create a file called `
 ```
 Then run the tool like so:
 ```bash
-shot-scraper multi shots.yml
+shot-power-scraper multi shots.yml
 ```
 This will create two image files, `www-example-com.png` and `w3c.org.png`, containing screenshots of those two URLs.
 
 Use `-` to pass in YAML from standard input:
 ```bash
-echo "- url: http://www.example.com" | shot-scraper multi -
+echo "- url: http://www.example.com" | shot-power-scraper multi -
 ```
 If you run the tool with the `-n` or `--no-clobber` option any shots where the output file aleady exists will be skipped.
 
 You can specify a subset of screenshots to take by specifying output files that you would like to create. For example, to take just the shots of `one.png` and `three.png` that are defined in `shots.yml` run this:
 ```bash
-shot-scraper multi shots.yml -o one.png -o three.png
+shot-power-scraper multi shots.yml -o one.png -o three.png
 ```
 The `url:` can be set to a path to a file on disk as well:
 
@@ -39,13 +39,13 @@ For example, setting `--scale-factor 3` results in screenshots with a CSS pixel 
 
 To take screenshots with a scale factor of 3 (tripled resolution), run the following command:
 ```bash
-shot-scraper multi shots.yml --scale-factor 3
+shot-power-scraper multi shots.yml --scale-factor 3
 ```
 This will multiply both the width and height of all screenshots by 3, resulting in images with a higher level of detail, suitable for scenarios where you need to capture the screen as it would appear on a high-DPI display.
 
 Use `--retina` to take all screenshots at retina resolution instead, doubling the dimensions of the files:
 ```bash
-shot-scraper multi shots.yml --retina
+shot-power-scraper multi shots.yml --retina
 ```
 Note: The `--retina` option should not be used in conjunction with the `--scale-factor` flag as they are mutually exclusive. If both are provided, the command will raise an error to prevent conflicts.
 
@@ -83,9 +83,9 @@ The `--js-selector` and `--js-selector-all` options can be provided using the `j
 
 ```yaml
 - output: js-selector-all.png
-  url: https://github.com/simonw/shot-scraper
+  url: https://github.com/simonw/shot-power-scraper
   js_selector: |-
-    el.tagName == "P" && el.innerText.includes("shot-scraper")
+    el.tagName == "P" && el.innerText.includes("shot-power-scraper")
   padding: 20
 ```
 
@@ -114,7 +114,7 @@ You can include desired `height`, `width`, `quality`, `wait` and `wait_for` opti
 (multi-har)=
 ## Recording to an HTTP Archive
 
-Similar to the {ref}`shot-scraper har command<har>`, `shot-scraper multi` can optionally record HTTP Archive files of the requests made during a session.
+Similar to the {ref}`shot-power-scraper har command<har>`, `shot-power-scraper multi` can optionally record HTTP Archive files of the requests made during a session.
 
 Add the `--har` flag to record all requests and responses to a `trace.har` JSON file, or `--har-zip` for a `trace.har.zip` file. Use `--har-file filename.har` to provide a path to a custom filename - this will be recorded as JSON or zip depending on the file extension.
 
@@ -123,7 +123,7 @@ If you are running this against a larger number of pages you should use `--har-z
 This example:
 
 ```bash
-shot-scraper multi shots.yml --har
+shot-power-scraper multi shots.yml --har
 ```
 Will output something like this:
 ```
@@ -138,7 +138,7 @@ When writing to a HAR you can omit the `output:` key in a YAML file to skip taki
 ```
 When run like this:
 ```bash
-shot-scraper multi shots.yml --har-zip
+shot-power-scraper multi shots.yml --har-zip
 ```
 Will produce this output, recording a HAR without taking any screenshots:
 ```
@@ -148,7 +148,7 @@ Wrote to HAR file: trace.har.zip
 ```
 ## Running a server for the duration of the session
 
-If you need to run a server for the duration of the `shot-scraper multi` session you can specify that using a `server:` block, like this:
+If you need to run a server for the duration of the `shot-power-scraper multi` session you can specify that using a `server:` block, like this:
 ```yaml
 - server: python -m http.server 8000
 ```
@@ -165,7 +165,7 @@ With that server configured, you can now take screenshots of `http://localhost:8
 - output: index.png
   url: http://localhost:8000/
 ```
-The server process will be automatically terminated when the `shot-scraper multi` command completes, unless you pass the `--leave-server` option to `shot-scraper multi` in which case it will be left running - you can terminate it using `kill PID` with the PID displayed in the console output.
+The server process will be automatically terminated when the `shot-power-scraper multi` command completes, unless you pass the `--leave-server` option to `shot-power-scraper multi` in which case it will be left running - you can terminate it using `kill PID` with the PID displayed in the console output.
 
 ## Running custom code between steps
 
@@ -196,29 +196,29 @@ If you specify these steps without a `url:` key they will still execute as indiv
     open("index.html", "w").write(content.upper())
 ```
 
-## `shot-scraper multi --help`
+## `shot-power-scraper multi --help`
 
 Full `--help` for this command:
 
 <!-- [[[cog
 import cog
-from shot_scraper import cli
+from shot_power_scraper import cli
 from click.testing import CliRunner
 runner = CliRunner()
 result = runner.invoke(cli.cli, ["multi", "--help"])
-help = result.output.replace("Usage: cli", "Usage: shot-scraper")
+help = result.output.replace("Usage: cli", "Usage: shot-power-scraper")
 cog.out(
     "```\n{}\n```\n".format(help.strip())
 )
 ]]] -->
 ```
-Usage: shot-scraper multi [OPTIONS] CONFIG
+Usage: shot-power-scraper multi [OPTIONS] CONFIG
 
   Take multiple screenshots, defined by a YAML file
 
   Usage:
 
-      shot-scraper multi config.yml
+      shot-power-scraper multi config.yml
 
   Where config.yml contains configuration like this:
 
@@ -226,7 +226,7 @@ Usage: shot-scraper multi [OPTIONS] CONFIG
         url: http://www.example.com/
 
   For full YAML syntax documentation, see:
-  https://shot-scraper.datasette.io/en/stable/multi.html
+  https://shot-power-scraper.datasette.io/en/stable/multi.html
 
 Options:
   -a, --auth FILENAME             Path to JSON authentication context file

@@ -1,5 +1,5 @@
 import pytest
-from shot_scraper.utils import filename_for_url
+from shot_power_scraper.utils import filename_for_url
 
 
 @pytest.mark.parametrize(

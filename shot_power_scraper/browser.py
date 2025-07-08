@@ -4,7 +4,7 @@ import json
 import click
 import nodriver as uc
 import pathlib
-from shot_scraper.utils import get_default_user_agent
+from shot_power_scraper.utils import get_default_user_agent
 
 
 class Config:

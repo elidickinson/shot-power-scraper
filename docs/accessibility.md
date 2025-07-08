@@ -2,37 +2,37 @@
 
 # Dumping out an accessibility tree
 
-The `shot-scraper accessibility` command dumps out the Chromium accessibility tree for the provided URL, as JSON:
+The `shot-power-scraper accessibility` command dumps out the Chromium accessibility tree for the provided URL, as JSON:
 ```bash
-shot-scraper accessibility https://datasette.io/
+shot-power-scraper accessibility https://datasette.io/
 ```
 Use `-o filename.json` to write the output to a file instead of displaying it.
 
 Add `--javascript SCRIPT` to execute custom JavaScript before taking the snapshot.
 
-## `shot-scraper accessibility --help`
+## `shot-power-scraper accessibility --help`
 
 Full `--help` for this command:
 
 <!-- [[[cog
 import cog
-from shot_scraper import cli
+from shot_power_scraper import cli
 from click.testing import CliRunner
 runner = CliRunner()
 result = runner.invoke(cli.cli, ["accessibility", "--help"])
-help = result.output.replace("Usage: cli", "Usage: shot-scraper")
+help = result.output.replace("Usage: cli", "Usage: shot-power-scraper")
 cog.out(
     "```\n{}\n```\n".format(help.strip())
 )
 ]]] -->
 ```
-Usage: shot-scraper accessibility [OPTIONS] URL
+Usage: shot-power-scraper accessibility [OPTIONS] URL
 
   Dump the Chromium accessibility tree for the specifed page
 
   Usage:
 
-      shot-scraper accessibility https://datasette.io/
+      shot-power-scraper accessibility https://datasette.io/
 
 Options:
   -a, --auth FILENAME    Path to JSON authentication context file

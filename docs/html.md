@@ -2,24 +2,24 @@
 
 # Dumping the HTML of a page
 
-The `shot-scraper html` command dumps out the final HTML of a page after all JavaScript has run.
+The `shot-power-scraper html` command dumps out the final HTML of a page after all JavaScript has run.
 ```bash
-shot-scraper html https://datasette.io/
+shot-power-scraper html https://datasette.io/
 ```
 Use `-o filename.html` to write the output to a file instead of displaying it.
 ```bash
-shot-scraper html https://datasette.io/ -o index.html
+shot-power-scraper html https://datasette.io/ -o index.html
 ```
 Add `--javascript SCRIPT` to execute custom JavaScript before taking the HTML snapshot.
 ```bash
-shot-scraper html https://datasette.io/ \
+shot-power-scraper html https://datasette.io/ \
   --javascript "document.querySelector('h1').innerText = 'Hello, world!'"
 ```
 ## Retrieving the HTML for a specific element
 
 You can use the `-s SELECTOR` option to capture just the HTML for one specific element on the page, identified using a CSS selector:
 ```bash
-shot-scraper html https://datasette.io/ -s h1
+shot-power-scraper html https://datasette.io/ -s h1
 ```
 This outputs:
 ```html
@@ -27,33 +27,33 @@ This outputs:
   <img class="datasette-logo" src="/static/datasette-logo.svg" alt="Datasette">
 </h1>
 ```
-## `shot-scraper html --help`
+## `shot-power-scraper html --help`
 
 Full `--help` for this command:
 
 <!-- [[[cog
 import cog
-from shot_scraper import cli
+from shot_power_scraper import cli
 from click.testing import CliRunner
 runner = CliRunner()
 result = runner.invoke(cli.cli, ["html", "--help"])
-help = result.output.replace("Usage: cli", "Usage: shot-scraper")
+help = result.output.replace("Usage: cli", "Usage: shot-power-scraper")
 cog.out(
     "```\n{}\n```\n".format(help.strip())
 )
 ]]] -->
 ```
-Usage: shot-scraper html [OPTIONS] URL
+Usage: shot-power-scraper html [OPTIONS] URL
 
   Output the final HTML of the specified page
 
   Usage:
 
-      shot-scraper html https://datasette.io/
+      shot-power-scraper html https://datasette.io/
 
   Use -o to specify a filename:
 
-      shot-scraper html https://datasette.io/ -o index.html
+      shot-power-scraper html https://datasette.io/ -o index.html
 
 Options:
   -a, --auth FILENAME             Path to JSON authentication context file

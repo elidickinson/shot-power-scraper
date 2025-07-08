@@ -2,7 +2,7 @@
 """
 Screenshot API Server
 
-A FastAPI server that provides REST endpoints for taking screenshots using shot-scraper.
+A FastAPI server that provides REST endpoints for taking screenshots using shot-power-scraper.
 
 Usage:
     python api_server.py [--browser-arg ARG ...]
@@ -59,13 +59,13 @@ import sys
 from pathlib import Path
 import click
 
-# Add parent directory to path to import shot_scraper
+# Add parent directory to path to import shot_power_scraper
 sys.path.insert(0, str(Path(__file__).parent))
 
-from shot_scraper.browser import create_browser_context, Config
-from shot_scraper.screenshot import take_shot
-from shot_scraper.utils import url_or_file_path
-from shot_scraper.cli import browser_args_option
+from shot_power_scraper.browser import create_browser_context, Config
+from shot_power_scraper.screenshot import take_shot
+from shot_power_scraper.utils import url_or_file_path
+from shot_power_scraper.cli import browser_args_option
 
 # Global browser instance for reuse
 browser_instance = None
@@ -162,7 +162,7 @@ async def get_browser():
 async def root():
     """API documentation"""
     return {
-        "message": "Shot Scraper API Server",
+        "message": "Shot Power Scraper API Server",
         "endpoints": {
             "/shot": "POST - Take a screenshot",
             "/health": "GET - Health check"
@@ -268,7 +268,7 @@ async def shot(request: ShotRequest):
     help="Enable auto-reload (default: false, can be overridden with RELOAD env var)"
 )
 def main(browser_args, host, port, reload):
-    """Start the Shot Scraper API Server"""
+    """Start the Shot Power Scraper API Server"""
     import uvicorn
     
     # Store browser args globally BEFORE creating the app
@@ -276,14 +276,14 @@ def main(browser_args, host, port, reload):
     global_browser_args = list(browser_args)
     
     # Now create the FastAPI app with the browser args already set
-    app = FastAPI(title="Shot Scraper API", version="1.0.0", lifespan=lifespan)
+    app = FastAPI(title="Shot Power Scraper API", version="1.0.0", lifespan=lifespan)
     
     # Register routes
     app.get("/")(root)
     app.get("/health")(health)
     app.post("/shot")(shot)
     
-    click.echo(f"Starting Shot Scraper API Server on {host}:{port}")
+    click.echo(f"Starting Shot Power Scraper API Server on {host}:{port}")
     click.echo(f"API documentation available at http://{host}:{port}/docs")
     click.echo("\nConfiguration:")
     click.echo(f"  HOST={host}")

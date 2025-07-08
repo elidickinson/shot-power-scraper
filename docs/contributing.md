@@ -2,11 +2,11 @@
 
 # Contributing
 
-The GitHub repository for this project is [simonw/shot-scraper](https://github.com/simonw/shot-scraper).
+The GitHub repository for this project is [simonw/shot-power-scraper](https://github.com/simonw/shot-power-scraper).
 
 To contribute to this tool, first checkout the code. Then create a new virtual environment:
 ```bash
-cd shot-scraper
+cd shot-power-scraper
 python -m venv venv
 source venv/bin/activate
 ```
@@ -20,7 +20,7 @@ pip install -e '.[test]'
 ```
 Then you'll need to install the Playwright browsers too:
 ```bash
-shot-scraper install
+shot-power-scraper install
 ```
 To run the tests:
 ```bash
@@ -50,7 +50,7 @@ cog -r docs/*.md
 
 After pushing a release, I use the following to create a screenshot of the release notes to use in social media posts:
 ```bash
-shot-scraper https://github.com/simonw/shot-scraper/releases/tag/0.15 \
+shot-power-scraper https://github.com/simonw/shot-power-scraper/releases/tag/0.15 \
   --selector '.Box-body' --width 700 \
   --retina
 ```
