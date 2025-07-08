@@ -364,3 +364,20 @@ def test_cloudflare_detection_logic():
     sig = inspect.signature(_wait_for_cloudflare_bypass)
     assert 'page' in sig.parameters
     assert 'max_wait_seconds' in sig.parameters
+
+
+def test_ad_block_flag():
+    """Test that --ad-block flag is accepted and processed correctly"""
+    runner = CliRunner()
+    
+    # Test that --ad-block flag is accepted by shot command
+    result = runner.invoke(cli, ["shot", "--ad-block", "--help"])
+    assert result.exit_code == 0
+    assert "--ad-block" in result.output
+    assert "Enable ad blocking using built-in filter lists" in result.output
+    
+    # Test that --ad-block flag is accepted by multi command
+    result = runner.invoke(cli, ["multi", "--ad-block", "--help"])
+    assert result.exit_code == 0
+    assert "--ad-block" in result.output
+    assert "Enable ad blocking using built-in filter lists" in result.output
