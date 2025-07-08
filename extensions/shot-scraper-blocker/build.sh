@@ -116,8 +116,8 @@ extract_cosmetic_rules() {
     # Print statistics header
     echo ""
     info "Filter List Statistics:"
-    printf "%-25s %8s %8s %8s %8s %8s\n" "Name" "Total" "Network" "Cosmetic" "Valid" "Unsupported"
-    printf "%-25s %8s %8s %8s %8s %8s\n" "----" "-----" "-------" "--------" "-----" "-----------"
+    printf "%-25s %8s %8s %8s %8s %8s %8s\n" "Name" "Total" "Network" "Cosmetic" "Script" "Valid" "Unsupported"
+    printf "%-25s %8s %8s %8s %8s %8s %8s\n" "----" "-----" "-------" "--------" "------" "-----" "-----------"
 
     # Combine all downloaded .txt files and show statistics
     echo "$FILTER_LISTS" | while IFS= read -r line; do
@@ -135,10 +135,11 @@ extract_cosmetic_rules() {
             local total=$(echo "$stats" | jq -r '.totalLines')
             local network=$(echo "$stats" | jq -r '.networkRules')
             local cosmetic=$(echo "$stats" | jq -r '.cosmeticRules')
+            local script=$(echo "$stats" | jq -r '.scriptRules')
             local valid=$(echo "$stats" | jq -r '.validCosmeticRules')
             local unsupported=$(echo "$stats" | jq -r '.unsupportedRules')
             
-            printf "%-25s %8s %8s %8s %8s %8s\n" "$name" "$total" "$network" "$cosmetic" "$valid" "$unsupported"
+            printf "%-25s %8s %8s %8s %8s %8s %8s\n" "$name" "$total" "$network" "$cosmetic" "$script" "$valid" "$unsupported"
             
             info "Adding cosmetic rules from $filter_file..."
             echo "" >> "$combined_filters"
@@ -185,19 +186,20 @@ combine_rules() {
             info "Processing $rules_file..."
 
             # Add IDs and merge with existing rules
+            local temp_rules_file="downloads/temp_${name_lower}_rules.json"
             jq --argjson start_id "$rule_id" '
                 [to_entries[] | .value.id = ($start_id + .key) | .value]
-            ' "$rules_file" > "downloads/temp_$rules_file"
+            ' "$rules_file" > "$temp_rules_file"
 
             # Update rule_id counter
             local count=$(jq length "$rules_file")
             rule_id=$((rule_id + count))
 
             # Merge with combined rules
-            jq -s '.[0] + .[1]' "$temp_combined" "downloads/temp_$rules_file" > "downloads/temp_new_combined.json"
+            jq -s '.[0] + .[1]' "$temp_combined" "$temp_rules_file" > "downloads/temp_new_combined.json"
             mv "downloads/temp_new_combined.json" "$temp_combined"
 
-            rm "downloads/temp_$rules_file"
+            rm "$temp_rules_file"
         fi
     done
 

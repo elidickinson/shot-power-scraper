@@ -6,7 +6,12 @@ const path = require('path');
 
 // Check if selector is a valid element hiding selector
 function isValidElementHidingSelector(selector) {
-    // Skip CSS injection rules and other complex ABP extensions
+    // Support JavaScript injection rules (+js)
+    if (selector.startsWith('+js(') && selector.endsWith(')')) {
+        return true;
+    }
+    
+    // Skip CSS injection rules and other complex ABP extensions (but not +js)
     if (selector.includes(':style(') || 
         selector.includes(':remove(') || 
         selector.includes(':has-text(') ||
@@ -50,10 +55,11 @@ function parseElementHidingRules(filterText) {
                 const selector = parts[1];
                 
                 if (selector && isValidElementHidingSelector(selector)) {
+                    const ruleType = selector.startsWith('+js(') ? 'script' : 'hide';
                     rules.push({
                         domains: domains ? domains.split(',') : null,
                         selector: selector,
-                        type: 'hide'
+                        type: ruleType
                     });
                 }
             }
@@ -94,6 +100,7 @@ function analyzeFilterFile(inputFile) {
         comments: 0,
         networkRules: 0,
         cosmeticRules: 0,
+        scriptRules: 0,
         unsupportedRules: 0,
         validCosmeticRules: 0
     };
@@ -113,7 +120,11 @@ function analyzeFilterFile(inputFile) {
             if (parts.length === 2) {
                 const selector = parts[1];
                 if (selector && isValidElementHidingSelector(selector)) {
-                    stats.validCosmeticRules++;
+                    if (selector.startsWith('+js(')) {
+                        stats.scriptRules++;
+                    } else {
+                        stats.validCosmeticRules++;
+                    }
                 } else {
                     stats.unsupportedRules++;
                 }

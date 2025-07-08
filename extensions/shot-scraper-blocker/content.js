@@ -54,8 +54,80 @@
         return rules;
     }
     
+    // Execute JavaScript injection rules
+    function executeScriptRule(scriptRule) {
+        // Parse +js(function, arg1, arg2, ...) format
+        const match = scriptRule.match(/^\+js\(([^)]+)\)$/);
+        if (!match) return;
+        
+        const args = match[1].split(',').map(arg => arg.trim());
+        const functionName = args[0];
+        const functionArgs = args.slice(1);
+        
+        try {
+            switch (functionName) {
+                case 'rc':
+                    // Remove class: rc(className, element, action)
+                    if (functionArgs.length >= 1) {
+                        const className = functionArgs[0];
+                        const element = functionArgs[1] || 'html';
+                        const action = functionArgs[2] || 'remove';
+                        
+                        const targetElement = element === 'html' ? document.documentElement : 
+                                            document.querySelector(element);
+                        
+                        if (targetElement) {
+                            if (action === 'remove' || action === 'stay') {
+                                targetElement.classList.remove(className);
+                            }
+                        }
+                    }
+                    break;
+                
+                case 'set':
+                    // Set property: set(property, value)
+                    if (functionArgs.length >= 2) {
+                        const property = functionArgs[0];
+                        const value = functionArgs[1];
+                        
+                        try {
+                            const keys = property.split('.');
+                            let obj = window;
+                            for (let i = 0; i < keys.length - 1; i++) {
+                                obj = obj[keys[i]] = obj[keys[i]] || {};
+                            }
+                            obj[keys[keys.length - 1]] = value;
+                        } catch (e) {
+                            // Ignore errors in property setting
+                        }
+                    }
+                    break;
+                
+                case 'noeval':
+                    // Disable eval
+                    try {
+                        window.eval = function() { return false; };
+                    } catch (e) {
+                        // Ignore errors
+                    }
+                    break;
+                
+                default:
+                    console.warn('Unsupported script function:', functionName);
+                    break;
+            }
+        } catch (error) {
+            console.warn('Error executing script rule:', scriptRule, error);
+        }
+    }
+    
     // Check if selector is a valid element hiding selector (not CSS injection or other complex rules)
     function isValidElementHidingSelector(selector) {
+        // Support JavaScript injection rules (+js)
+        if (selector.startsWith('+js(') && selector.endsWith(')')) {
+            return true;
+        }
+        
         // Skip CSS injection rules (:style(), :remove(), etc.)
         if (selector.includes(':style(') || 
             selector.includes(':remove(') || 
@@ -99,23 +171,29 @@
             if (!ruleApplies(rule, currentDomain)) return;
             
             try {
-                const elements = document.querySelectorAll(rule.selector);
-                elements.forEach(element => {
-                    if (rule.type === 'hide') {
-                        if (element.style.display !== 'none') {
-                            element.style.display = 'none';
-                            element.style.visibility = 'hidden';
-                            element.setAttribute('data-shot-scraper-blocked', 'cosmetic');
-                            hiddenElements++;
+                if (rule.type === 'script') {
+                    // Execute JavaScript injection rules
+                    executeScriptRule(rule.selector);
+                } else {
+                    // Handle CSS selector rules
+                    const elements = document.querySelectorAll(rule.selector);
+                    elements.forEach(element => {
+                        if (rule.type === 'hide') {
+                            if (element.style.display !== 'none') {
+                                element.style.display = 'none';
+                                element.style.visibility = 'hidden';
+                                element.setAttribute('data-shot-scraper-blocked', 'cosmetic');
+                                hiddenElements++;
+                            }
+                        } else if (rule.type === 'unhide') {
+                            // Remove hiding from unhide rules
+                            element.style.display = '';
+                            element.style.visibility = '';
+                            element.removeAttribute('data-shot-scraper-blocked');
+                            hiddenElements = Math.max(0, hiddenElements - 1);
                         }
-                    } else if (rule.type === 'unhide') {
-                        // Remove hiding from unhide rules
-                        element.style.display = '';
-                        element.style.visibility = '';
-                        element.removeAttribute('data-shot-scraper-blocked');
-                        hiddenElements = Math.max(0, hiddenElements - 1);
-                    }
-                });
+                    });
+                }
             } catch (error) {
                 console.warn('Invalid cosmetic filter selector:', rule.selector, error);
             }
