@@ -12,7 +12,7 @@ import nodriver as uc
 import asyncio
 
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent
-from shot_power_scraper.browser import Config, create_browser_context
+from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.page_utils import evaluate_js, wait_for_condition
 
@@ -24,6 +24,13 @@ async def run_with_browser_cleanup(coro):
     result = await coro
     await asyncio.sleep(0.25)  # Give nodriver time to cleanup background processes
     return result
+
+
+def run_async(coro):
+    """Run an async coroutine using uc.loop() as in nodriver examples."""
+    # Use nodriver's event loop as recommended in their docs
+    loop = uc.loop()
+    return loop.run_until_complete(coro)
 
 
 
@@ -71,7 +78,7 @@ def user_agent_option(fn):
 
 
 def log_console_option(fn):
-    click.option("--log-console", is_flag=True, help="Write console.log() to stderr")(
+    click.option("--log-console", "--console-log", is_flag=True, help="Write console.log() to stderr")(
         fn
     )
     return fn
@@ -424,7 +431,7 @@ def shot(
                 ad_blocker_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
                 if os.path.exists(ad_blocker_path):
                     extensions = [ad_blocker_path]
-                    if not silent:
+                    if verbose:
                         click.echo(f"Ad blocking enabled", err=True)
                 else:
                     if not silent:
@@ -489,13 +496,9 @@ def shot(
             raise click.ClickException(str(e))
         finally:
             if browser_obj:
-                try:
-                    await browser_obj.stop()
-                except Exception:
-                    # Browser cleanup can be flaky with event loops - just ignore it
-                    pass
+                await cleanup_browser(browser_obj)
 
-    asyncio.run(run_with_browser_cleanup(run_shot()))
+    run_async(run_with_browser_cleanup(run_shot()))
 
 
 
@@ -645,7 +648,7 @@ def multi(
             ad_blocker_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
             if os.path.exists(ad_blocker_path):
                 extensions = [ad_blocker_path]
-                if not silent:
+                if verbose:
                     click.echo(f"Ad blocking enabled", err=True)
             else:
                 if not silent:
@@ -715,12 +718,8 @@ def multi(
                             click.echo(str(e), err=True)
                             continue
         finally:
-            try:
-                if browser_obj:
-                    await browser_obj.stop()
-            except Exception:
-                # Ignore cleanup errors
-                pass
+            if browser_obj:
+                await cleanup_browser(browser_obj)
             if leave_server:
                 for process, details in server_processes:
                     click.echo(
@@ -734,7 +733,7 @@ def multi(
             if har_file and not silent:
                 click.echo(f"Wrote to HAR file: {har_file}", err=True)
 
-    asyncio.run(run_with_browser_cleanup(run_multi()))
+    run_async(run_with_browser_cleanup(run_multi()))
 
 
 @cli.command()
@@ -809,14 +808,10 @@ def accessibility(
         # nodriver doesn't have accessibility.snapshot(), we'll implement a basic alternative
         # or note that this feature is not available
         snapshot = {"message": "Accessibility tree dumping not yet supported with nodriver"}
-        try:
-            await browser_obj.stop()
-        except Exception:
-            # Browser cleanup can be flaky - just ignore it
-            pass
+        await cleanup_browser(browser_obj)
         return snapshot
 
-    snapshot = asyncio.run(run_with_browser_cleanup(run_accessibility()))
+    snapshot = run_async(run_with_browser_cleanup(run_accessibility()))
     output.write(json.dumps(snapshot, indent=4))
     output.write("\n")
 
@@ -917,15 +912,11 @@ def har(
         if wait_for:
             await page.wait_for_function(wait_for)
 
-        try:
-            await browser_obj.stop()
-        except Exception:
-            # Browser cleanup can be flaky - just ignore it
-            pass
+        await cleanup_browser(browser_obj)
 
     # Note: HAR recording not yet fully implemented with nodriver
     click.echo("HAR recording not yet fully supported with nodriver", err=True)
-    asyncio.run(run_with_browser_cleanup(run_har()))
+    run_async(run_with_browser_cleanup(run_har()))
 
 
 @cli.command()
@@ -1052,14 +1043,10 @@ def javascript(
         await page.get(url)
         
         result = await evaluate_js(page, javascript)
-        try:
-            await browser_obj.stop()
-        except Exception:
-            # Browser cleanup can be flaky - just ignore it
-            pass
+        await cleanup_browser(browser_obj)
         return result
 
-    result = asyncio.run(run_with_browser_cleanup(run_javascript()))
+    result = run_async(run_with_browser_cleanup(run_javascript()))
     if raw:
         output.write(str(result))
         return
@@ -1290,14 +1277,10 @@ def html(
         else:
             html = await page.get_content()
 
-        try:
-            await browser_obj.stop()
-        except Exception:
-            # Browser cleanup can be flaky - just ignore it
-            pass
+        await cleanup_browser(browser_obj)
         return html
 
-    html = asyncio.run(run_with_browser_cleanup(run_html()))
+    html = run_async(run_with_browser_cleanup(run_html()))
 
     if output == "-":
         sys.stdout.write(html)
@@ -1389,12 +1372,9 @@ def set_default_user_agent_cmd(browser, browser_args):
             click.echo(f"Saved default user agent to: {get_config_file()}")
 
         finally:
-            try:
-                await browser_obj.stop()
-            except Exception:
-                pass
+            await cleanup_browser(browser_obj)
 
-    asyncio.run(run_with_browser_cleanup(detect_and_set_user_agent()))
+    run_async(run_with_browser_cleanup(detect_and_set_user_agent()))
 
 
 @cli.command()
@@ -1437,14 +1417,10 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
             "cookies": cookies.cookies if hasattr(cookies, 'cookies') else [],
             "origins": []
         }
-        try:
-            await browser_obj.stop()
-        except Exception:
-            # Browser cleanup can be flaky - just ignore it
-            pass
+        await cleanup_browser(browser_obj)
         return context_state
 
-    context_state = asyncio.run(run_with_browser_cleanup(run_auth()))
+    context_state = run_async(run_with_browser_cleanup(run_auth()))
     context_json = json.dumps(context_state, indent=2) + "\n"
     if context_file == "-":
         click.echo(context_json)

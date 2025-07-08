@@ -4,6 +4,8 @@ import json
 import click
 import nodriver as uc
 import pathlib
+import tempfile
+import shutil
 from shot_power_scraper.utils import get_default_user_agent
 
 
@@ -79,8 +81,11 @@ async def create_browser_context(
             if Config.verbose:
                 click.echo(f"Added extension arguments: {extension_arg}", err=True)
     
+    # Create temporary user data directory to avoid nodriver cleanup messages
+    temp_user_data_dir = tempfile.mkdtemp(prefix="shot_scraper_")
+    
     # Create browser config
-    config = uc.Config()
+    config = uc.Config(user_data_dir=temp_user_data_dir)
     config.headless = not interactive
     
     # Add browser args (including extension args)
@@ -117,4 +122,22 @@ async def create_browser_context(
                     # Ignore cookie setting errors for now
                     pass
 
+    # Store the temp directory on the browser object for later cleanup
+    browser_obj._temp_user_data_dir = temp_user_data_dir
+    
     return browser_obj
+
+
+async def cleanup_browser(browser_obj):
+    """Clean up browser and its temporary user data directory"""
+    if browser_obj is None:
+        return
+        
+    # Stop the browser first (stop() is a regular sync method, not async)
+    browser_obj.stop()
+    
+    # Clean up our temporary user data directory
+    if hasattr(browser_obj, '_temp_user_data_dir'):
+        shutil.rmtree(browser_obj._temp_user_data_dir, ignore_errors=True)
+        if Config.verbose:
+            click.echo(f"Cleaned up temp profile: {browser_obj._temp_user_data_dir}", err=True)
