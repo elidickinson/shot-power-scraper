@@ -301,6 +301,11 @@ def cli():
     is_flag=True,
     help="Skip automatic annoyance clearing"
 )
+@click.option(
+    "--ad-block",
+    is_flag=True,
+    help="Enable ad blocking using built-in filter lists"
+)
 def shot(
     url,
     auth,
@@ -341,6 +346,7 @@ def shot(
     verbose,
     save_html,
     skip_annoyance_clearing,
+    ad_block,
 ):
     """
     Take a single screenshot of a page or portion of a page.
@@ -412,6 +418,18 @@ def shot(
         use_existing_page = False
         browser_obj = None
         try:
+            # Add ad blocker extension if requested
+            extensions = None
+            if ad_block:
+                ad_blocker_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
+                if os.path.exists(ad_blocker_path):
+                    extensions = [ad_blocker_path]
+                    if not silent:
+                        click.echo(f"Ad blocking enabled", err=True)
+                else:
+                    if not silent:
+                        click.echo(f"Warning: Ad blocker extension not found at {ad_blocker_path}", err=True)
+            
             browser_obj = await create_browser_context(
                 auth=auth,
                 interactive=interactive,
@@ -425,6 +443,7 @@ def shot(
                 bypass_csp=bypass_csp,
                 auth_username=auth_username,
                 auth_password=auth_password,
+                extensions=extensions,
             )
 
             if not browser_obj:
@@ -548,6 +567,11 @@ def shot(
     is_flag=True,
     help="Enable verbose logging including DOM Ready timing"
 )
+@click.option(
+    "--ad-block",
+    is_flag=True,
+    help="Enable ad blocking using built-in filter lists"
+)
 def multi(
     config,
     auth,
@@ -572,6 +596,7 @@ def multi(
     har_zip,
     har_file,
     verbose,
+    ad_block,
 ):
     """
     Take multiple screenshots, defined by a YAML file
@@ -614,6 +639,18 @@ def multi(
     if not isinstance(shots, list):
         raise click.ClickException("YAML file must contain a list")
     async def run_multi():
+        # Add ad blocker extension if requested
+        extensions = None
+        if ad_block:
+            ad_blocker_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
+            if os.path.exists(ad_blocker_path):
+                extensions = [ad_blocker_path]
+                if not silent:
+                    click.echo(f"Ad blocking enabled", err=True)
+            else:
+                if not silent:
+                    click.echo(f"Warning: Ad blocker extension not found at {ad_blocker_path}", err=True)
+        
         browser_obj = await create_browser_context(
             auth=auth,
             scale_factor=scale_factor,
@@ -625,6 +662,7 @@ def multi(
             auth_username=auth_username,
             auth_password=auth_password,
             record_har_path=har_file or None,
+            extensions=extensions,
         )
         try:
             for shot in shots:
