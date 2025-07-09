@@ -385,15 +385,9 @@ def cli():
     help="Skip Cloudflare challenge detection and waiting"
 )
 @click.option(
-    "--wait-for-dom-ready-timeout",
-    type=int,
-    default=10000,
-    help="Maximum milliseconds to wait for DOM ready (default: 10000)"
-)
-@click.option(
-    "--skip-wait-for-dom-ready",
+    "--skip-wait-for-load",
     is_flag=True,
-    help="Skip waiting for DOM ready state"
+    help="Skip waiting for window load event"
 )
 @click.option(
     "--full-page",
@@ -460,8 +454,7 @@ def shot(
     auth_username,
     auth_password,
     skip_cloudflare_check,
-    wait_for_dom_ready_timeout,
-    skip_wait_for_dom_ready,
+    skip_wait_for_load,
     full_page,
     verbose,
     save_html,
@@ -529,8 +522,7 @@ def shot(
         "omit_background": omit_background,
         "scale_factor": scale_factor,
         "skip_cloudflare_check": skip_cloudflare_check,
-        "wait_for_dom_ready_timeout": wait_for_dom_ready_timeout,
-        "skip_wait_for_dom_ready": skip_wait_for_dom_ready,
+        "skip_wait_for_load": skip_wait_for_load,
         "full_page": full_page,
         "verbose": verbose,
         "save_html": save_html,

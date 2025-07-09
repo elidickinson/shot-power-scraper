@@ -14,7 +14,6 @@ from shot_power_scraper.page_utils import (
     evaluate_js,
     detect_cloudflare_challenge,
     wait_for_cloudflare_bypass,
-    wait_for_dom_ready,
     wait_for_condition,
     detect_navigation_error
 )
@@ -174,8 +173,8 @@ async def take_shot(
     wait_for = shot.get("wait_for")
     padding = shot.get("padding") or 0
     skip_cloudflare_check = shot.get("skip_cloudflare_check", False)
-    wait_for_dom_ready_timeout = shot.get("wait_for_dom_ready_timeout", 10000)
-    skip_wait_for_dom_ready = shot.get("skip_wait_for_dom_ready", False)
+    timeout = shot.get("timeout", 30)
+    skip_wait_for_load = shot.get("skip_wait_for_load", False)
 
     selectors = list(shot.get("selectors") or [])
     selectors_all = list(shot.get("selectors_all") or [])
@@ -211,8 +210,22 @@ async def take_shot(
         if Config.verbose:
             click.echo(f"Loading page: {url}", err=True)
         await page.get(url)
-        if Config.verbose:
-            click.echo(f"Page loaded: {url}", err=True)
+        
+        # Wait for the window load event (all resources including images) unless skipped
+        if not skip_wait_for_load:
+            if Config.verbose:
+                click.echo(f"Waiting for window load event...", err=True)
+            
+            await page.evaluate(f"""
+                new Promise((resolve) => {{
+                    if (document.readyState === 'complete') {{
+                        resolve();
+                    }} else {{
+                        window.addEventListener('load', resolve);
+                        setTimeout(resolve, {timeout * 1000});
+                    }}
+                }});
+            """)
             
         if log_requests:
             # nodriver doesn't have direct response events like Playwright
@@ -240,11 +253,6 @@ async def take_shot(
             elif not silent:
                 click.echo(f"Warning: {full_msg}", err=True)
 
-        # Wait for DOM ready unless explicitly skipped or wait_for is specified
-        if not skip_wait_for_dom_ready and not wait_for:
-            dom_ready = await wait_for_dom_ready(page, wait_for_dom_ready_timeout)
-            if not dom_ready and not silent:
-                click.echo(f"DOM ready timeout after {wait_for_dom_ready_timeout}ms", err=True)
     else:
         page = context_or_page
         # Set up console logging for existing page

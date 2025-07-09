@@ -63,44 +63,6 @@ async def wait_for_cloudflare_bypass(page, max_wait_seconds=8):
     return False
 
 
-async def wait_for_dom_ready(page, timeout_ms=10000):
-    """Wait for DOM to be ready or timeout"""
-    try:
-        start_time = time.time()
-        timeout_seconds = timeout_ms / 1000
-
-        if Config.verbose:
-            click.echo(f"Waiting for DOM ready state (timeout: {timeout_ms}ms)...", err=True)
-
-        check_count = 0
-        while time.time() - start_time < timeout_seconds:
-            elapsed_ms = int((time.time() - start_time) * 1000)
-
-            # Get current state for verbose logging
-            ready_state = await page.evaluate("document.readyState")
-
-            if Config.verbose:
-                check_count += 1
-                if check_count % 10 == 0:  # Log every 10 checks (roughly every second)
-                    click.echo(f"DOM ready check #{check_count}: readyState='{ready_state}', elapsed={elapsed_ms}ms", err=True)
-
-            if ready_state == 'complete':
-                if Config.verbose:
-                    click.echo(f"DOM ready achieved in {elapsed_ms}ms (readyState: {ready_state})", err=True)
-                return True
-
-            await asyncio.sleep(0.1)
-
-        # Timeout reached
-        if Config.verbose:
-            final_state = await page.evaluate("document.readyState")
-            click.echo(f"DOM ready timeout after {timeout_ms}ms (final readyState: {final_state})", err=True)
-
-        return False  # Timed out
-    except Exception as e:
-        if Config.verbose:
-            click.echo(f"DOM ready check failed with exception: {e}", err=True)
-        return False
 
 
 async def wait_for_condition(page, wait_for_expression, timeout_seconds=30):
@@ -119,6 +81,9 @@ async def wait_for_condition(page, wait_for_expression, timeout_seconds=30):
         await asyncio.sleep(0.1)
 
     raise click.ClickException(f"Timeout waiting for condition: {wait_for_expression}")
+
+
+
 
 
 async def detect_navigation_error(page, expected_url):
