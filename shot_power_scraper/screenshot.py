@@ -20,6 +20,7 @@ from shot_power_scraper.page_utils import (
 from shot_power_scraper.annoyance_manager import clear_annoyances
 from shot_power_scraper.utils import filename_for_url, url_or_file_path
 from shot_power_scraper.console_logger import ConsoleLogger
+from shot_power_scraper.response_handler import ResponseHandler
 
 
 def _check_and_absolutize(filepath):
@@ -173,7 +174,7 @@ async def take_shot(
     wait_for = shot.get("wait_for")
     padding = shot.get("padding") or 0
     skip_cloudflare_check = shot.get("skip_cloudflare_check", False)
-    timeout = shot.get("timeout", 30)
+    timeout = shot.get("timeout") or 30
     skip_wait_for_load = shot.get("skip_wait_for_load", False)
 
     selectors = list(shot.get("selectors") or [])
@@ -206,6 +207,11 @@ async def take_shot(
             if Config.verbose:
                 click.echo("Console logging enabled", err=True)
         
+        # Set up response handler for HTTP status checking
+        response_handler = ResponseHandler()
+        import nodriver as uc
+        page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
+        
         # Now navigate to the actual URL
         if Config.verbose:
             click.echo(f"Loading page: {url}", err=True)
@@ -231,6 +237,18 @@ async def take_shot(
             # nodriver doesn't have direct response events like Playwright
             # We can implement this later using CDP if needed
             pass
+        
+        # Check HTTP response status
+        response_status, response_url = await response_handler.wait_for_response(timeout=5)
+        if response_status is not None:
+            # Create a response-like object for skip_or_fail function
+            class ResponseObj:
+                def __init__(self, status, url):
+                    self.status = status
+                    self.url = url
+            
+            from shot_power_scraper.cli import skip_or_fail
+            skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
 
         # Automatic Cloudflare detection and waiting
         if not skip_cloudflare_check and await detect_cloudflare_challenge(page):

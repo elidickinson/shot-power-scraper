@@ -346,7 +346,7 @@ def cli():
 )
 @click.option("--quality", type=int, help="Save as JPEG with this quality, e.g. 80")
 @click.option(
-    "--wait", type=int, help="Wait this many milliseconds before taking the screenshot"
+    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the screenshot (default: 250)"
 )
 @click.option("--wait-for", help="Wait until this JS expression returns true")
 @click.option(
@@ -956,7 +956,7 @@ def accessibility(
     help="HAR filename",
 )
 @click.option(
-    "--wait", type=int, help="Wait this many milliseconds before taking the screenshot"
+    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the screenshot (default: 250)"
 )
 @click.option("--wait-for", help="Wait until this JS expression returns true")
 @click.option("-j", "--javascript", help="Execute this JavaScript on the page")
@@ -1145,7 +1145,7 @@ def javascript(
 )
 @click.option("-j", "--javascript", help="Execute this JS prior to creating the PDF")
 @click.option(
-    "--wait", type=int, help="Wait this many milliseconds before taking the screenshot"
+    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the screenshot (default: 250)"
 )
 @click.option("--wait-for", help="Wait until this JS expression returns true")
 @click.option(
@@ -1245,7 +1245,7 @@ def pdf(
     help="Return outerHTML of first element matching this CSS selector",
 )
 @click.option(
-    "--wait", type=int, help="Wait this many milliseconds before taking the snapshot"
+    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the snapshot (default: 250)"
 )
 @log_console_option
 @browser_option
