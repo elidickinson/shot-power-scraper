@@ -88,6 +88,10 @@ async def create_browser_context(
     config = uc.Config(user_data_dir=temp_user_data_dir)
     config.headless = not interactive
     
+    # Add --hide-scrollbars when in headless mode
+    if not interactive:
+        browser_args_list.append("--hide-scrollbars")
+    
     # Add browser args (including extension args)
     for arg in browser_args_list:
         config.add_argument(arg)

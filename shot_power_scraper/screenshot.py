@@ -20,6 +20,69 @@ from shot_power_scraper.console_logger import ConsoleLogger
 from shot_power_scraper.response_handler import ResponseHandler
 
 
+class ShotConfig:
+    """Configuration for screenshot operations"""
+    def __init__(self, shot):
+        self.url = shot.get("url") or ""
+        self.output = (shot.get("output") or "").strip()
+        self.quality = shot.get("quality")
+        self.omit_background = shot.get("omit_background")
+        self.wait = shot.get("wait")
+        self.wait_for = shot.get("wait_for")
+        self.padding = shot.get("padding") or 0
+        self.skip_cloudflare_check = shot.get("skip_cloudflare_check", False)
+        self.timeout = shot.get("timeout") or 30
+        self.skip_wait_for_load = shot.get("skip_wait_for_load", False)
+        self.javascript = shot.get("javascript")
+        self.full_page = shot.get("full_page", not shot.get("height"))
+        self.configure_extension = shot.get("configure_extension")
+        self.ad_block = shot.get("ad_block", False)
+        self.popup_block = shot.get("popup_block", False)
+        self.skip_shot = shot.get("skip_shot")
+        self.save_html = shot.get("save_html")
+        self.width = shot.get("width")
+        self.height = shot.get("height")
+        
+        # Process selectors
+        self.selectors = list(shot.get("selectors") or [])
+        self.selectors_all = list(shot.get("selectors_all") or [])
+        self.js_selectors = list(shot.get("js_selectors") or [])
+        self.js_selectors_all = list(shot.get("js_selectors_all") or [])
+        
+        # Add single selectors to their respective lists
+        if shot.get("selector"):
+            self.selectors.append(shot["selector"])
+        if shot.get("selector_all"):
+            self.selectors_all.append(shot["selector_all"])
+        if shot.get("js_selector"):
+            self.js_selectors.append(shot["js_selector"])
+        if shot.get("js_selector_all"):
+            self.js_selectors_all.append(shot["js_selector_all"])
+    
+    def has_selectors(self):
+        """Check if any selectors are defined"""
+        return bool(self.selectors or self.js_selectors or self.selectors_all or self.js_selectors_all)
+
+
+async def _save_screenshot_with_temp_file(page, format, quality, full_page):
+    """Save screenshot to temporary file and return bytes"""
+    suffix = '.jpg' if format == "jpeg" else '.png'
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        await _save_screenshot(page, tmp.name, format, quality, full_page)
+        with open(tmp.name, 'rb') as f:
+            bytes_data = f.read()
+        os.unlink(tmp.name)
+        return bytes_data
+
+
+async def _save_screenshot(page, output, format, quality, full_page):
+    """Save screenshot to file"""
+    if format == "jpeg" and quality:
+        await page.save_screenshot(output, format=format, quality=quality, full_page=full_page)
+    else:
+        await page.save_screenshot(output, format=format, full_page=full_page)
+
+
 def _check_and_absolutize(filepath):
     """Check if a file exists and return its absolute path"""
     try:
@@ -153,40 +216,18 @@ async def take_shot(
     silent=False,
 ):
     """Take a screenshot based on the provided configuration"""
-    url = shot.get("url") or ""
-    if not url:
+    config = ShotConfig(shot)
+    
+    if not config.url:
         raise click.ClickException("url is required")
 
     if skip and fail:
         raise click.ClickException("--skip and --fail cannot be used together")
 
-    url = url_or_file_path(url, file_exists=_check_and_absolutize)
-
-    output = (shot.get("output") or "").strip()
-    if not output and not return_bytes:
-        output = filename_for_url(url, ext="png", file_exists=os.path.exists)
-    quality = shot.get("quality")
-    omit_background = shot.get("omit_background")
-    wait = shot.get("wait")
-    wait_for = shot.get("wait_for")
-    padding = shot.get("padding") or 0
-    skip_cloudflare_check = shot.get("skip_cloudflare_check", False)
-    timeout = shot.get("timeout") or 30
-    skip_wait_for_load = shot.get("skip_wait_for_load", False)
-
-    selectors = list(shot.get("selectors") or [])
-    selectors_all = list(shot.get("selectors_all") or [])
-    js_selectors = list(shot.get("js_selectors") or [])
-    js_selectors_all = list(shot.get("js_selectors_all") or [])
-    # If a single 'selector' append to 'selectors' array (and 'js_selectors' etc)
-    if shot.get("selector"):
-        selectors.append(shot["selector"])
-    if shot.get("selector_all"):
-        selectors_all.append(shot["selector_all"])
-    if shot.get("js_selector"):
-        js_selectors.append(shot["js_selector"])
-    if shot.get("js_selector_all"):
-        js_selectors_all.append(shot["js_selector_all"])
+    url = url_or_file_path(config.url, file_exists=_check_and_absolutize)
+    
+    if not config.output and not return_bytes:
+        config.output = filename_for_url(url, ext="png", file_exists=os.path.exists)
 
     if not use_existing_page:
         # Create a new tab first to set up console logging before navigation
@@ -215,7 +256,7 @@ async def take_shot(
         await page.get(url)
 
         # Wait for the window load event (all resources including images) unless skipped
-        if not skip_wait_for_load:
+        if not config.skip_wait_for_load:
             if Config.verbose:
                 click.echo(f"Waiting for window load event...", err=True)
 
@@ -225,7 +266,7 @@ async def take_shot(
                         resolve();
                     }} else {{
                         window.addEventListener('load', resolve);
-                        setTimeout(resolve, {timeout * 1000});
+                        setTimeout(resolve, {config.timeout * 1000});
                     }}
                 }});
             """)
@@ -248,7 +289,7 @@ async def take_shot(
             skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
 
         # Automatic Cloudflare detection and waiting
-        if not skip_cloudflare_check and await detect_cloudflare_challenge(page):
+        if not config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
             if not silent:
                 click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
             success = await wait_for_cloudflare_bypass(page)
@@ -276,72 +317,53 @@ async def take_shot(
             console_logger = ConsoleLogger(silent=silent)
             await console_logger.setup(page)
 
-    viewport = get_viewport(shot.get("width"), shot.get("height"))
+    viewport = get_viewport(config.width, config.height)
     if viewport:
         # nodriver doesn't have set_viewport_size, we'll use window size instead
         await page.set_window_size(viewport["width"], viewport["height"])
 
-    # Use explicit full_page if provided, otherwise default to True if no height is specified
-    full_page = shot.get("full_page", not shot.get("height"))
-
     # Configure blocking extensions if enabled
-    if shot.get("configure_extension"):
+    if config.configure_extension:
         from shot_power_scraper.cli import configure_blocking_extension
         await configure_blocking_extension(
             page,
-            shot.get("ad_block", False),
-            shot.get("popup_block", False),
+            config.ad_block,
+            config.popup_block,
             Config.verbose
         )
 
-    if wait:
+    if config.wait:
         if Config.verbose:
-            click.echo(f"Waiting {wait}ms before processing...", err=True)
-        time.sleep(wait / 1000)
+            click.echo(f"Waiting {config.wait}ms before processing...", err=True)
+        time.sleep(config.wait / 1000)
 
-
-    javascript = shot.get("javascript")
-    if javascript:
+    if config.javascript:
         if Config.verbose:
-            click.echo(f"Executing JavaScript: {javascript[:50]}{'...' if len(javascript) > 50 else ''}", err=True)
-        await evaluate_js(page, javascript)
+            click.echo(f"Executing JavaScript: {config.javascript[:50]}{'...' if len(config.javascript) > 50 else ''}", err=True)
+        await evaluate_js(page, config.javascript)
 
-    if wait_for:
-        await wait_for_condition(page, wait_for)
+    if config.wait_for:
+        await wait_for_condition(page, config.wait_for)
 
-    screenshot_args = {}
     # Determine format based on quality parameter
-    format = "jpeg" if quality else "png"
-    if quality:
-        screenshot_args.update({"quality": quality, "type": "jpeg"})
-    if omit_background:
-        screenshot_args.update({"omit_background": True})
-    if not return_bytes:
-        screenshot_args["path"] = output
+    format = "jpeg" if config.quality else "png"
+    full_page = config.full_page if not config.has_selectors() else True
 
-    if (
-        not selectors
-        and not js_selectors
-        and not selectors_all
-        and not js_selectors_all
-    ):
-        screenshot_args["full_page"] = full_page
-
-    if js_selectors or js_selectors_all:
+    if config.js_selectors or config.js_selectors_all:
         # Evaluate JavaScript adding classes we can select on
         (
             js_selector_js,
             extra_selectors,
             extra_selectors_all,
-        ) = js_selector_javascript(js_selectors, js_selectors_all)
-        selectors.extend(extra_selectors)
-        selectors_all.extend(extra_selectors_all)
+        ) = js_selector_javascript(config.js_selectors, config.js_selectors_all)
+        config.selectors.extend(extra_selectors)
+        config.selectors_all.extend(extra_selectors_all)
         await evaluate_js(page, js_selector_js)
 
-    if selectors or selectors_all:
+    if config.has_selectors():
         # Use JavaScript to create a box around those elements
         selector_js, selector_to_shoot = selector_javascript(
-            selectors, selectors_all, padding
+            config.selectors, config.selectors_all, config.padding
         )
         await evaluate_js(page, selector_js)
         try:
@@ -349,30 +371,13 @@ async def take_shot(
             element = await page.select(selector_to_shoot)
             if element:
                 if return_bytes:
-                    # For bytes output, save to temp file then read
-                    # Use appropriate suffix based on format
-                    suffix = '.jpg' if format == "jpeg" else '.png'
-                    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-                        # Add quality parameter for JPEG format
-                        if format == "jpeg" and quality:
-                            await page.save_screenshot(tmp.name, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
-                        else:
-                            await page.save_screenshot(tmp.name, format=format, full_page=screenshot_args.get("full_page", True))
-                        with open(tmp.name, 'rb') as f:
-                            bytes_data = f.read()
-                        os.unlink(tmp.name)
-                        return bytes_data
+                    return await _save_screenshot_with_temp_file(page, format, config.quality, full_page)
                 else:
                     if Config.verbose:
                         click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
-                    # Add quality parameter for JPEG format
-                    if format == "jpeg" and quality:
-                        result = await page.save_screenshot(output, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
-                    else:
-                        result = await page.save_screenshot(output, format=format, full_page=screenshot_args.get("full_page", True))
-                    # save_screenshot might return None, that's OK
+                    await _save_screenshot(page, config.output, format, config.quality, full_page)
                     message = "Screenshot of '{}' on '{}' written to '{}'".format(
-                        ", ".join(list(selectors) + list(selectors_all)), url, output
+                        ", ".join(list(config.selectors) + list(config.selectors_all)), url, config.output
                     )
             else:
                 raise click.ClickException(f"Could not find element matching selector: {selector_to_shoot}")
@@ -381,45 +386,28 @@ async def take_shot(
                 f"Timed out while waiting for element to become available.\n\n{e}"
             )
     else:
-        if shot.get("skip_shot"):
+        if config.skip_shot:
             message = "Skipping screenshot of '{}'".format(url)
         else:
             # Whole page
             if return_bytes:
-                # For bytes output, save to temp file then read
-                # Use appropriate suffix based on format
-                suffix = '.jpg' if format == "jpeg" else '.png'
-                with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-                    # Add quality parameter for JPEG format
-                    if format == "jpeg" and quality:
-                        await page.save_screenshot(tmp.name, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
-                    else:
-                        await page.save_screenshot(tmp.name, format=format, full_page=screenshot_args.get("full_page", True))
-                    with open(tmp.name, 'rb') as f:
-                        bytes_data = f.read()
-                    os.unlink(tmp.name)
-                    return bytes_data
+                return await _save_screenshot_with_temp_file(page, format, config.quality, full_page)
             else:
                 if Config.verbose:
-                    click.echo(f"Taking screenshot (full_page={screenshot_args.get('full_page', True)})", err=True)
-                # Add quality parameter for JPEG format
-                if format == "jpeg" and quality:
-                    await page.save_screenshot(output, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
-                else:
-                    await page.save_screenshot(output, format=format, full_page=screenshot_args.get("full_page", True))
-                # save_screenshot might return None, that's OK
-                message = f"Screenshot of '{url}' written to '{output}'"
+                    click.echo(f"Taking screenshot (full_page={full_page})", err=True)
+                await _save_screenshot(page, config.output, format, config.quality, full_page)
+                message = f"Screenshot of '{url}' written to '{config.output}'"
 
     # Save HTML if requested
-    if shot.get("save_html") and not return_bytes:
+    if config.save_html and not return_bytes:
         try:
             # Get the HTML content
             html_content = await page.get_content()
 
             # Determine HTML filename from screenshot output
-            if output and output != "-":
+            if config.output and config.output != "-":
                 # Get the base name without extension
-                output_path = pathlib.Path(output)
+                output_path = pathlib.Path(config.output)
                 html_filename = output_path.with_suffix('.html')
 
                 # Write HTML content to file

@@ -13,7 +13,7 @@ import asyncio
 
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser
-from shot_power_scraper.screenshot import take_shot
+from shot_power_scraper.screenshot import take_shot, get_viewport
 from shot_power_scraper.page_utils import evaluate_js
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
@@ -559,7 +559,7 @@ def shot(
                 use_existing_page = True
                 page = await browser_obj.get(url)
                 if width or height:
-                    viewport = _get_viewport(width, height)
+                    viewport = get_viewport(width, height)
                     await page.set_window_size(viewport["width"], viewport["height"])
                 click.echo(
                     "Hit <enter> to take the shot and close the browser window:", err=True
@@ -591,8 +591,6 @@ def shot(
                     fail=fail,
                     silent=silent,
                 )
-        except Exception as e:
-            raise click.ClickException(str(e))
         finally:
             if browser_obj:
                 await cleanup_browser(browser_obj)
