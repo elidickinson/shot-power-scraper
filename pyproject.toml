@@ -1,0 +1,31 @@
+[project]
+name = "shot-power-scraper"
+version = "0.1.0"
+description = "A powerful command-line utility for taking automated screenshots of websites with enhanced capabilities"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click",
+    "pyyaml",
+    "nodriver",
+    "click-default-group",
+    "fastapi>=0.115.14",
+    "uvicorn>=0.35.0",
+    "pydantic>=2.11.7",
+    "pytest>=8.4.1",
+]
+
+[project.scripts]
+shot-power-scraper = "shot_power_scraper.cli:cli"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.4.1",
+    "cogapp",
+    "pytest-mock",
+]
+api = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.0.0",
+]
