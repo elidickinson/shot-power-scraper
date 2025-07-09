@@ -11,7 +11,7 @@ import click
 import nodriver as uc
 import asyncio
 
-from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent
+from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.page_utils import evaluate_js, wait_for_condition
@@ -31,6 +31,15 @@ def run_async(coro):
     # Use nodriver's event loop as recommended in their docs
     loop = uc.loop()
     return loop.run_until_complete(coro)
+
+
+def resolve_blocking_config(ad_block, popup_block):
+    """Resolve ad_block and popup_block values from config if not explicitly set."""
+    if ad_block is None:
+        ad_block = get_default_ad_block()
+    if popup_block is None:
+        popup_block = get_default_popup_block()
+    return ad_block, popup_block
 
 
 async def setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent):
@@ -407,15 +416,15 @@ def cli():
     help="Enable automatic annoyance clearing"
 )
 @click.option(
-    "--ad-block",
-    is_flag=True,
-    help="Enable ad blocking using built-in filter lists"
+    "--ad-block/--no-ad-block",
+    default=None,
+    help="Enable/disable ad blocking (overrides config file setting)"
 )
 @click.option(
-    "--popup-block",
-    "--block-popups",
-    is_flag=True,
-    help="Enable popup and annoyance blocking using filter lists"
+    "--popup-block/--no-popup-block",
+    "--block-popups/--no-block-popups",
+    default=None,
+    help="Enable/disable popup blocking (overrides config file setting)"
 )
 def shot(
     url,
@@ -499,6 +508,9 @@ def shot(
         output = filename_for_url(url, ext=ext, file_exists=os.path.exists)
 
     scale_factor = normalize_scale_factor(retina, scale_factor)
+    
+    # Resolve ad_block and popup_block from config if not explicitly set
+    ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
 
     shot = {
         "url": url,
@@ -674,15 +686,15 @@ def shot(
     help="Enable verbose logging including DOM Ready timing"
 )
 @click.option(
-    "--ad-block",
-    is_flag=True,
-    help="Enable ad blocking using built-in filter lists"
+    "--ad-block/--no-ad-block",
+    default=None,
+    help="Enable/disable ad blocking (overrides config file setting)"
 )
 @click.option(
-    "--popup-block",
-    "--block-popups",
-    is_flag=True,
-    help="Enable popup and annoyance blocking using filter lists"
+    "--popup-block/--no-popup-block",
+    "--block-popups/--no-block-popups",
+    default=None,
+    help="Enable/disable popup blocking (overrides config file setting)"
 )
 def multi(
     config,
@@ -738,6 +750,9 @@ def multi(
         )
 
     scale_factor = normalize_scale_factor(retina, scale_factor)
+    
+    # Resolve ad_block and popup_block from config if not explicitly set
+    ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
     shots = yaml.safe_load(config)
 
     # Special case: if we are recording a har_file output can be blank to skip a shot
@@ -921,9 +936,10 @@ def accessibility(
         
         if javascript:
             await evaluate_js(page, javascript)
-        # nodriver doesn't have accessibility.snapshot(), we'll implement a basic alternative
-        # or note that this feature is not available
-        snapshot = {"message": "Accessibility tree dumping not yet supported with nodriver"}
+        
+        # Accessibility not implemented
+        snapshot = {"message": "Accessibility tree dumping not implemented"}
+        
         await cleanup_browser(browser_obj)
         return snapshot
 
@@ -1429,6 +1445,54 @@ def set_default_user_agent_cmd(browser, browser_args):
             await cleanup_browser(browser_obj)
 
     run_async(run_with_browser_cleanup(detect_and_set_user_agent()))
+
+
+@cli.command(name="config")
+@click.option(
+    "--ad-block",
+    type=bool,
+    help="Set default ad blocking (true/false)"
+)
+@click.option(
+    "--popup-block",
+    type=bool,
+    help="Set default popup blocking (true/false)"
+)
+@click.option(
+    "--show",
+    is_flag=True,
+    help="Show current configuration"
+)
+def config_cmd(ad_block, popup_block, show):
+    """
+    Configure default settings for shot-power-scraper
+    
+    Usage:
+    
+        shot-power-scraper config --ad-block true --popup-block false
+        shot-power-scraper config --show
+    """
+    from shot_power_scraper.utils import load_config, set_default_ad_block, set_default_popup_block, get_config_file
+    
+    if show:
+        config = load_config()
+        click.echo(f"Configuration file: {get_config_file()}")
+        click.echo(f"ad_block: {config.get('ad_block', False)}")
+        click.echo(f"popup_block: {config.get('popup_block', False)}")
+        click.echo(f"user_agent: {config.get('user_agent', 'None')}")
+        return
+    
+    if ad_block is not None:
+        set_default_ad_block(ad_block)
+        click.echo(f"Set default ad_block to: {ad_block}")
+    
+    if popup_block is not None:
+        set_default_popup_block(popup_block)
+        click.echo(f"Set default popup_block to: {popup_block}")
+    
+    if ad_block is None and popup_block is None and not show:
+        click.echo("No configuration changes specified. Use --show to view current settings.")
+        click.echo("Use --ad-block true/false or --popup-block true/false to set defaults.")
 
 
 @cli.command()

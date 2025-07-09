@@ -121,3 +121,29 @@ def set_default_user_agent(user_agent):
     config = load_config()
     config['user_agent'] = user_agent
     save_config(config)
+
+
+def get_default_ad_block():
+    """Get the default ad block setting from config"""
+    config = load_config()
+    return config.get('ad_block', False)
+
+
+def get_default_popup_block():
+    """Get the default popup block setting from config"""
+    config = load_config()
+    return config.get('popup_block', False)
+
+
+def set_default_ad_block(ad_block):
+    """Set the default ad block setting in config"""
+    config = load_config()
+    config['ad_block'] = ad_block
+    save_config(config)
+
+
+def set_default_popup_block(popup_block):
+    """Set the default popup block setting in config"""
+    config = load_config()
+    config['popup_block'] = popup_block
+    save_config(config)

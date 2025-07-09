@@ -5,6 +5,7 @@ let hiddenCount = 0;
 chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
   blockedCount++;
   console.log(`Blocked: ${info.request.url} (Total: ${blockedCount})`);
+  console.info(`[RULE STATS] Network rule triggered - Rule ID: ${info.rule.ruleId}, Priority: ${info.rule.priority}, Type: ${info.rule.action.type}, Domain: ${new URL(info.request.url).hostname}`);
 });
 
 // Reset count on navigation

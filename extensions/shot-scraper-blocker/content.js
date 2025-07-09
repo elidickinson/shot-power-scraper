@@ -166,6 +166,7 @@
     // Apply element hiding rules
     function applyElementHiding() {
         const currentDomain = window.location.hostname;
+        let newElementsHidden = 0;
         
         cosmeticFilters.forEach(rule => {
             if (!ruleApplies(rule, currentDomain)) return;
@@ -184,6 +185,7 @@
                                 element.style.visibility = 'hidden';
                                 element.setAttribute('data-shot-scraper-blocked', 'cosmetic');
                                 hiddenElements++;
+                                newElementsHidden++;
                             }
                         } else if (rule.type === 'unhide') {
                             // Remove hiding from unhide rules
@@ -198,6 +200,10 @@
                 console.warn('Invalid cosmetic filter selector:', rule.selector, error);
             }
         });
+        
+        if (newElementsHidden > 0) {
+            console.info(`[RULE STATS] Cosmetic filtering - New elements hidden: ${newElementsHidden}, Total hidden: ${hiddenElements}`);
+        }
     }
     
     // Load pre-processed cosmetic rules
