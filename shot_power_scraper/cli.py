@@ -414,6 +414,11 @@ def cli():
     default=None,
     help="Enable/disable popup blocking (overrides config file setting)"
 )
+@click.option(
+    "--trigger-lazy-load",
+    is_flag=True,
+    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
+)
 def shot(
     url,
     auth,
@@ -454,6 +459,7 @@ def shot(
     save_html,
     ad_block,
     popup_block,
+    trigger_lazy_load,
 ):
     """
     Take a single screenshot of a page or portion of a page.
@@ -522,6 +528,7 @@ def shot(
         "configure_extension": ad_block or popup_block,
         "ad_block": ad_block,
         "popup_block": popup_block,
+        "trigger_lazy_load": trigger_lazy_load,
     }
     interactive = interactive or devtools
 

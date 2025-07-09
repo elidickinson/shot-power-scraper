@@ -42,6 +42,7 @@ class ShotConfig:
         self.save_html = shot.get("save_html")
         self.width = shot.get("width")
         self.height = shot.get("height")
+        self.trigger_lazy_load = shot.get("trigger_lazy_load", False)
         
         # Process selectors
         self.selectors = list(shot.get("selectors") or [])
@@ -344,6 +345,10 @@ async def take_shot(
 
     if config.wait_for:
         await wait_for_condition(page, config.wait_for)
+
+    if config.trigger_lazy_load:
+        from shot_power_scraper.page_utils import trigger_lazy_load
+        await trigger_lazy_load(page)
 
     # Determine format based on quality parameter
     format = "jpeg" if config.quality else "png"
