@@ -22,13 +22,14 @@ adguard-base-optimized:https://filters.adtidy.org/extension/chromium/filters/2_o
 # Popup blocking filter lists (popups, cookie notices, newsletters, etc.)
 POPUP_BLOCK_FILTERS="
 adguard-popups-full:https://filters.adtidy.org/windows/filters/19.txt
-adguard-cookie-notices-full:https://filters.adtidy.org/windows/filters/18.txt
+i-dont-care-about-cookies:https://www.i-dont-care-about-cookies.eu/abp/
 easylist-newsletters-ubo:https://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt
 anti-adblock-killer:https://raw.githubusercontent.com/reek/anti-adblock-killer/master/anti-adblock-killer-filters.txt
 "
 
 # Combined list for backward compatibility
 FILTER_LISTS="$AD_BLOCK_FILTERS$POPUP_BLOCK_FILTERS"
+# adguard-cookie-notices-full:https://filters.adtidy.org/windows/filters/18.txt
 # fanboy-annoyances:https://secure.fanboy.co.nz/fanboy-annoyance.txt
 # adguard-annoyances-full:https://filters.adtidy.org/extension/chromium/filters/14.txt
 #  Title: AdGuard Annoyances filter - Blocks irritating elements on web pages including cookie notices, third-party widgets and in-page pop-ups. Contains the following AdGuard filters: Cookie Notices, Popups, Mobile App Banners, Other Annoyances and Widgets.
@@ -46,6 +47,7 @@ FILTER_LISTS="$AD_BLOCK_FILTERS$POPUP_BLOCK_FILTERS"
 # cookie notices https://filters.adtidy.org/extension/chromium/filters/18_optimized.txt
 # dns filter https://filters.adtidy.org/extension/chromium/filters/15_optimized.txt
 # remove tracking params https://filters.adtidy.org/extension/chromium/filters/17_optimized.txt
+# easylist cookies https://secure.fanboy.co.nz/fanboy-cookiemonster.txt
 
 
 # Ensure abp2dnr is available
@@ -145,10 +147,10 @@ extract_cosmetic_rules() {
             local script=$(echo "$stats" | jq -r '.scriptRules')
             local valid=$(echo "$stats" | jq -r '.validCosmeticRules')
             local unsupported=$(echo "$stats" | jq -r '.unsupportedRules')
-            
+
             printf "%-25s %8s %8s %8s %8s %8s %8s\n" "$name" "$total" "$network" "$cosmetic" "$script" "$valid" "$unsupported"
-            
-            info "Adding cosmetic rules from $filter_file..."
+
+            #   info "Adding cosmetic rules from $filter_file..."
             echo "" >> "$combined_filters"
             echo "! === $name ===" >> "$combined_filters"
             cat "$filter_file" >> "$combined_filters"
@@ -172,7 +174,7 @@ combine_rules_by_category() {
     local category="$1"
     local filter_list="$2"
     local output_file="$3"
-    
+
     info "Combining $category rules..."
 
     local rule_id=1
@@ -231,11 +233,11 @@ combine_rules() {
     # Generate category-specific rule files
     combine_rules_by_category "ad-block" "$AD_BLOCK_FILTERS" "ad-block-rules.json"
     combine_rules_by_category "popup-block" "$POPUP_BLOCK_FILTERS" "popup-block-rules.json"
-    
+
     # Also generate combined rules.json for backward compatibility
     info "Combining all rules for backward compatibility..."
     jq -s '.[0] + .[1]' "ad-block-rules.json" "popup-block-rules.json" > "rules.json"
-    
+
     local combined_count=$(jq length "rules.json")
     success "Generated $combined_count total rules in rules.json"
 }
