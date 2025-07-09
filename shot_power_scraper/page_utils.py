@@ -109,7 +109,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     """Trigger lazy-loaded content by scrolling and converting data-src attributes"""
     if Config.verbose:
         click.echo("Triggering lazy-loaded content...", err=True)
-    
+
     # First, convert all data-src to src and remove loading="lazy"
     converted_count = await page.evaluate("""
         (() => {
@@ -127,7 +127,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
                     img.removeAttribute('loading');
                 }
             });
-            
+
             // Handle other elements that might have data-src (like iframes)
             const otherElements = document.querySelectorAll('[data-src]:not(img)');
             otherElements.forEach(el => {
@@ -137,50 +137,43 @@ async def trigger_lazy_load(page, timeout_ms=5000):
                     count++;
                 }
             });
-            
+
             return count;
         })()
     """)
-    
+
     if Config.verbose and converted_count > 0:
         click.echo(f"Converted {converted_count} data-src attributes to src", err=True)
-    
+
     # Now scroll through the page to trigger any remaining lazy loading
     start_time = time.time()
     max_wait_seconds = timeout_ms / 1000
     scroll_count = 0
-    
-    # Get initial page height
-    last_height = await page.evaluate("document.body.scrollHeight")
-    
+
     while time.time() - start_time < max_wait_seconds:
         # Scroll down progressively
-        await page.scroll_down(amount=100)  # Scroll by 100% of viewport
+        await page.scroll_down(amount=110)  # Scroll by X% of viewport
         scroll_count += 1
-        
+
         # Give time for content to load
-        await asyncio.sleep(0.5)
-        
+        await asyncio.sleep(0.15)
+
         # Check if we've reached the bottom
         at_bottom = await page.scroll_bottom_reached()
-        
-        # Get new page height
-        new_height = await page.evaluate("document.body.scrollHeight")
-        
+
         if Config.verbose and scroll_count % 5 == 0:
-            click.echo(f"Scrolled {scroll_count} times, page height: {new_height}px", err=True)
-        
+            click.echo(f"Scrolled {scroll_count} times", err=True)
+
         # If we're at the bottom and height hasn't changed, we're done
-        if at_bottom and new_height == last_height:
+        if at_bottom:
             if Config.verbose:
                 click.echo(f"Reached bottom of page after {scroll_count} scrolls", err=True)
             break
-            
-        last_height = new_height
-    
+
     # Scroll back to top for consistent screenshot
     await page.scroll_up(amount=10000)  # Scroll to top using nodriver method
-    
+    await asyncio.sleep(0.15)
+
     if Config.verbose:
         elapsed = time.time() - start_time
         click.echo(f"Lazy load triggering completed in {elapsed:.1f}s", err=True)
