@@ -16,13 +16,16 @@ A comprehensive Chrome extension that provides both network-level request blocki
 - Filters out unsupported rule types during build
 - Real-time application with DOM mutation observer
 
-### Supported Filter Lists
-- AdGuard Base (Optimized)
-- AdGuard Popups
-- AdGuard Cookie Notices
-- EasyList Newsletters
-- Anti-Adblock Killer
-- Fanboy's Annoyance List
+### Filter Categories
+
+**Ad Blocking Filters** (Core ad blocking):
+- AdGuard Base (Optimized) - Primary ad blocking rules
+
+**Popup Blocking Filters** (Popups and annoyances):
+- AdGuard Popups - Popup and overlay blocking
+- AdGuard Cookie Notices - Cookie notification blocking
+- EasyList Newsletters - Newsletter subscription blocking
+- Anti-Adblock Killer - Circumvents anti-adblocker detection
 
 ## Installation
 
@@ -61,7 +64,9 @@ Load the extension directory directly into Chrome without building (uses pre-bui
 6. **Cleanup**: Preserves source files in `downloads/` directory
 
 ### Build Output
-- `rules.json` - Network blocking rules for DNR API
+- `ad-block-rules.json` - Network blocking rules for advertisements
+- `popup-block-rules.json` - Network blocking rules for popups and annoyances
+- `rules.json` - Combined rules for backward compatibility
 - `cosmetic_rules.json` - Element hiding rules for content script
 - `downloads/` - All downloaded filter lists and intermediate files
 
@@ -122,11 +127,18 @@ shot-scraper-blocker/
 ```
 
 ### Adding New Filter Lists
-1. Edit `build.sh` and add to `FILTER_LISTS`:
+1. Edit `build.sh` and add to the appropriate category:
    ```bash
-   FILTER_LISTS="
+   # For ad blocking filters
+   AD_BLOCK_FILTERS="
    existing-list:https://example.com/filter.txt
-   new-list:https://newsite.com/filters.txt
+   new-ad-filter:https://newsite.com/ads.txt
+   "
+   
+   # For popup blocking filters
+   POPUP_BLOCK_FILTERS="
+   existing-popup-filter:https://example.com/popups.txt
+   new-popup-filter:https://newsite.com/annoyances.txt
    "
    ```
 2. Run `./build.sh --force` to download and process
@@ -138,10 +150,20 @@ shot-scraper-blocker/
 
 ## Usage with shot-scraper
 
-The extension is automatically loaded when you use the `--ad-block` flag:
+The extension supports selective blocking based on content type:
 
 ```bash
+# Enable ad blocking only
 shot-scraper 'https://example.com' --ad-block -o screenshot.png
+
+# Enable popup blocking only  
+shot-scraper 'https://example.com' --popup-block -o screenshot.png
+
+# Enable both ad and popup blocking
+shot-scraper 'https://example.com' --ad-block --popup-block -o screenshot.png
+
+# Enable automatic annoyance clearing (manual DOM manipulation)
+shot-scraper 'https://example.com' --clear-annoyances -o screenshot.png
 ```
 
 ## Troubleshooting

@@ -23,7 +23,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["cosmetic_rules.json"],
+      "resources": ["cosmetic_rules.json", "ad-block-rules.json", "popup-block-rules.json"],
       "matches": ["<all_urls>"]
     }
   ],

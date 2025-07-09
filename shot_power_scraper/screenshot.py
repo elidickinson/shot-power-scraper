@@ -266,13 +266,23 @@ async def take_shot(
         # We'll assume the page loaded successfully unless we get an exception
         pass
 
+    # Configure blocking extensions if enabled
+    if shot.get("configure_extension"):
+        from shot_power_scraper.cli import configure_blocking_extension
+        await configure_blocking_extension(
+            page, 
+            shot.get("ad_block", False), 
+            shot.get("popup_block", False), 
+            Config.verbose
+        )
+
     if wait:
         if Config.verbose:
             click.echo(f"Waiting {wait}ms before processing...", err=True)
         time.sleep(wait / 1000)
 
     # Clear annoyances after any wait period if enabled
-    if shot.get("clear_annoyances", True):
+    if shot.get("clear_annoyances", False):
         try:
             await clear_annoyances(page, timeout_seconds=5)
         except Exception as e:

@@ -15,7 +15,19 @@ chrome.webNavigation.onCommitted.addListener((details) => {
   }
 });
 
-// Handle popup requests
+// Extension startup
+chrome.runtime.onStartup.addListener(() => {
+  console.log('Shot-scraper extension started');
+});
+
+// Check when extension is installed/enabled
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('Shot-scraper extension installed/enabled');
+});
+
+console.log('Shot-scraper background script loaded');
+
+// Handle popup requests  
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "getBlockedCount") {
     sendResponse({ 
@@ -26,4 +38,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === "updateHiddenCount") {
     hiddenCount = request.count;
   }
+  
+  return true;
 });

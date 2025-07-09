@@ -33,6 +33,104 @@ def run_async(coro):
     return loop.run_until_complete(coro)
 
 
+async def setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent):
+    """Setup blocking extensions based on requested flags"""
+    import tempfile
+    import shutil
+    import json
+    
+    base_extension_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
+    
+    if not os.path.exists(base_extension_path):
+        if not silent:
+            click.echo(f"Warning: Base extension not found at {base_extension_path}", err=True)
+        return
+    
+    # Create a temporary extension directory
+    temp_ext_dir = tempfile.mkdtemp(prefix="shot_scraper_ext_")
+    
+    # Copy base extension files
+    shutil.copytree(base_extension_path, temp_ext_dir, dirs_exist_ok=True)
+    
+    # Create custom rules.json based on selected filters
+    rules_path = os.path.join(temp_ext_dir, "rules.json")
+    create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path, verbose)
+    
+    extensions.append(temp_ext_dir)
+    
+    if verbose:
+        enabled_filters = []
+        if ad_block:
+            enabled_filters.append("ad blocking")
+        if popup_block:
+            enabled_filters.append("popup blocking")
+        click.echo(f"Blocking enabled: {', '.join(enabled_filters)}", err=True)
+
+
+def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path, verbose):
+    """Create a rules.json file with only the selected filter categories"""
+    import json
+    
+    # Load rules from category files
+    combined_rules = []
+    rule_id = 1
+    
+    downloads_dir = os.path.join(base_extension_path, "downloads")
+    
+    # Ad blocking rules
+    if ad_block:
+        ad_rules_file = os.path.join(base_extension_path, "ad-block-rules.json")
+        if os.path.exists(ad_rules_file):
+            try:
+                with open(ad_rules_file, 'r') as f:
+                    rules = json.load(f)
+                for rule in rules:
+                    rule["id"] = rule_id
+                    rule_id += 1
+                combined_rules.extend(rules)
+                if verbose:
+                    click.echo(f"Added {len(rules)} ad-block rules", err=True)
+            except Exception as e:
+                if verbose:
+                    click.echo(f"Warning: Could not load ad-block rules: {e}", err=True)
+    
+    # Popup blocking rules  
+    if popup_block:
+        popup_rules_file = os.path.join(base_extension_path, "popup-block-rules.json")
+        if os.path.exists(popup_rules_file):
+            try:
+                with open(popup_rules_file, 'r') as f:
+                    rules = json.load(f)
+                for rule in rules:
+                    rule["id"] = rule_id
+                    rule_id += 1
+                combined_rules.extend(rules)
+                if verbose:
+                    click.echo(f"Added {len(rules)} popup-block rules", err=True)
+            except Exception as e:
+                if verbose:
+                    click.echo(f"Warning: Could not load popup-block rules: {e}", err=True)
+    
+    # Limit to Chrome's 30,000 rule limit
+    if len(combined_rules) > 30000:
+        combined_rules = combined_rules[:30000]
+        if verbose:
+            click.echo(f"Limited rules to 30,000 (Chrome's limit)", err=True)
+    
+    # Write combined rules
+    with open(rules_path, 'w') as f:
+        json.dump(combined_rules, f, indent=2)
+    
+    if verbose:
+        click.echo(f"Created {len(combined_rules)} total blocking rules", err=True)
+
+
+async def configure_blocking_extension(page, ad_block, popup_block, verbose):
+    """No configuration needed - extension configured via file generation"""
+    if verbose:
+        click.echo("Extension configured via rules file", err=True)
+
+
 
 
 # Small utility functions stay here
@@ -304,14 +402,20 @@ def cli():
     help="Save HTML content alongside the screenshot with the same base name"
 )
 @click.option(
-    "--skip-annoyance-clearing",
+    "--clear-annoyances",
     is_flag=True,
-    help="Skip automatic annoyance clearing"
+    help="Enable automatic annoyance clearing"
 )
 @click.option(
     "--ad-block",
     is_flag=True,
     help="Enable ad blocking using built-in filter lists"
+)
+@click.option(
+    "--popup-block",
+    "--block-popups",
+    is_flag=True,
+    help="Enable popup and annoyance blocking using filter lists"
 )
 def shot(
     url,
@@ -352,8 +456,9 @@ def shot(
     full_page,
     verbose,
     save_html,
-    skip_annoyance_clearing,
+    clear_annoyances,
     ad_block,
+    popup_block,
 ):
     """
     Take a single screenshot of a page or portion of a page.
@@ -417,7 +522,10 @@ def shot(
         "full_page": full_page,
         "verbose": verbose,
         "save_html": save_html,
-        "clear_annoyances": not skip_annoyance_clearing,
+        "clear_annoyances": clear_annoyances,
+        "configure_extension": ad_block or popup_block,
+        "ad_block": ad_block,
+        "popup_block": popup_block,
     }
     interactive = interactive or devtools
 
@@ -425,17 +533,10 @@ def shot(
         use_existing_page = False
         browser_obj = None
         try:
-            # Add ad blocker extension if requested
-            extensions = None
-            if ad_block:
-                ad_blocker_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
-                if os.path.exists(ad_blocker_path):
-                    extensions = [ad_blocker_path]
-                    if verbose:
-                        click.echo(f"Ad blocking enabled", err=True)
-                else:
-                    if not silent:
-                        click.echo(f"Warning: Ad blocker extension not found at {ad_blocker_path}", err=True)
+            # Add blocking extensions if requested
+            extensions = []
+            if ad_block or popup_block:
+                await setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent)
             
             browser_obj = await create_browser_context(
                 auth=auth,
@@ -450,8 +551,10 @@ def shot(
                 bypass_csp=bypass_csp,
                 auth_username=auth_username,
                 auth_password=auth_password,
-                extensions=extensions,
+                extensions=extensions if extensions else None,
             )
+            
+            # Don't configure extension here - do it after page loads
 
             if not browser_obj:
                 raise click.ClickException("Browser initialization failed")
@@ -575,6 +678,12 @@ def shot(
     is_flag=True,
     help="Enable ad blocking using built-in filter lists"
 )
+@click.option(
+    "--popup-block",
+    "--block-popups",
+    is_flag=True,
+    help="Enable popup and annoyance blocking using filter lists"
+)
 def multi(
     config,
     auth,
@@ -600,6 +709,7 @@ def multi(
     har_file,
     verbose,
     ad_block,
+    popup_block,
 ):
     """
     Take multiple screenshots, defined by a YAML file
@@ -641,18 +751,16 @@ def multi(
         shots = []
     if not isinstance(shots, list):
         raise click.ClickException("YAML file must contain a list")
+    
+    # Set global config
+    Config.verbose = verbose
+    Config.silent = silent
+    
     async def run_multi():
-        # Add ad blocker extension if requested
-        extensions = None
-        if ad_block:
-            ad_blocker_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
-            if os.path.exists(ad_blocker_path):
-                extensions = [ad_blocker_path]
-                if verbose:
-                    click.echo(f"Ad blocking enabled", err=True)
-            else:
-                if not silent:
-                    click.echo(f"Warning: Ad blocker extension not found at {ad_blocker_path}", err=True)
+        # Add blocking extensions if requested
+        extensions = []
+        if ad_block or popup_block:
+            await setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent)
         
         browser_obj = await create_browser_context(
             auth=auth,
@@ -665,8 +773,10 @@ def multi(
             auth_username=auth_username,
             auth_password=auth_password,
             record_har_path=har_file or None,
-            extensions=extensions,
+            extensions=extensions if extensions else None,
         )
+        
+        # Extension will be configured per-shot in take_shot() function
         try:
             for shot in shots:
                 if (
@@ -702,6 +812,12 @@ def multi(
                     server_processes.append((proc, server))
                     time.sleep(1)
                 if "url" in shot:
+                    # Add extension configuration to each shot
+                    if ad_block or popup_block:
+                        shot["configure_extension"] = True
+                        shot["ad_block"] = ad_block
+                        shot["popup_block"] = popup_block
+                    
                     try:
                         await take_shot(
                             browser_obj,

@@ -254,5 +254,5 @@
         });
     }, 1000);
     
-    console.log(`Shot Scraper: Cosmetic filtering initialized`);
+    console.log('Shot Scraper: Cosmetic filtering initialized');
 })();

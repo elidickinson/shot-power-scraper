@@ -14,14 +14,21 @@ if [[ "$1" == "--force" ]]; then
     info "Force download enabled - will redownload all filter lists"
 fi
 
-# Filter lists to download (name:url pairs)
-FILTER_LISTS="
+# Ad blocking filter lists (core ad blocking)
+AD_BLOCK_FILTERS="
 adguard-base-optimized:https://filters.adtidy.org/extension/chromium/filters/2_optimized.txt
+"
+
+# Popup blocking filter lists (popups, cookie notices, newsletters, etc.)
+POPUP_BLOCK_FILTERS="
 adguard-popups-full:https://filters.adtidy.org/windows/filters/19.txt
 adguard-cookie-notices-full:https://filters.adtidy.org/windows/filters/18.txt
 easylist-newsletters-ubo:https://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt
-Anti-Adblock-Killer:https://raw.githubusercontent.com/reek/anti-adblock-killer/master/anti-adblock-killer-filters.txt
+anti-adblock-killer:https://raw.githubusercontent.com/reek/anti-adblock-killer/master/anti-adblock-killer-filters.txt
 "
+
+# Combined list for backward compatibility
+FILTER_LISTS="$AD_BLOCK_FILTERS$POPUP_BLOCK_FILTERS"
 # fanboy-annoyances:https://secure.fanboy.co.nz/fanboy-annoyance.txt
 # adguard-annoyances-full:https://filters.adtidy.org/extension/chromium/filters/14.txt
 #  Title: AdGuard Annoyances filter - Blocks irritating elements on web pages including cookie notices, third-party widgets and in-page pop-ups. Contains the following AdGuard filters: Cookie Notices, Popups, Mobile App Banners, Other Annoyances and Widgets.
@@ -161,11 +168,15 @@ extract_cosmetic_rules() {
     fi
 }
 
-combine_rules() {
-    info "Combining all rules..."
+combine_rules_by_category() {
+    local category="$1"
+    local filter_list="$2"
+    local output_file="$3"
+    
+    info "Combining $category rules..."
 
     local rule_id=1
-    local temp_combined="downloads/temp_combined.json"
+    local temp_combined="downloads/temp_${category}_combined.json"
 
     # Create downloads directory if it doesn't exist
     mkdir -p downloads
@@ -173,7 +184,7 @@ combine_rules() {
     # Start with empty array
     echo "[]" > "$temp_combined"
 
-    echo "$FILTER_LISTS" | while IFS= read -r line; do
+    echo "$filter_list" | while IFS= read -r line; do
         # Skip empty lines
         [ -z "$line" ] && continue
 
@@ -183,10 +194,10 @@ combine_rules() {
         local rules_file="downloads/${name_lower}_rules.json"
 
         if [ -f "$rules_file" ]; then
-            info "Processing $rules_file..."
+            info "Processing $rules_file for $category..."
 
             # Add IDs and merge with existing rules
-            local temp_rules_file="downloads/temp_${name_lower}_rules.json"
+            local temp_rules_file="downloads/temp_${category}_${name_lower}_rules.json"
             jq --argjson start_id "$rule_id" '
                 [to_entries[] | .value.id = ($start_id + .key) | .value]
             ' "$rules_file" > "$temp_rules_file"
@@ -196,8 +207,8 @@ combine_rules() {
             rule_id=$((rule_id + count))
 
             # Merge with combined rules
-            jq -s '.[0] + .[1]' "$temp_combined" "$temp_rules_file" > "downloads/temp_new_combined.json"
-            mv "downloads/temp_new_combined.json" "$temp_combined"
+            jq -s '.[0] + .[1]' "$temp_combined" "$temp_rules_file" > "downloads/temp_${category}_new_combined.json"
+            mv "downloads/temp_${category}_new_combined.json" "$temp_combined"
 
             rm "$temp_rules_file"
         fi
@@ -206,14 +217,27 @@ combine_rules() {
     # Limit to 30,000 rules (Chrome's limit)
     local total_rules=$(jq length "$temp_combined")
     if [ "$total_rules" -gt 30000 ]; then
-        warn "Generated $total_rules rules, limiting to 30,000"
-        jq '.[0:30000]' "$temp_combined" > rules.json
+        warn "Generated $total_rules $category rules, limiting to 30,000"
+        jq '.[0:30000]' "$temp_combined" > "$output_file"
     else
-        mv "$temp_combined" rules.json
+        mv "$temp_combined" "$output_file"
     fi
 
-    local final_count=$(jq length rules.json)
-    success "Generated $final_count blocking rules in rules.json"
+    local final_count=$(jq length "$output_file")
+    success "Generated $final_count $category rules in $output_file"
+}
+
+combine_rules() {
+    # Generate category-specific rule files
+    combine_rules_by_category "ad-block" "$AD_BLOCK_FILTERS" "ad-block-rules.json"
+    combine_rules_by_category "popup-block" "$POPUP_BLOCK_FILTERS" "popup-block-rules.json"
+    
+    # Also generate combined rules.json for backward compatibility
+    info "Combining all rules for backward compatibility..."
+    jq -s '.[0] + .[1]' "ad-block-rules.json" "popup-block-rules.json" > "rules.json"
+    
+    local combined_count=$(jq length "rules.json")
+    success "Generated $combined_count total rules in rules.json"
 }
 
 # Check for required dependencies
