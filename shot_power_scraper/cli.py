@@ -1479,20 +1479,41 @@ def set_default_user_agent_cmd(browser, browser_args):
     help="Set default popup blocking (true/false)"
 )
 @click.option(
+    "--user-agent",
+    help="Set default user agent string"
+)
+@click.option(
+    "--clear",
+    is_flag=True,
+    help="Clear all configuration settings (delete config file)"
+)
+@click.option(
     "--show",
     is_flag=True,
     help="Show current configuration"
 )
-def config_cmd(ad_block, popup_block, show):
+def config_cmd(ad_block, popup_block, user_agent, clear, show):
     """
     Configure default settings for shot-power-scraper
     
     Usage:
     
         shot-power-scraper config --ad-block true --popup-block false
+        shot-power-scraper config --user-agent "Mozilla/5.0 ..."
+        shot-power-scraper config --clear
         shot-power-scraper config --show
     """
-    from shot_power_scraper.utils import load_config, set_default_ad_block, set_default_popup_block, get_config_file
+    from shot_power_scraper.utils import load_config, set_default_ad_block, set_default_popup_block, set_default_user_agent, get_config_file
+    import os
+    
+    if clear:
+        config_file = get_config_file()
+        if config_file.exists():
+            os.remove(config_file)
+            click.echo("Configuration file cleared.")
+        else:
+            click.echo("No configuration file found to clear.")
+        return
     
     if show:
         config = load_config()
@@ -1510,9 +1531,13 @@ def config_cmd(ad_block, popup_block, show):
         set_default_popup_block(popup_block)
         click.echo(f"Set default popup_block to: {popup_block}")
     
-    if ad_block is None and popup_block is None and not show:
+    if user_agent is not None:
+        set_default_user_agent(user_agent)
+        click.echo(f"Set default user_agent to: {user_agent}")
+    
+    if ad_block is None and popup_block is None and user_agent is None and not show and not clear:
         click.echo("No configuration changes specified. Use --show to view current settings.")
-        click.echo("Use --ad-block true/false or --popup-block true/false to set defaults.")
+        click.echo("Use --ad-block true/false, --popup-block true/false, --user-agent 'string', or --clear to modify settings.")
 
 
 @cli.command()

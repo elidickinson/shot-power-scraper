@@ -134,25 +134,190 @@ Many more options are available, see [Taking a screenshot](https://shot-scraper.
 This fork has significant differences from the original shot-scraper. **Several commands do not work or have limited functionality.**
 
 ### 🚫 **Commands That Don't Work**
-- `shot-power-scraper pdf` - PDF generation not implemented with nodriver
-- `shot-power-scraper accessibility` - Accessibility tree dumping not available in nodriver
-- `shot-power-scraper har` - HAR file recording not implemented with nodriver
+- `shot-power-scraper pdf` - PDF generation completely not implemented
+- `shot-power-scraper har` - HAR file recording completely not implemented  
+- `shot-power-scraper accessibility` - Returns placeholder data only ("not implemented")
 
 ### 🔄 **Commands With Limited Functionality**
-- Console logging (`--log-console`) - Limited support compared to Playwright
-- Request/response monitoring - Limited compared to Playwright
+- Console logging (`--log-console`) - Basic CDP implementation, may miss some message types
+- Request/response monitoring - Limited network event handling via CDP
 - Browser selection (`--browser`) - Only Chrome/Chromium supported (no Firefox/WebKit)
+- Configuration system - Only `user_agent`, `ad_block`, and `popup_block` settings implemented
+
+### ⚠️ **Missing Features from Original**
+- **Multi-browser support** - Firefox, WebKit/Safari automation removed
+- **Advanced network features** - Full HAR recording, request interception, response body capture
+- **URL validation** - CLI argument validation marked as TODO
+
+## 📋 **Detailed Command Option Status**
+
+### `shot` command (screenshots) - ✅ **Fully Implemented**
+**All options work:**
+- `--auth` / `-a` - ✅ Authentication context file
+- `--width` - ✅ Browser window width (default: 1280)
+- `--height` - ✅ Browser window height (defaults to full page height)
+- `--output` / `-o` - ✅ Output file path or `-` for stdout
+- `--selector` / `-s` - ✅ CSS selector for element screenshots (multiple supported)
+- `--selector-all` - ✅ All elements matching CSS selector
+- `--js-selector` - ✅ JavaScript selector for element screenshots
+- `--js-selector-all` - ✅ All elements matching JavaScript selector  
+- `--padding` / `-p` - ✅ Padding around selected elements (default: 0)
+- `--javascript` / `-j` - ✅ Execute JavaScript before screenshot
+- `--retina` - ✅ Use device scale factor of 2
+- `--scale-factor` - ✅ Custom device scale factor
+- `--omit-background` - ✅ Transparent background (PNG only)
+- `--quality` - ✅ JPEG quality setting
+- `--wait` - ✅ Wait milliseconds before screenshot (default: 250)
+- `--wait-for` - ✅ Wait for JavaScript expression to be true
+- `--timeout` - ✅ Timeout in milliseconds
+- `--interactive` / `-i` - ✅ Interactive mode with manual control
+- `--devtools` - ✅ Open with developer tools
+- `--log-requests` - ✅ Log requests to file
+- `--log-console` - ✅ Log console output to stderr
+- `--browser` / `-b` - ✅ Browser selection (Chrome/Chromium only)
+- `--browser-arg` - ✅ Additional browser arguments
+- `--user-agent` - ✅ Custom user agent string
+- `--reduced-motion` - ✅ Emulate reduced motion preference
+- `--skip` - ✅ Skip pages with HTTP errors
+- `--fail` - ✅ Fail on HTTP errors
+- `--bypass-csp` - ✅ Bypass Content Security Policy
+- `--silent` - ✅ Suppress output messages
+- `--auth-username` - ✅ HTTP Basic auth username
+- `--auth-password` - ✅ HTTP Basic auth password
+- `--skip-cloudflare-check` - ✅ Skip Cloudflare challenge detection
+- `--skip-wait-for-load` - ✅ Skip waiting for window load event
+- `--full-page` - ✅ Capture full scrollable page
+- `--verbose` - ✅ Verbose logging
+- `--save-html` - ✅ Save HTML alongside screenshot
+- `--ad-block` / `--no-ad-block` - ✅ Ad blocking toggle
+- `--popup-block` / `--no-popup-block` - ✅ Popup blocking toggle
+
+### `multi` command (batch screenshots) - ✅ **Fully Implemented**
+**All options work:**
+- `--auth` / `-a` - ✅ Authentication context file
+- `--retina` - ✅ Use device scale factor of 2
+- `--scale-factor` - ✅ Custom device scale factor
+- `--timeout` - ✅ Timeout in milliseconds
+- `--fail-on-error` - ✅ Fail noisily on error (hidden option)
+- `--no-clobber` / `-n` - ✅ Skip existing files
+- `--output` / `-o` - ✅ Filter to specific output files
+- `--browser` / `-b` - ✅ Browser selection (Chrome/Chromium only)
+- `--browser-arg` - ✅ Additional browser arguments
+- `--user-agent` - ✅ Custom user agent string
+- `--reduced-motion` - ✅ Emulate reduced motion preference
+- `--log-console` - ✅ Log console output to stderr
+- `--skip` - ✅ Skip pages with HTTP errors
+- `--fail` - ✅ Fail on HTTP errors
+- `--silent` - ✅ Suppress output messages
+- `--auth-username` - ✅ HTTP Basic auth username
+- `--auth-password` - ✅ HTTP Basic auth password
+- `--leave-server` - ✅ Keep server processes running
+- `--verbose` - ✅ Verbose logging
+- `--ad-block` / `--no-ad-block` - ✅ Ad blocking toggle
+- `--popup-block` / `--no-popup-block` - ✅ Popup blocking toggle
+- `--har` - ❌ **Not implemented** (raises abort error)
+- `--har-zip` - ❌ **Not implemented** (raises abort error)  
+- `--har-file` - ❌ **Not implemented** (raises abort error)
+
+### `javascript` command - ✅ **Fully Implemented**
+**All options work:**
+- `--input` / `-i` - ✅ JavaScript input file or GitHub script (`gh:user/script`)
+- `--auth` / `-a` - ✅ Authentication context file
+- `--output` / `-o` - ✅ Output file for JSON results
+- `--raw` / `-r` - ✅ Output raw text instead of JSON
+- `--browser` / `-b` - ✅ Browser selection (Chrome/Chromium only)
+- `--browser-arg` - ✅ Additional browser arguments
+- `--user-agent` - ✅ Custom user agent string
+- `--reduced-motion` - ✅ Emulate reduced motion preference
+- `--log-console` - ✅ Log console output to stderr
+- `--skip` - ✅ Skip pages with HTTP errors
+- `--fail` - ✅ Fail on HTTP errors
+- `--bypass-csp` - ✅ Bypass Content Security Policy
+- `--auth-username` - ✅ HTTP Basic auth username
+- `--auth-password` - ✅ HTTP Basic auth password
+
+### `html` command - ✅ **Fully Implemented**
+**All options work:**
+- `--auth` / `-a` - ✅ Authentication context file
+- `--output` / `-o` - ✅ Output file path or `-` for stdout
+- `--javascript` / `-j` - ✅ Execute JavaScript before capturing HTML
+- `--selector` / `-s` - ✅ CSS selector for specific element's outerHTML
+- `--wait` - ✅ Wait milliseconds before capture (default: 250)
+- `--timeout` - ✅ Timeout in milliseconds
+- `--verbose` - ✅ Verbose logging
+- `--log-console` - ✅ Log console output to stderr
+- `--browser` / `-b` - ✅ Browser selection (Chrome/Chromium only)
+- `--browser-arg` - ✅ Additional browser arguments
+- `--user-agent` - ✅ Custom user agent string
+- `--skip` - ✅ Skip pages with HTTP errors
+- `--fail` - ✅ Fail on HTTP errors
+- `--bypass-csp` - ✅ Bypass Content Security Policy
+- `--silent` - ✅ Suppress output messages
+- `--auth-username` - ✅ HTTP Basic auth username
+- `--auth-password` - ✅ HTTP Basic auth password
+
+### `auth` command - ✅ **Fully Implemented**
+**All options work:**
+- `--browser` / `-b` - ✅ Browser selection (Chrome/Chromium only)
+- `--browser-arg` - ✅ Additional browser arguments
+- `--user-agent` - ✅ Custom user agent string
+- `--devtools` - ✅ Open browser with DevTools
+- `--log-console` - ✅ Log console output to stderr
+
+### `accessibility` command - ⚠️ **Placeholder Only**
+**Options exist but return placeholder data:**
+- `--auth` / `-a` - ✅ Authentication context file (works)
+- `--output` / `-o` - ✅ Output file (works)
+- `--javascript` / `-j` - ✅ Execute JavaScript (works)
+- `--timeout` - ✅ Timeout setting (works)
+- `--log-console` - ✅ Console logging (works)
+- `--skip` - ✅ Skip on HTTP errors (works)
+- `--fail` - ✅ Fail on HTTP errors (works)
+- `--bypass-csp` - ✅ Bypass CSP (works)
+- `--auth-username` - ✅ HTTP Basic auth username (works)
+- `--auth-password` - ✅ HTTP Basic auth password (works)
+
+**Note**: All options are technically implemented but the command only returns `{"message": "Accessibility tree dumping not implemented"}`.
+
+### `har` command - ❌ **Not Implemented**
+**Command exists but immediately aborts with error message:**
+- All options are defined but non-functional
+- Command displays error: "HAR recording is not implemented with nodriver"
+
+### `pdf` command - ❌ **Not Implemented**
+**Command exists but immediately aborts with error message:**
+- All options are defined but non-functional
+- Command displays error: "PDF generation is not implemented with nodriver"
+
+### `install` command - ℹ️ **Info Only**
+**Command works but no actual installation:**
+- `--browser` / `-b` - ✅ Browser selection (for info display only)
+- Displays message: "nodriver... does not require any drivers"
+
+### `set-default-user-agent` command - ✅ **Fully Implemented**
+**All options work:**
+- `--browser` / `-b` - ✅ Browser selection (Chrome/Chromium only)
+- `--browser-arg` - ✅ Additional browser arguments
+
+### `config` command - ✅ **Fully Implemented**
+**All options work:**
+- `--ad-block` - ✅ Set default ad blocking (true/false)
+- `--popup-block` - ✅ Set default popup blocking (true/false)
+- `--user-agent` - ✅ Set default user agent string
+- `--clear` - ✅ Clear all configuration settings (delete config file)
+- `--show` - ✅ Show current configuration
 
 ### ✅ **Commands That Work Fully**
 - `shot-power-scraper` (screenshots) - Full functionality
 - `shot-power-scraper javascript` - Full functionality
 - `shot-power-scraper html` - Full functionality
-- `shot-power-scraper multi` - Full functionality
-- `shot-power-scraper auth` - Works with some limitations
+- `shot-power-scraper multi` - Full functionality (except HAR options)
+- `shot-power-scraper auth` - Full functionality
 - `shot-power-scraper install` - Now just shows info message (no installation needed)
 
 ### 🆕 **New Commands**
 - `shot-power-scraper set-default-user-agent` - Configure stealth user agent
+- `shot-power-scraper config` - Configure default settings (ad/popup blocking, user agent)
 
 ### 🎯 **Why This Fork? Benefits of nodriver Migration**
 - **No driver management** - Uses your installed Chrome/Chromium directly
@@ -175,17 +340,37 @@ shot-power-scraper stores default settings in `~/.shot-power-scraper/config.json
 ### How It Works
 - Settings in the config file become the new defaults for all commands
 - Command-line options always override config file settings
-- Currently supports setting a default user agent (more defaults may be added in the future)
+- Supports setting default user agent, ad blocking, and popup blocking
+
+### Configuration Commands
+```bash
+# Set individual options
+shot-power-scraper config --ad-block true
+shot-power-scraper config --popup-block false
+shot-power-scraper config --user-agent "Mozilla/5.0 (Custom) ..."
+
+# View current settings
+shot-power-scraper config --show
+
+# Clear all settings
+shot-power-scraper config --clear
+```
 
 ### Example Config File
-After running `shot-power-scraper set-default-user-agent`, your config file will look like:
+After configuring various settings, your config file will look like:
 ```json
 {
-  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+  "ad_block": true,
+  "popup_block": false
 }
 ```
 
-This user agent (with "Chrome" instead of "HeadlessChrome") will be used for all screenshots automatically.
+These settings will be used for all screenshots automatically:
+
+    shot-power-scraper https://example.com  # Uses config defaults
+    shot-power-scraper --user-agent "Custom" https://example.com  # Override when needed
+    shot-power-scraper --no-ad-block https://example.com  # Override ad blocking
 
 **Note**: Config file uses `user_agent` (underscore) while command line uses `--user-agent` (hyphen). This is the standard convention for Python CLI tools.
 
