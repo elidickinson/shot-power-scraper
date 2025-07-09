@@ -67,7 +67,7 @@ class ConsoleLogger:
             obj_class_name = getattr(obj, 'class_name', None)
         
         if obj_type == "string":
-            return str(obj_value) if obj_value is not None else ""
+            return str(obj_value) if obj_value is not None else "[empty]"
         elif obj_type == "number":
             return str(obj_value) if obj_value is not None else "0"
         elif obj_type == "boolean":

@@ -14,7 +14,7 @@ import asyncio
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser
 from shot_power_scraper.screenshot import take_shot
-from shot_power_scraper.page_utils import evaluate_js, wait_for_condition
+from shot_power_scraper.page_utils import evaluate_js
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -46,27 +46,26 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, verbose, 
     """Setup blocking extensions based on requested flags"""
     import tempfile
     import shutil
-    import json
-    
+
     base_extension_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
-    
+
     if not os.path.exists(base_extension_path):
         if not silent:
             click.echo(f"Warning: Base extension not found at {base_extension_path}", err=True)
         return
-    
+
     # Create a temporary extension directory
     temp_ext_dir = tempfile.mkdtemp(prefix="shot_scraper_ext_")
-    
+
     # Copy base extension files
     shutil.copytree(base_extension_path, temp_ext_dir, dirs_exist_ok=True)
-    
+
     # Create custom rules.json based on selected filters
     rules_path = os.path.join(temp_ext_dir, "rules.json")
     create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path, verbose)
-    
+
     extensions.append(temp_ext_dir)
-    
+
     if verbose:
         enabled_filters = []
         if ad_block:
@@ -79,13 +78,13 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, verbose, 
 def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path, verbose):
     """Create a rules.json file with only the selected filter categories"""
     import json
-    
+
     # Load rules from category files
     combined_rules = []
     rule_id = 1
-    
+
     downloads_dir = os.path.join(base_extension_path, "downloads")
-    
+
     # Ad blocking rules
     if ad_block:
         ad_rules_file = os.path.join(base_extension_path, "ad-block-rules.json")
@@ -102,8 +101,8 @@ def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path
             except Exception as e:
                 if verbose:
                     click.echo(f"Warning: Could not load ad-block rules: {e}", err=True)
-    
-    # Popup blocking rules  
+
+    # Popup blocking rules
     if popup_block:
         popup_rules_file = os.path.join(base_extension_path, "popup-block-rules.json")
         if os.path.exists(popup_rules_file):
@@ -119,17 +118,17 @@ def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path
             except Exception as e:
                 if verbose:
                     click.echo(f"Warning: Could not load popup-block rules: {e}", err=True)
-    
+
     # Limit to Chrome's 30,000 rule limit
     if len(combined_rules) > 30000:
         combined_rules = combined_rules[:30000]
         if verbose:
             click.echo(f"Limited rules to 30,000 (Chrome's limit)", err=True)
-    
+
     # Write combined rules
     with open(rules_path, 'w') as f:
         json.dump(combined_rules, f, indent=2)
-    
+
     if verbose:
         click.echo(f"Created {len(combined_rules)} total blocking rules", err=True)
 
@@ -495,7 +494,7 @@ def shot(
         output = filename_for_url(url, ext=ext, file_exists=os.path.exists)
 
     scale_factor = normalize_scale_factor(retina, scale_factor)
-    
+
     # Resolve ad_block and popup_block from config if not explicitly set
     ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
 
@@ -534,7 +533,7 @@ def shot(
             extensions = []
             if ad_block or popup_block:
                 await setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent)
-            
+
             browser_obj = await create_browser_context(
                 auth=auth,
                 interactive=interactive,
@@ -550,7 +549,7 @@ def shot(
                 auth_password=auth_password,
                 extensions=extensions if extensions else None,
             )
-            
+
             # Don't configure extension here - do it after page loads
 
             if not browser_obj:
@@ -735,7 +734,7 @@ def multi(
         )
 
     scale_factor = normalize_scale_factor(retina, scale_factor)
-    
+
     # Resolve ad_block and popup_block from config if not explicitly set
     ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
     shots = yaml.safe_load(config)
@@ -751,17 +750,17 @@ def multi(
         shots = []
     if not isinstance(shots, list):
         raise click.ClickException("YAML file must contain a list")
-    
+
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
-    
+
     async def run_multi():
         # Add blocking extensions if requested
         extensions = []
         if ad_block or popup_block:
             await setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent)
-        
+
         browser_obj = await create_browser_context(
             auth=auth,
             scale_factor=scale_factor,
@@ -775,7 +774,7 @@ def multi(
             record_har_path=har_file or None,
             extensions=extensions if extensions else None,
         )
-        
+
         # Extension will be configured per-shot in take_shot() function
         try:
             for shot in shots:
@@ -817,11 +816,11 @@ def multi(
                         shot["configure_extension"] = True
                         shot["ad_block"] = ad_block
                         shot["popup_block"] = popup_block
-                    
+
                     # Set timeout if not already specified in the shot
                     if timeout and "timeout" not in shot:
                         shot["timeout"] = timeout
-                    
+
                     try:
                         await take_shot(
                             browser_obj,
@@ -910,25 +909,25 @@ def accessibility(
             auth_username=auth_username,
             auth_password=auth_password,
         )
-        
+
         # Get a blank page first to set up console logging
         page = await browser_obj.get("about:blank")
-        
+
         # Set up console logging BEFORE navigating
         if log_console:
             from shot_power_scraper.console_logger import ConsoleLogger
             console_logger = ConsoleLogger(silent=False)
             await console_logger.setup(page)
-        
+
         # Now navigate to the actual URL
         await page.get(url)
-        
+
         if javascript:
             await evaluate_js(page, javascript)
-        
+
         # Accessibility not implemented
         snapshot = {"message": "Accessibility tree dumping not implemented"}
-        
+
         await cleanup_browser(browser_obj)
         return snapshot
 
@@ -1102,19 +1101,19 @@ def javascript(
             auth_username=auth_username,
             auth_password=auth_password,
         )
-        
+
         # Get a blank page first to set up console logging
         page = await browser_obj.get("about:blank")
-        
+
         # Set up console logging BEFORE navigating
         if log_console:
             from shot_power_scraper.console_logger import ConsoleLogger
             console_logger = ConsoleLogger(silent=False)
             await console_logger.setup(page)
-        
+
         # Now navigate to the actual URL
         await page.get(url)
-        
+
         result = await evaluate_js(page, javascript)
         await cleanup_browser(browser_obj)
         return result
@@ -1311,17 +1310,17 @@ def html(
             auth_username=auth_username,
             auth_password=auth_password,
         )
-        
+
         # Get a blank page first to set up console logging
         page = await browser_obj.get("about:blank")
-        
+
         # Set up console logging BEFORE navigating
         console_logger = None
         if log_console:
             from shot_power_scraper.console_logger import ConsoleLogger
             console_logger = ConsoleLogger(silent=silent)
             await console_logger.setup(page)
-        
+
         # Now navigate to the actual URL
         await page.get(url)
 
@@ -1344,7 +1343,7 @@ def html(
             time.sleep(wait / 1000)
         if javascript:
             await evaluate_js(page, javascript)
-        
+
         # Wait for page to be ready with timeout
         if timeout:
             await page.evaluate(f"""
@@ -1453,7 +1452,7 @@ def set_default_user_agent_cmd(browser, browser_args):
 
             # Store in config
             set_default_user_agent(modified_user_agent)
-            
+
             # Import here to avoid circular imports
             from shot_power_scraper.utils import get_config_file
 
@@ -1495,9 +1494,9 @@ def set_default_user_agent_cmd(browser, browser_args):
 def config_cmd(ad_block, popup_block, user_agent, clear, show):
     """
     Configure default settings for shot-power-scraper
-    
+
     Usage:
-    
+
         shot-power-scraper config --ad-block true --popup-block false
         shot-power-scraper config --user-agent "Mozilla/5.0 ..."
         shot-power-scraper config --clear
@@ -1505,7 +1504,7 @@ def config_cmd(ad_block, popup_block, user_agent, clear, show):
     """
     from shot_power_scraper.utils import load_config, set_default_ad_block, set_default_popup_block, set_default_user_agent, get_config_file
     import os
-    
+
     if clear:
         config_file = get_config_file()
         if config_file.exists():
@@ -1514,7 +1513,7 @@ def config_cmd(ad_block, popup_block, user_agent, clear, show):
         else:
             click.echo("No configuration file found to clear.")
         return
-    
+
     if show:
         config = load_config()
         click.echo(f"Configuration file: {get_config_file()}")
@@ -1522,19 +1521,19 @@ def config_cmd(ad_block, popup_block, user_agent, clear, show):
         click.echo(f"popup_block: {config.get('popup_block', False)}")
         click.echo(f"user_agent: {config.get('user_agent', 'None')}")
         return
-    
+
     if ad_block is not None:
         set_default_ad_block(ad_block)
         click.echo(f"Set default ad_block to: {ad_block}")
-    
+
     if popup_block is not None:
         set_default_popup_block(popup_block)
         click.echo(f"Set default popup_block to: {popup_block}")
-    
+
     if user_agent is not None:
         set_default_user_agent(user_agent)
         click.echo(f"Set default user_agent to: {user_agent}")
-    
+
     if ad_block is None and popup_block is None and user_agent is None and not show and not clear:
         click.echo("No configuration changes specified. Use --show to view current settings.")
         click.echo("Use --ad-block true/false, --popup-block true/false, --user-agent 'string', or --clear to modify settings.")

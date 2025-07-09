@@ -10,10 +10,10 @@ Usage:
 Example server startup:
     # Start server with custom browser arguments
     python api_server.py --browser-arg --window-size=1920,1080 --browser-arg --disable-dev-shm-usage
-    
+
     # Start server with proxy settings
     python api_server.py --browser-arg "--proxy-server=http://localhost:8888"
-    
+
     # Start server on different host/port
     python api_server.py --host 0.0.0.0 --port 8080
 
@@ -64,12 +64,10 @@ Example API calls:
 """
 
 from fastapi import FastAPI, HTTPException, Response, Request
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from contextlib import asynccontextmanager
 import asyncio
-import io
 import os
 import sys
 from pathlib import Path
@@ -82,7 +80,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from shot_power_scraper.browser import create_browser_context, Config
 from shot_power_scraper.screenshot import take_shot
-from shot_power_scraper.utils import url_or_file_path
 from shot_power_scraper.cli import browser_args_option
 from shot_power_scraper.page_utils import evaluate_js, detect_navigation_error
 import time
@@ -111,9 +108,9 @@ async def lifespan(app: FastAPI):
     global browser_instance
     if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
         await get_browser()
-    
+
     yield
-    
+
     # Shutdown
     if browser_instance:
         try:
@@ -154,7 +151,7 @@ class ShotRequest(BaseModel):
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
     auth_username: Optional[str] = Field(None, description="HTTP Basic Auth username")
     auth_password: Optional[str] = Field(None, description="HTTP Basic Auth password")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -177,7 +174,7 @@ class HtmlRequest(BaseModel):
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
     auth_username: Optional[str] = Field(None, description="HTTP Basic Auth username")
     auth_password: Optional[str] = Field(None, description="HTTP Basic Auth password")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -195,11 +192,11 @@ async def get_browser():
         if browser_instance is None:
             Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
             Config.silent = not Config.verbose
-            
+
             # Debug logging
             if global_browser_args:
                 logger.info(f"Creating browser with args: {global_browser_args}")
-            
+
             browser_instance = await create_browser_context(
                 browser="chromium",
                 browser_args=global_browser_args,
@@ -212,22 +209,22 @@ async def get_browser():
 async def log_requests(request: Request, call_next):
     """Log all incoming requests and responses"""
     start_time = datetime.now()
-    
+
     # Log request
     logger.info(f"Request: {request.method} {request.url.path} from {request.client.host if request.client else 'unknown'}")
-    
+
     # Process request
     try:
         response = await call_next(request)
-        
+
         # Calculate response time
         duration = (datetime.now() - start_time).total_seconds()
-        
+
         # Log response
         logger.info(f"Response: {response.status_code} - {duration:.3f}s")
-        
+
         return response
-        
+
     except Exception as e:
         duration = (datetime.now() - start_time).total_seconds()
         logger.error(f"Request failed after {duration:.3f}s: {str(e)}")
@@ -270,7 +267,7 @@ async def shot(request: ShotRequest):
     try:
         # Get browser instance
         browser = await get_browser()
-        
+
         # Build shot configuration
         shot_config = {
             "url": request.url,
@@ -293,7 +290,7 @@ async def shot(request: ShotRequest):
             "wait_for_dom_ready_timeout": request.wait_for_dom_ready_timeout,
             "skip_wait_for_dom_ready": request.skip_wait_for_dom_ready,
         }
-        
+
         # Add single selector fields to arrays if provided
         if request.selector:
             shot_config["selectors"].append(request.selector)
@@ -303,13 +300,13 @@ async def shot(request: ShotRequest):
             shot_config["js_selectors"].append(request.js_selector)
         if request.js_selector_all:
             shot_config["js_selectors_all"].append(request.js_selector_all)
-        
+
         # Handle authentication
         if request.auth_username and request.auth_password:
             # Note: nodriver doesn't have built-in HTTP auth like Playwright
             # This would need to be implemented via CDP or page manipulation
             pass
-        
+
         # Take the screenshot
         screenshot_bytes = await take_shot(
             browser,
@@ -317,13 +314,13 @@ async def shot(request: ShotRequest):
             return_bytes=True,
             silent=True
         )
-        
+
         # Determine content type based on quality setting
         if request.quality:
             content_type = "image/jpeg"
         else:
             content_type = "image/png"
-        
+
         # Return the image
         return Response(
             content=screenshot_bytes,
@@ -332,7 +329,7 @@ async def shot(request: ShotRequest):
                 "Content-Disposition": f"inline; filename=screenshot.{'jpg' if request.quality else 'png'}"
             }
         )
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -342,23 +339,23 @@ async def html(request: HtmlRequest):
     try:
         # Get browser instance
         browser = await get_browser()
-        
+
         # Get a new page
         page = await browser.get(request.url)
-        
+
         # Check if page failed to load
         has_error, error_msg = await detect_navigation_error(page, request.url)
         if has_error:
             raise HTTPException(status_code=400, detail=f"Page failed to load: {error_msg}")
-        
+
         # Wait if specified
         if request.wait:
             time.sleep(request.wait / 1000)
-        
+
         # Execute JavaScript if provided
         if request.javascript:
             await evaluate_js(page, request.javascript)
-        
+
         # Extract HTML
         if request.selector:
             element = await page.select(request.selector)
@@ -368,14 +365,14 @@ async def html(request: HtmlRequest):
                 raise HTTPException(status_code=404, detail=f"Selector '{request.selector}' not found")
         else:
             html_content = await page.get_content()
-        
+
         return {
             "url": request.url,
             "html": html_content,
             "selector": request.selector,
             "timestamp": time.time()
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -404,18 +401,18 @@ async def html(request: HtmlRequest):
 def main(browser_args, host, port, reload):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
-    
+
     # Store browser args globally BEFORE creating the app
     global global_browser_args, app
     global_browser_args = list(browser_args)
-    
+
     # Now create the FastAPI app with the browser args already set
     app = FastAPI(
         title="Shot Power Scraper API",
         version="1.0.0",
         description="""
         A powerful API for automated web screenshots and HTML extraction with anti-detection capabilities.
-        
+
         ## Features
         - Screenshot capture with CSS/JS selectors
         - HTML content extraction
@@ -423,10 +420,10 @@ def main(browser_args, host, port, reload):
         - Cloudflare bypass support
         - Full page screenshots
         - Shared browser instance for performance
-        
+
         ## Authentication
         Currently no authentication required. Set environment variables for production use.
-        
+
         ## Rate Limiting
         No rate limiting implemented. Consider adding for production use.
         """,
@@ -439,16 +436,16 @@ def main(browser_args, host, port, reload):
         ],
         lifespan=lifespan
     )
-    
+
     # Add logging middleware
     app.middleware("http")(log_requests)
-    
+
     # Register routes with tags
     app.get("/", tags=["utility"], summary="API Information")(root)
     app.get("/health", tags=["utility"], summary="Health Check")(health)
     app.post("/shot", tags=["screenshots"], summary="Capture Screenshot")(shot)
     app.post("/html", tags=["content"], summary="Extract HTML Content")(html)
-    
+
     click.echo(f"Starting Shot Power Scraper API Server on {host}:{port}")
     click.echo(f"API documentation available at http://{host}:{port}/docs")
     click.echo("\nAvailable endpoints:")
@@ -462,12 +459,12 @@ def main(browser_args, host, port, reload):
     click.echo(f"  RELOAD={reload}")
     click.echo(f"  VERBOSE={os.getenv('VERBOSE', 'false')}")
     click.echo(f"  PRELOAD_BROWSER={os.getenv('PRELOAD_BROWSER', 'true')}")
-    
+
     if browser_args:
         click.echo(f"  Browser args: {list(browser_args)}")
-    
+
     logger.info(f"Starting server on {host}:{port}")
-    
+
     uvicorn.run(
         app,
         host=host,

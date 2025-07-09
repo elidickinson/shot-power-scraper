@@ -1,13 +1,11 @@
 """Core screenshot functionality for shot-scraper"""
 import os
-import sys
 import time
 import json
 import secrets
 import textwrap
 import tempfile
 import pathlib
-import asyncio
 import click
 from shot_power_scraper.browser import Config
 from shot_power_scraper.page_utils import (
@@ -406,9 +404,9 @@ async def take_shot(
                     click.echo(f"Taking screenshot (full_page={screenshot_args.get('full_page', True)})", err=True)
                 # Add quality parameter for JPEG format
                 if format == "jpeg" and quality:
-                    result = await page.save_screenshot(output, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
+                    await page.save_screenshot(output, format=format, quality=quality, full_page=screenshot_args.get("full_page", True))
                 else:
-                    result = await page.save_screenshot(output, format=format, full_page=screenshot_args.get("full_page", True))
+                    await page.save_screenshot(output, format=format, full_page=screenshot_args.get("full_page", True))
                 # save_screenshot might return None, that's OK
                 message = f"Screenshot of '{url}' written to '{output}'"
 
