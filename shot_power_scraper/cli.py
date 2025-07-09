@@ -405,11 +405,6 @@ def cli():
     help="Save HTML content alongside the screenshot with the same base name"
 )
 @click.option(
-    "--clear-annoyances",
-    is_flag=True,
-    help="Enable automatic annoyance clearing"
-)
-@click.option(
     "--ad-block/--no-ad-block",
     default=None,
     help="Enable/disable ad blocking (overrides config file setting)"
@@ -458,7 +453,6 @@ def shot(
     full_page,
     verbose,
     save_html,
-    clear_annoyances,
     ad_block,
     popup_block,
 ):
@@ -526,7 +520,6 @@ def shot(
         "full_page": full_page,
         "verbose": verbose,
         "save_html": save_html,
-        "clear_annoyances": clear_annoyances,
         "configure_extension": ad_block or popup_block,
         "ad_block": ad_block,
         "popup_block": popup_block,
@@ -824,6 +817,10 @@ def multi(
                         shot["configure_extension"] = True
                         shot["ad_block"] = ad_block
                         shot["popup_block"] = popup_block
+                    
+                    # Set timeout if not already specified in the shot
+                    if timeout and "timeout" not in shot:
+                        shot["timeout"] = timeout
                     
                     try:
                         await take_shot(
@@ -1247,6 +1244,16 @@ def pdf(
 @click.option(
     "--wait", type=int, default=250, help="Wait this many milliseconds before taking the snapshot (default: 250)"
 )
+@click.option(
+    "--timeout",
+    type=int,
+    help="Wait this many milliseconds before failing",
+)
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose logging to stdout"
+)
 @log_console_option
 @browser_option
 @browser_args_option
@@ -1262,6 +1269,8 @@ def html(
     javascript,
     selector,
     wait,
+    timeout,
+    verbose,
     log_console,
     browser,
     browser_args,
@@ -1287,6 +1296,10 @@ def html(
     url = url_or_file_path(url, _check_and_absolutize)
     if output is None:
         output = filename_for_url(url, ext="html", file_exists=os.path.exists)
+
+    # Set global config
+    Config.verbose = verbose
+    Config.silent = silent
 
     async def run_html():
         browser_obj = await create_browser_context(
@@ -1326,9 +1339,24 @@ def html(
                 click.echo(f"Warning: {full_msg}", err=True)
 
         if wait:
+            if verbose:
+                click.echo(f"Waiting {wait}ms before processing...", err=True)
             time.sleep(wait / 1000)
         if javascript:
             await evaluate_js(page, javascript)
+        
+        # Wait for page to be ready with timeout
+        if timeout:
+            await page.evaluate(f"""
+                new Promise((resolve) => {{
+                    if (document.readyState === 'complete') {{
+                        resolve();
+                    }} else {{
+                        window.addEventListener('load', resolve);
+                        setTimeout(resolve, {timeout * 1000});
+                    }}
+                }});
+            """)
 
         if selector:
             element = await page.select(selector)

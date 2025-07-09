@@ -17,7 +17,6 @@ from shot_power_scraper.page_utils import (
     wait_for_condition,
     detect_navigation_error
 )
-from shot_power_scraper.annoyance_manager import clear_annoyances
 from shot_power_scraper.utils import filename_for_url, url_or_file_path
 from shot_power_scraper.console_logger import ConsoleLogger
 from shot_power_scraper.response_handler import ResponseHandler
@@ -195,10 +194,10 @@ async def take_shot(
         # Create a new tab first to set up console logging before navigation
         if Config.verbose:
             click.echo(f"Creating new page for: {url}", err=True)
-        
+
         # Get a blank page first
         page = await context_or_page.get("about:blank")
-        
+
         # Set up console logging BEFORE navigating to the actual URL
         console_logger = None
         if log_console:
@@ -206,22 +205,22 @@ async def take_shot(
             await console_logger.setup(page)
             if Config.verbose:
                 click.echo("Console logging enabled", err=True)
-        
+
         # Set up response handler for HTTP status checking
         response_handler = ResponseHandler()
         import nodriver as uc
         page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
-        
+
         # Now navigate to the actual URL
         if Config.verbose:
             click.echo(f"Loading page: {url}", err=True)
         await page.get(url)
-        
+
         # Wait for the window load event (all resources including images) unless skipped
         if not skip_wait_for_load:
             if Config.verbose:
                 click.echo(f"Waiting for window load event...", err=True)
-            
+
             await page.evaluate(f"""
                 new Promise((resolve) => {{
                     if (document.readyState === 'complete') {{
@@ -232,12 +231,12 @@ async def take_shot(
                     }}
                 }});
             """)
-            
+
         if log_requests:
             # nodriver doesn't have direct response events like Playwright
             # We can implement this later using CDP if needed
             pass
-        
+
         # Check HTTP response status
         response_status, response_url = await response_handler.wait_for_response(timeout=5)
         if response_status is not None:
@@ -246,7 +245,7 @@ async def take_shot(
                 def __init__(self, status, url):
                     self.status = status
                     self.url = url
-            
+
             from shot_power_scraper.cli import skip_or_fail
             skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
 
@@ -287,18 +286,13 @@ async def take_shot(
     # Use explicit full_page if provided, otherwise default to True if no height is specified
     full_page = shot.get("full_page", not shot.get("height"))
 
-    if not use_existing_page:
-        # nodriver automatically handles page loading and doesn't return response status
-        # We'll assume the page loaded successfully unless we get an exception
-        pass
-
     # Configure blocking extensions if enabled
     if shot.get("configure_extension"):
         from shot_power_scraper.cli import configure_blocking_extension
         await configure_blocking_extension(
-            page, 
-            shot.get("ad_block", False), 
-            shot.get("popup_block", False), 
+            page,
+            shot.get("ad_block", False),
+            shot.get("popup_block", False),
             Config.verbose
         )
 
@@ -307,13 +301,6 @@ async def take_shot(
             click.echo(f"Waiting {wait}ms before processing...", err=True)
         time.sleep(wait / 1000)
 
-    # Clear annoyances after any wait period if enabled
-    if shot.get("clear_annoyances", False):
-        try:
-            await clear_annoyances(page, timeout_seconds=5)
-        except Exception as e:
-            if Config.verbose:
-                click.echo(f"Annoyance clearing failed: {e}", err=True)
 
     javascript = shot.get("javascript")
     if javascript:
@@ -430,23 +417,23 @@ async def take_shot(
         try:
             # Get the HTML content
             html_content = await page.get_content()
-            
+
             # Determine HTML filename from screenshot output
             if output and output != "-":
                 # Get the base name without extension
                 output_path = pathlib.Path(output)
                 html_filename = output_path.with_suffix('.html')
-                
+
                 # Write HTML content to file
                 with open(html_filename, 'w', encoding='utf-8') as f:
                     f.write(html_content)
-                
+
                 if not silent:
                     click.echo(f"HTML content saved to '{html_filename}'", err=True)
             else:
                 if not silent:
                     click.echo("Cannot save HTML when output is stdout", err=True)
-                    
+
         except Exception as e:
             if not silent:
                 click.echo(f"Failed to save HTML: {e}", err=True)

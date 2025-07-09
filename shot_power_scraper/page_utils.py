@@ -88,26 +88,18 @@ async def wait_for_condition(page, wait_for_expression, timeout_seconds=30):
 
 async def detect_navigation_error(page, expected_url):
     """Detect if page navigation failed (DNS errors, network failures, etc.)"""
-    try:
-        current_url = page.url
-        page_title = await page.evaluate("document.title")
-        body_text = await page.evaluate("document.body ? document.body.innerText.trim() : ''")
-        
-        # Check for Chrome error pages
-        if current_url.startswith('chrome-error://'):
-            return True, f"Chrome error page: {current_url}"
-        
-        # Check for Chrome error page pattern
-        if (len(body_text) < 200 and 
-            page_title == current_url.replace('https://', '').replace('http://', '').split('/')[0] and
-            "This site can't be reached" in body_text):
-            return True, "DNS or network error"
-        
-        return False, None
-        
-    except Exception as e:
-        if Config.verbose:
-            click.echo(f"Error detection failed: {e}", err=True)
-        return False, None
+    current_url = page.url
+    page_title = await page.evaluate("document.title")
+    body_text = await page.evaluate("document.body ? document.body.innerText.trim() : ''")
 
+    # Check for Chrome error pages
+    if current_url.startswith('chrome-error://'):
+        return True, f"Chrome error page: {current_url}"
 
+    # Check for Chrome error page pattern
+    if (len(body_text) < 200 and
+        page_title == current_url.replace('https://', '').replace('http://', '').split('/')[0] and
+        "This site can't be reached" in body_text):
+        return True, "DNS or network error"
+
+    return False, None
