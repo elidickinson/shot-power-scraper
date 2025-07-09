@@ -28,7 +28,7 @@ You can adjust these with the `--width` and `--height` options (`-w` and `-h` fo
 ```bash
 shot-power-scraper https://datasette.io/ -o small.png --width 400 --height 800
 ```
-If you provide both options, the resulting screenshot will be of that size. If you omit `--height` a full page length screenshot will be produced (the default).
+If you provide both options, the resulting screenshot will be of that size. If you omit `--height` a full page length screenshot will be produced, which is the default behavior.
 
 ## Screenshotting a specific area with CSS selectors
 

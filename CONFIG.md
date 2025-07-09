@@ -19,7 +19,7 @@ These options currently only work as command-line arguments but may be added to 
 ```json
 {
   "width": 1280,                        // Browser viewport width in pixels
-  "height": 720,                        // Browser viewport height (omit for full page)
+  "height": 720,                        // Browser viewport height (omit for full page capture)
   "wait": 2000,                         // Wait time in ms before screenshot
   "quality": 80,                        // JPEG quality (1-100)
   "timeout": 30000,                     // Page load timeout in ms
@@ -27,7 +27,6 @@ These options currently only work as command-line arguments but may be added to 
   "wait_for_dom_ready_timeout": 10000, // DOM ready timeout in ms
   "skip_cloudflare_check": false,      // Disable Cloudflare detection
   "scale_factor": 1,                    // Device scale factor (2 = retina)
-  "full_page": true,                    // Capture full page by default
   "omit_background": false,             // Transparent background
   "bypass_csp": false,                  // Bypass Content Security Policy
   "reduced_motion": false,              // Emulate prefers-reduced-motion
@@ -56,7 +55,6 @@ Once these options are implemented, you could set defaults like:
   "height": 1080,
   "wait": 1000,
   "quality": 90,
-  "full_page": false
 }
 ```
 

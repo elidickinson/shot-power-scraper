@@ -155,7 +155,7 @@ This fork has significant differences from the original shot-scraper. **Several 
 **All options work:**
 - `--auth` / `-a` - ✅ Authentication context file
 - `--width` - ✅ Browser window width (default: 1280)
-- `--height` - ✅ Browser window height (defaults to full page height)
+- `--height` - ✅ Browser window height (full page capture by default)
 - `--output` / `-o` - ✅ Output file path or `-` for stdout
 - `--selector` / `-s` - ✅ CSS selector for element screenshots (multiple supported)
 - `--selector-all` - ✅ All elements matching CSS selector
@@ -186,7 +186,6 @@ This fork has significant differences from the original shot-scraper. **Several 
 - `--auth-password` - ✅ HTTP Basic auth password
 - `--skip-cloudflare-check` - ✅ Skip Cloudflare challenge detection
 - `--skip-wait-for-load` - ✅ Skip waiting for window load event
-- `--full-page` - ✅ Capture full scrollable page
 - `--verbose` - ✅ Verbose logging
 - `--save-html` - ✅ Save HTML alongside screenshot
 - `--ad-block` / `--no-ad-block` - ✅ Ad blocking toggle

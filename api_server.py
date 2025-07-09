@@ -32,7 +32,6 @@ Example API calls:
             "width": 1280,
             "height": 720,
             "wait": 2000,
-            "full_page": true
         }' \
         -o screenshot.png
 
@@ -144,7 +143,6 @@ class ShotRequest(BaseModel):
     timeout: Optional[int] = Field(30000, description="Timeout in milliseconds")
     scale_factor: Optional[float] = Field(1.0, description="Scale factor for screenshot")
     omit_background: Optional[bool] = Field(False, description="Omit background for transparency")
-    full_page: Optional[bool] = Field(None, description="Capture full scrollable page")
     skip_cloudflare_check: Optional[bool] = Field(False, description="Skip Cloudflare challenge detection")
     wait_for_dom_ready_timeout: Optional[int] = Field(10000, description="DOM ready timeout in milliseconds")
     skip_wait_for_dom_ready: Optional[bool] = Field(False, description="Skip waiting for DOM ready")
@@ -159,7 +157,6 @@ class ShotRequest(BaseModel):
                 "width": 1280,
                 "height": 720,
                 "wait": 2000,
-                "full_page": False
             }
         }
 
@@ -285,7 +282,6 @@ async def shot(request: ShotRequest):
             "timeout": request.timeout,
             "scale_factor": request.scale_factor,
             "omit_background": request.omit_background,
-            "full_page": request.full_page,
             "skip_cloudflare_check": request.skip_cloudflare_check,
             "wait_for_dom_ready_timeout": request.wait_for_dom_ready_timeout,
             "skip_wait_for_dom_ready": request.skip_wait_for_dom_ready,

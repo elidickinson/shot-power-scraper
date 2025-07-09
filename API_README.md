@@ -67,7 +67,6 @@ Take a screenshot with various options.
   "width": 1280,
   "height": 720,
   "wait": 2000,
-  "full_page": false,
   "selector": "#main-content",
   "padding": 20,
   "quality": 80,
@@ -101,7 +100,6 @@ curl -X POST http://localhost:8000/shot \
     "url": "https://example.com",
     "width": 1920,
     "height": 1080,
-    "full_page": true
   }' \
   -o fullpage.png
 

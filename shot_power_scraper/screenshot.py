@@ -34,7 +34,7 @@ class ShotConfig:
         self.timeout = shot.get("timeout") or 30
         self.skip_wait_for_load = shot.get("skip_wait_for_load", False)
         self.javascript = shot.get("javascript")
-        self.full_page = shot.get("full_page", not shot.get("height"))
+        self.full_page = not shot.get("height")
         self.configure_extension = shot.get("configure_extension")
         self.ad_block = shot.get("ad_block", False)
         self.popup_block = shot.get("popup_block", False)

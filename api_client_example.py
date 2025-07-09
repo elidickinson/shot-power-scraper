@@ -47,13 +47,12 @@ def example_sized_screenshot():
     save_screenshot(response, "example_sized.png")
 
 def example_full_page_screenshot():
-    """Example: Full page screenshot"""
-    print("\n3. Full page screenshot example:")
+    """Example: Full page screenshot (default behavior)"""
+    print("\n3. Full page screenshot example (default behavior):")
     response = requests.post(
         f"{API_BASE_URL}/shot",
         json={
             "url": "https://example.com",
-            "full_page": True,
             "width": 1280
         }
     )

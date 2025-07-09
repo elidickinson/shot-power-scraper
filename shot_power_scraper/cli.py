@@ -389,11 +389,6 @@ def cli():
     help="Skip waiting for window load event"
 )
 @click.option(
-    "--full-page",
-    is_flag=True,
-    help="Capture the full scrollable page (overrides --height)"
-)
-@click.option(
     "--verbose",
     is_flag=True,
     help="Enable verbose logging to stdout"
@@ -454,7 +449,6 @@ def shot(
     auth_password,
     skip_cloudflare_check,
     skip_wait_for_load,
-    full_page,
     verbose,
     save_html,
     ad_block,
@@ -487,9 +481,9 @@ def shot(
 
         shot-scraper https://simonwillison.net -s '#bighead'
 
-    Use --full-page to capture the entire scrollable page:
+    Full page screenshots are taken by default. Use --height to limit the screenshot height:
 
-        shot-scraper https://www.example.com/ --full-page -o full.png
+        shot-scraper https://www.example.com/ --height 600 -o partial.png
     """
     # Set global config
     Config.verbose = verbose
@@ -522,7 +516,6 @@ def shot(
         "scale_factor": scale_factor,
         "skip_cloudflare_check": skip_cloudflare_check,
         "skip_wait_for_load": skip_wait_for_load,
-        "full_page": full_page,
         "verbose": verbose,
         "save_html": save_html,
         "configure_extension": ad_block or popup_block,
