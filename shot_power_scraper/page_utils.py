@@ -114,8 +114,8 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     converted_count = await page.evaluate("""
         (() => {
             let count = 0;
-            // Handle images with data-src
-            const images = document.querySelectorAll('img[data-src]');
+            // Handle lazy loaded images (some have loading as a JS property not an attribute)
+            const images = document.querySelectorAll('img');
             images.forEach(img => {
                 if (img.dataset.src) {
                     img.src = img.dataset.src;
@@ -124,7 +124,8 @@ async def trigger_lazy_load(page, timeout_ms=5000):
                 }
                 // Remove lazy loading attribute
                 if (img.loading === 'lazy') {
-                    img.removeAttribute('loading');
+                    img.loading = 'eager';
+                    count++;
                 }
             });
 
@@ -143,7 +144,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     """)
 
     if Config.verbose and converted_count > 0:
-        click.echo(f"Converted {converted_count} data-src attributes to src", err=True)
+        click.echo(f"Converted {converted_count} lazy load attributes", err=True)
 
     # Now scroll through the page to trigger any remaining lazy loading
     start_time = time.time()
@@ -152,14 +153,16 @@ async def trigger_lazy_load(page, timeout_ms=5000):
 
     while time.time() - start_time < max_wait_seconds:
         # Scroll down progressively
-        await page.scroll_down(amount=110)  # Scroll by X% of viewport
+        await page.scroll_down(amount=100)  # Scroll by X% of viewport
         scroll_count += 1
 
         # Give time for content to load
-        await asyncio.sleep(0.15)
+        await asyncio.sleep(0.1)
 
-        # Check if we've reached the bottom
-        at_bottom = await page.scroll_bottom_reached()
+        # Check if we've reached the bottom by comparing scroll position
+        at_bottom = await page.evaluate("""
+            window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 25
+        """)
 
         if Config.verbose and scroll_count % 5 == 0:
             click.echo(f"Scrolled {scroll_count} times", err=True)
@@ -171,8 +174,10 @@ async def trigger_lazy_load(page, timeout_ms=5000):
             break
 
     # Scroll back to top for consistent screenshot
-    await page.scroll_up(amount=10000)  # Scroll to top using nodriver method
-    await asyncio.sleep(0.15)
+    # await page.scroll_up(amount=10000)  # Scroll to top using nodriver method
+    await asyncio.sleep(0.1)
+    await page.evaluate("window.scrollTo(0,0);")
+    await asyncio.sleep(0.1)
 
     if Config.verbose:
         elapsed = time.time() - start_time

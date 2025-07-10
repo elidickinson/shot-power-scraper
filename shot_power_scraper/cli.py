@@ -1174,6 +1174,11 @@ def javascript(
 )
 @click.option("--print-background", is_flag=True, help="Print background graphics")
 @click.option("--pdf-css", help="Inject custom CSS for PDF generation")
+@click.option(
+    "--trigger-lazy-load",
+    is_flag=True,
+    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
+)
 @log_console_option
 @skip_fail_options
 @bypass_csp_option
@@ -1201,6 +1206,7 @@ def pdf(
     scale,
     print_background,
     pdf_css,
+    trigger_lazy_load,
     log_console,
     skip,
     fail,
@@ -1295,6 +1301,10 @@ def pdf(
             if verbose:
                 click.echo(f"Waiting for condition: {wait_for}", err=True)
             await page.wait_for(wait_for, timeout=timeout)
+
+        if trigger_lazy_load:
+            from shot_power_scraper.page_utils import trigger_lazy_load as trigger_lazy_load_func
+            await trigger_lazy_load_func(page)
 
         # Generate PDF using CDP
         pdf_data = await generate_pdf(page, {
