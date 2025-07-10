@@ -3,6 +3,7 @@ import time
 import asyncio
 import click
 from shot_power_scraper.browser import Config
+import nodriver as uc
 
 
 async def evaluate_js(page, javascript):
@@ -125,6 +126,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
                 // Remove lazy loading attribute
                 if (img.loading === 'lazy') {
                     img.loading = 'eager';
+                    img.decode(); // try to force loading right now
                     count++;
                 }
             });
@@ -146,39 +148,37 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     if Config.verbose and converted_count > 0:
         click.echo(f"Converted {converted_count} lazy load attributes", err=True)
 
-    # Now scroll through the page to trigger any remaining lazy loading
-    start_time = time.time()
-    max_wait_seconds = timeout_ms / 1000
-    scroll_count = 0
+    # Try CDP-based viewport scaling to trigger image loading in headless mode. I had strange problems
+    # triggering loading=lazy images when in headless. Both scrolling and rewriting img attributes
+    # didn't seem to work. Something peculiar to --headless (or --headless=new perhaps)
+    if Config.verbose:
+        click.echo(f"Attempting viewport scaling trick for headless image loading...", err=True)
+    viewport_width = await page.evaluate("window.innerWidth")
+    # This makes Chrome think the viewport is very tall
+    await page.send(uc.cdp.emulation.set_device_metrics_override(
+        width=viewport_width,
+        height=10000,  # Very tall viewport
+        device_scale_factor=1,
+        mobile=False
+    ))
 
-    while time.time() - start_time < max_wait_seconds:
-        # Scroll down progressively
-        await page.scroll_down(amount=100)  # Scroll by X% of viewport
-        scroll_count += 1
+    # Wait for all images to load with timeout
+    max_wait = 5  # seconds (TODO: don't hardcode this)
+    start_wait = time.time()
 
-        # Give time for content to load
-        await asyncio.sleep(0.1)
-
-        # Check if we've reached the bottom by comparing scroll position
-        at_bottom = await page.evaluate("""
-            window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 25
+    while time.time() - start_wait < max_wait:
+        all_loaded = await page.evaluate("""
+            Array.from(document.querySelectorAll('img[src]')).every(img => img.complete)
         """)
-
-        if Config.verbose and scroll_count % 5 == 0:
-            click.echo(f"Scrolled {scroll_count} times", err=True)
-
-        # If we're at the bottom and height hasn't changed, we're done
-        if at_bottom:
+        if all_loaded:
             if Config.verbose:
-                click.echo(f"Reached bottom of page after {scroll_count} scrolls", err=True)
+                click.echo(f"All images loaded after {time.time() - start_wait:.1f}s", err=True)
             break
 
-    # Scroll back to top for consistent screenshot
-    # await page.scroll_up(amount=10000)  # Scroll to top using nodriver method
-    await asyncio.sleep(0.1)
-    await page.evaluate("window.scrollTo(0,0);")
-    await asyncio.sleep(0.1)
+        await asyncio.sleep(0.1)
+
+    # Clear the override to restore normal viewport
+    await page.send(uc.cdp.emulation.clear_device_metrics_override())
 
     if Config.verbose:
-        elapsed = time.time() - start_time
-        click.echo(f"Lazy load triggering completed in {elapsed:.1f}s", err=True)
+        click.echo(f"Lazy load complete", err=True)
