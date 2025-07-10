@@ -45,19 +45,19 @@ class ShotConfig:
         self.width = shot.get("width")
         self.height = shot.get("height")
         self.trigger_lazy_load = shot.get("trigger_lazy_load", False)
-        
+
         # PDF specific options
         self.pdf_landscape = shot.get("pdf_landscape", False)
         self.pdf_scale = shot.get("pdf_scale", 1.0)
-        self.pdf_print_background = shot.get("pdf_print_background", True)
+        self.pdf_print_background = shot.get("pdf_print_background", False)
         self.pdf_media_screen = shot.get("pdf_media_screen", False)
-        
+
         # Process selectors
         self.selectors = list(shot.get("selectors") or [])
         self.selectors_all = list(shot.get("selectors_all") or [])
         self.js_selectors = list(shot.get("js_selectors") or [])
         self.js_selectors_all = list(shot.get("js_selectors_all") or [])
-        
+
         # Add single selectors to their respective lists
         if shot.get("selector"):
             self.selectors.append(shot["selector"])
@@ -67,7 +67,7 @@ class ShotConfig:
             self.js_selectors.append(shot["js_selector"])
         if shot.get("js_selector_all"):
             self.js_selectors_all.append(shot["js_selector_all"])
-    
+
     def has_selectors(self):
         """Check if any selectors are defined"""
         return bool(self.selectors or self.js_selectors or self.selectors_all or self.js_selectors_all)
@@ -226,7 +226,7 @@ async def take_shot(
 ):
     """Take a screenshot based on the provided configuration"""
     config = ShotConfig(shot)
-    
+
     if not config.url:
         raise click.ClickException("url is required")
 
@@ -234,7 +234,7 @@ async def take_shot(
         raise click.ClickException("--skip and --fail cannot be used together")
 
     url = url_or_file_path(config.url, file_exists=_check_and_absolutize)
-    
+
     if not config.output and not return_bytes:
         config.output = filename_for_url(url, ext="png", file_exists=os.path.exists)
 
@@ -446,13 +446,13 @@ async def take_shot(
 
 async def generate_pdf(page, options):
     """Generate PDF from a page using Chrome DevTools Protocol with standard letter size."""
-    
+
     # Build CDP print options - always use letter size (8.5x11 inches)
     print_options = {
-        "landscape": options.get("landscape", False),
+        "landscape": options.get("landscape"),
         "display_header_footer": False,
-        "print_background": options.get("print_background", True),
-        "scale": options.get("scale", 1.0),
+        "print_background": options.get("print_background"),
+        "scale": options.get("scale"),
         "margin_top": 0.4,
         "margin_bottom": 0.4,
         "margin_left": 0.4,
@@ -460,30 +460,94 @@ async def generate_pdf(page, options):
         "paper_width": 8.5,  # Letter size width
         "paper_height": 11,   # Letter size height
     }
-    
+
     # If landscape, swap width and height
     if options.get("landscape"):
         print_options["paper_width"] = 11
         print_options["paper_height"] = 8.5
-    
+
     # Handle media type
     if options.get("media_screen"):
         # Emulate screen media for CSS
         await page.send(uc.cdp.emulation.set_emulated_media(media="screen"))
+
+        # Default CSS for better page break handling
+        default_css = """
+            /* Avoid breaking inside paragraphs and list items */
+            p, li, blockquote, h1, h2, h3, h4, h5, h6 {
+                break-inside: avoid;
+            }
+
+            /* Try to keep headings with their content */
+            h1, h2, h3, h4, h5, h6 {
+                break-after: avoid;
+            }
+
+            /* Avoid widows and orphans */
+            p {
+                widows: 3;
+                orphans: 3;
+            }
+
+        """
+
+        # Combine default CSS with custom CSS if provided
+        css_to_inject = default_css
+        if options.get("pdf_css"):
+            css_to_inject = default_css + "\n" + options.get("pdf_css")
+
+        # Inject the CSS
+        await page.evaluate(f"""
+            const style = document.createElement('style');
+            style.textContent = `{css_to_inject}`;
+            document.head.appendChild(style);
+        """)
+
+        # Additionally, use JavaScript to convert fixed/sticky elements to static
+        await page.evaluate("""
+            // Find all elements with computed position fixed or sticky
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(el => {
+                const computed = window.getComputedStyle(el);
+                // Skip hidden elements
+                if (computed.visibility === 'hidden' || computed.display === 'none') {
+                    return;
+                }
+                if (computed.position === 'fixed' || computed.position === 'sticky') {
+                    // Store original position for reference
+                    el.dataset.originalPosition = computed.position;
+                    // Change to static to prevent repeating on every page
+                    el.style.position = 'static';
+                    // Remove any top/bottom/left/right values that might cause layout issues
+                    el.style.top = 'auto';
+                    el.style.bottom = 'auto';
+                    el.style.left = 'auto';
+                    el.style.right = 'auto';
+                }
+            });
+        """)
     else:
         # Use print media (default)
         await page.send(uc.cdp.emulation.set_emulated_media(media="print"))
-    
+
+        # Inject custom CSS if provided (even for print media)
+        if options.get("pdf_css"):
+            await page.evaluate(f"""
+                const style = document.createElement('style');
+                style.textContent = `{options.get("pdf_css")}`;
+                document.head.appendChild(style);
+            """)
+
     # Generate PDF using CDP
     result = await page.send(uc.cdp.page.print_to_pdf(**print_options))
-    
+
     # nodriver returns a tuple: (base64_string, stream_handle)
     # The first element is the base64-encoded PDF data as a string
     pdf_base64_string = result[0]
-    
+
     # Decode base64 PDF data
     pdf_data = base64.b64decode(pdf_base64_string)
-    
+
     return pdf_data
 
 
@@ -500,7 +564,7 @@ async def take_pdf(
 ):
     """Generate a PDF based on the provided configuration"""
     config = ShotConfig(shot)
-    
+
     if not config.url:
         raise click.ClickException("url is required")
 
@@ -508,7 +572,7 @@ async def take_pdf(
         raise click.ClickException("--skip and --fail cannot be used together")
 
     url = url_or_file_path(config.url, file_exists=_check_and_absolutize)
-    
+
     if not config.output and not return_bytes:
         config.output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
 
@@ -639,10 +703,10 @@ async def take_pdf(
         "print_background": config.pdf_print_background,
         "media_screen": config.pdf_media_screen,
     }
-    
+
     if Config.verbose:
         click.echo(f"Generating PDF with options: {pdf_options}", err=True)
-    
+
     pdf_data = await generate_pdf(page, pdf_options)
 
     if return_bytes:

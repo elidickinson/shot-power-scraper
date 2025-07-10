@@ -1173,6 +1173,7 @@ def javascript(
     help="Scale of the webpage rendering",
 )
 @click.option("--print-background", is_flag=True, help="Print background graphics")
+@click.option("--pdf-css", help="Inject custom CSS for PDF generation")
 @log_console_option
 @skip_fail_options
 @bypass_csp_option
@@ -1199,6 +1200,7 @@ def pdf(
     landscape,
     scale,
     print_background,
+    pdf_css,
     log_console,
     skip,
     fail,
@@ -1300,6 +1302,7 @@ def pdf(
             "scale": scale or 1.0,
             "print_background": print_background,
             "media_screen": media_screen,
+            "pdf_css": pdf_css,
         })
 
         await cleanup_browser(browser_obj)
