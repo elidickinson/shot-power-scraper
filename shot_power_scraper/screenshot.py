@@ -6,7 +6,9 @@ import secrets
 import textwrap
 import tempfile
 import pathlib
+import base64
 import click
+import nodriver as uc
 from shot_power_scraper.browser import Config
 from shot_power_scraper.page_utils import (
     evaluate_js,
@@ -18,7 +20,6 @@ from shot_power_scraper.page_utils import (
 from shot_power_scraper.utils import filename_for_url, url_or_file_path
 from shot_power_scraper.console_logger import ConsoleLogger
 from shot_power_scraper.response_handler import ResponseHandler
-from shot_power_scraper.pdf_utils import generate_pdf
 
 
 class ShotConfig:
@@ -47,9 +48,6 @@ class ShotConfig:
         
         # PDF specific options
         self.pdf_landscape = shot.get("pdf_landscape", False)
-        self.pdf_format = shot.get("pdf_format")
-        self.pdf_width = shot.get("pdf_width")
-        self.pdf_height = shot.get("pdf_height")
         self.pdf_scale = shot.get("pdf_scale", 1.0)
         self.pdf_print_background = shot.get("pdf_print_background", True)
         self.pdf_media_screen = shot.get("pdf_media_screen", False)
@@ -446,6 +444,49 @@ async def take_shot(
     return None
 
 
+async def generate_pdf(page, options):
+    """Generate PDF from a page using Chrome DevTools Protocol with standard letter size."""
+    
+    # Build CDP print options - always use letter size (8.5x11 inches)
+    print_options = {
+        "landscape": options.get("landscape", False),
+        "display_header_footer": False,
+        "print_background": options.get("print_background", True),
+        "scale": options.get("scale", 1.0),
+        "margin_top": 0.4,
+        "margin_bottom": 0.4,
+        "margin_left": 0.4,
+        "margin_right": 0.4,
+        "paper_width": 8.5,  # Letter size width
+        "paper_height": 11,   # Letter size height
+    }
+    
+    # If landscape, swap width and height
+    if options.get("landscape"):
+        print_options["paper_width"] = 11
+        print_options["paper_height"] = 8.5
+    
+    # Handle media type
+    if options.get("media_screen"):
+        # Emulate screen media for CSS
+        await page.send(uc.cdp.emulation.set_emulated_media(media="screen"))
+    else:
+        # Use print media (default)
+        await page.send(uc.cdp.emulation.set_emulated_media(media="print"))
+    
+    # Generate PDF using CDP
+    result = await page.send(uc.cdp.page.print_to_pdf(**print_options))
+    
+    # nodriver returns a tuple: (base64_string, stream_handle)
+    # The first element is the base64-encoded PDF data as a string
+    pdf_base64_string = result[0]
+    
+    # Decode base64 PDF data
+    pdf_data = base64.b64decode(pdf_base64_string)
+    
+    return pdf_data
+
+
 async def take_pdf(
     context_or_page,
     shot,
@@ -594,9 +635,6 @@ async def take_pdf(
     # Generate PDF
     pdf_options = {
         "landscape": config.pdf_landscape,
-        "format": config.pdf_format,
-        "width": config.pdf_width,
-        "height": config.pdf_height,
         "scale": config.pdf_scale,
         "print_background": config.pdf_print_background,
         "media_screen": config.pdf_media_screen,

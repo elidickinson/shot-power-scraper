@@ -13,9 +13,8 @@ import asyncio
 
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser
-from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport
+from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport, generate_pdf
 from shot_power_scraper.page_utils import evaluate_js
-from shot_power_scraper.pdf_utils import generate_pdf
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -1169,29 +1168,6 @@ def javascript(
 )
 @click.option("--landscape", is_flag=True, help="Use landscape orientation")
 @click.option(
-    "--format",
-    "format_",
-    type=click.Choice(
-        [
-            "Letter",
-            "Legal",
-            "Tabloid",
-            "Ledger",
-            "A0",
-            "A1",
-            "A2",
-            "A3",
-            "A4",
-            "A5",
-            "A6",
-        ],
-        case_sensitive=False,
-    ),
-    help="Which standard paper size to use",
-)
-@click.option("--width", help="PDF width including units, e.g. 10cm")
-@click.option("--height", help="PDF height including units, e.g. 10cm")
-@click.option(
     "--scale",
     type=click.FloatRange(min=0.1, max=2.0),
     help="Scale of the webpage rendering",
@@ -1221,9 +1197,6 @@ def pdf(
     timeout,
     media_screen,
     landscape,
-    format_,
-    width,
-    height,
     scale,
     print_background,
     log_console,
@@ -1246,7 +1219,7 @@ def pdf(
 
         shot-power-scraper pdf https://www.example.com/
 
-    This will write the PDF to www-example-com.pdf
+    This will write the PDF to www-example-com.pdf using standard letter size (8.5x11 inches).
 
     Use "-o" to write to a specific file:
 
@@ -1324,9 +1297,6 @@ def pdf(
         # Generate PDF using CDP
         pdf_data = await generate_pdf(page, {
             "landscape": landscape,
-            "format": format_,
-            "width": width,
-            "height": height,
             "scale": scale or 1.0,
             "print_background": print_background,
             "media_screen": media_screen,
