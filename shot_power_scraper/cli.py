@@ -13,8 +13,9 @@ import asyncio
 
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser
-from shot_power_scraper.screenshot import take_shot, get_viewport
+from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport
 from shot_power_scraper.page_utils import evaluate_js
+from shot_power_scraper.pdf_utils import generate_pdf
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -706,21 +707,25 @@ def multi(
     popup_block,
 ):
     """
-    Take multiple screenshots, defined by a YAML file
+    Take multiple screenshots or PDFs, defined by a YAML file
 
     Usage:
 
-        shot-scraper multi config.yml
+        shot-power-scraper multi config.yml
 
     Where config.yml contains configuration like this:
 
     \b
         - output: example.png
           url: http://www.example.com/
+        - output: example.pdf
+          url: http://www.example.com/
+          pdf_format: A4
+          pdf_landscape: false
 
     \b
-    For full YAML syntax documentation, see:
-    https://shot-scraper.datasette.io/en/stable/multi.html
+    PDF files are automatically detected by .pdf extension.
+    All PDF options from the pdf command are supported in YAML format.
     """
     # Set global config
     Config.verbose = verbose
@@ -820,14 +825,26 @@ def multi(
                         shot["timeout"] = timeout
 
                     try:
-                        await take_shot(
-                            browser_obj,
-                            shot,
-                            log_console=log_console,
-                            skip=skip,
-                            fail=fail,
-                            silent=silent,
-                        )
+                        # Check if this is a PDF output
+                        output_file = shot.get("output", "")
+                        if output_file.lower().endswith('.pdf'):
+                            await take_pdf(
+                                browser_obj,
+                                shot,
+                                log_console=log_console,
+                                skip=skip,
+                                fail=fail,
+                                silent=silent,
+                            )
+                        else:
+                            await take_shot(
+                                browser_obj,
+                                shot,
+                                log_console=log_console,
+                                skip=skip,
+                                fail=fail,
+                                silent=silent,
+                            )
                     except Exception as e:
                         if fail or fail_on_error:
                             raise click.ClickException(str(e))
@@ -1185,6 +1202,15 @@ def javascript(
 @bypass_csp_option
 @silent_option
 @http_auth_options
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose logging to stdout"
+)
+@browser_option
+@browser_args_option
+@user_agent_option
+@reduced_motion_option
 def pdf(
     url,
     auth,
@@ -1207,15 +1233,117 @@ def pdf(
     silent,
     auth_username,
     auth_password,
+    verbose,
+    browser,
+    browser_args,
+    user_agent,
+    reduced_motion,
 ):
     """
-    NOT IMPLEMENTED - Create a PDF of the specified page
+    Create a PDF of the specified page
 
-    This command is not yet implemented with nodriver.
+    Usage:
+
+        shot-power-scraper pdf https://www.example.com/
+
+    This will write the PDF to www-example-com.pdf
+
+    Use "-o" to write to a specific file:
+
+        shot-power-scraper pdf https://www.example.com/ -o example.pdf
+
+    You can also pass a path to a local file on disk:
+
+        shot-power-scraper pdf index.html -o index.pdf
+
+    Using "-o -" will output to standard out:
+
+        shot-power-scraper pdf https://www.example.com/ -o - > example.pdf
     """
-    click.echo("Error: PDF generation is not implemented with nodriver", err=True)
-    click.echo("Use the screenshot commands instead for capturing page content.", err=True)
-    raise click.Abort()
+    # Set global config
+    Config.verbose = verbose
+    Config.silent = silent
+    
+    url = url_or_file_path(url, _check_and_absolutize)
+    
+    if output is None:
+        output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
+
+    async def run_pdf():
+        browser_obj = await create_browser_context(
+            auth=auth,
+            browser=browser,
+            browser_args=browser_args,
+            user_agent=user_agent,
+            timeout=timeout,
+            reduced_motion=reduced_motion,
+            bypass_csp=bypass_csp,
+            auth_username=auth_username,
+            auth_password=auth_password,
+        )
+
+        # Get a blank page first to set up console logging
+        page = await browser_obj.get("about:blank")
+
+        # Set up console logging BEFORE navigating
+        console_logger = None
+        if log_console:
+            from shot_power_scraper.console_logger import ConsoleLogger
+            console_logger = ConsoleLogger(silent=silent)
+            await console_logger.setup(page)
+
+        # Now navigate to the actual URL
+        await page.get(url)
+
+        # Check if page failed to load
+        from shot_power_scraper.page_utils import detect_navigation_error
+        has_error, error_msg = await detect_navigation_error(page, url)
+        if has_error:
+            full_msg = f"Page failed to load: {error_msg}"
+            if skip:
+                click.echo(f"{full_msg}, skipping", err=True)
+                raise SystemExit
+            elif fail:
+                raise click.ClickException(full_msg)
+            elif not silent:
+                click.echo(f"Warning: {full_msg}", err=True)
+
+        if wait:
+            if verbose:
+                click.echo(f"Waiting {wait}ms before processing...", err=True)
+            time.sleep(wait / 1000)
+
+        if javascript:
+            await evaluate_js(page, javascript)
+
+        if wait_for:
+            if verbose:
+                click.echo(f"Waiting for condition: {wait_for}", err=True)
+            await page.wait_for(wait_for, timeout=timeout)
+
+        # Generate PDF using CDP
+        pdf_data = await generate_pdf(page, {
+            "landscape": landscape,
+            "format": format_,
+            "width": width,
+            "height": height,
+            "scale": scale or 1.0,
+            "print_background": print_background,
+            "media_screen": media_screen,
+        })
+
+        await cleanup_browser(browser_obj)
+        return pdf_data
+
+    pdf_data = run_async(run_with_browser_cleanup(run_pdf()))
+
+    if output == "-":
+        sys.stdout.buffer.write(pdf_data)
+    else:
+        with open(output, "wb") as f:
+            f.write(pdf_data)
+        if not silent:
+            click.echo(f"PDF created: {output}", err=True)
 
 
 @cli.command()
