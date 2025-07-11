@@ -455,8 +455,8 @@ async def generate_pdf(page, options):
         "scale": options.get("scale"),
         "margin_top": 0.4,
         "margin_bottom": 0.4,
-        "margin_left": 0.4,
-        "margin_right": 0.4,
+        "margin_left": 0.25,
+        "margin_right": 0.25,
         "paper_width": 8.5,  # Letter size width
         "paper_height": 11,   # Letter size height
     }
