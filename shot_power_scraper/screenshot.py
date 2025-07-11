@@ -7,6 +7,7 @@ import textwrap
 import tempfile
 import pathlib
 import base64
+import asyncio
 import click
 import nodriver as uc
 from shot_power_scraper.browser import Config
@@ -344,7 +345,7 @@ async def take_shot(
     if config.wait:
         if Config.verbose:
             click.echo(f"Waiting {config.wait}ms before processing...", err=True)
-        time.sleep(config.wait / 1000)
+        await asyncio.sleep(config.wait / 1000)
 
     if config.javascript:
         if Config.verbose:
@@ -682,7 +683,7 @@ async def take_pdf(
     if config.wait:
         if Config.verbose:
             click.echo(f"Waiting {config.wait}ms before processing...", err=True)
-        time.sleep(config.wait / 1000)
+        await asyncio.sleep(config.wait / 1000)
 
     if config.javascript:
         if Config.verbose:
