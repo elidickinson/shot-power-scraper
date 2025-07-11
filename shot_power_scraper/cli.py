@@ -21,9 +21,17 @@ BROWSERS = ("chromium", "chrome", "chrome-beta")
 
 async def run_with_browser_cleanup(coro):
     """Run an async function and give nodriver time to cleanup afterwards."""
-    result = await coro
-    await asyncio.sleep(0.25)  # Give nodriver time to cleanup background processes
-    return result
+    import warnings
+
+    # Suppress harmless cleanup warnings from nodriver
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",
+                              message=".*Task was destroyed but it is pending.*",
+                              category=RuntimeWarning)
+
+        result = await coro
+        await asyncio.sleep(0.1)  # Give nodriver time to cleanup background processes
+        return result
 
 
 def run_async(coro):
@@ -1244,9 +1252,9 @@ def pdf(
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
-    
+
     url = url_or_file_path(url, _check_and_absolutize)
-    
+
     if output is None:
         output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
 
