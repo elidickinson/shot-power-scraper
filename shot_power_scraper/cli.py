@@ -155,14 +155,10 @@ def console_log(msg):
 
 
 def _check_and_absolutize(filepath):
-    try:
-        path = pathlib.Path(filepath)
-        if path.exists():
-            return path.absolute()
-        return False
-    except OSError:
-        # On Windows, instantiating a Path object on `http://` or `https://` will raise an exception
-        return False
+    path = pathlib.Path(filepath)
+    if path.exists():
+        return path.absolute()
+    return False
 
 
 def browser_option(fn):
@@ -1707,4 +1703,5 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
         with open(context_file, "w") as fp:
             fp.write(context_json)
         # chmod 600 to avoid other users on the shared machine reading it
-        pathlib.Path(context_file).chmod(0o600)
+        if os.name != "nt":
+            pathlib.Path(context_file).chmod(0o600)

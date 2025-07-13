@@ -103,7 +103,7 @@ def load_config():
 def save_config(config):
     """Save configuration to the config file"""
     config_dir = get_config_dir()
-    config_dir.mkdir(exist_ok=True)
+    config_dir.mkdir(parents=True, exist_ok=True)
     
     config_file = get_config_file()
     with open(config_file, 'w') as f:
