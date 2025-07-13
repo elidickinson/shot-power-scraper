@@ -1,6 +1,7 @@
 """Browser management for shot-scraper"""
 import asyncio
 import json
+import os
 import click
 import nodriver as uc
 import pathlib
@@ -8,6 +9,11 @@ import tempfile
 import shutil
 from shot_power_scraper.utils import get_default_user_agent
 
+
+import logging
+
+# Enable debug logging for nodriver
+logging.basicConfig(level=logging.DEBUG)
 
 class Config:
     """Global configuration state"""
@@ -85,8 +91,15 @@ async def create_browser_context(
     temp_user_data_dir = tempfile.mkdtemp(prefix="shot_scraper_")
     
     # Create browser config
-    config = uc.Config(user_data_dir=temp_user_data_dir)
+    config = uc.Config(
+        user_data_dir=temp_user_data_dir, 
+        no_sandbox=True
+    )
     config.headless = not interactive
+    
+    # Add container-friendly flags
+    browser_args_list.append("--disable-setuid-sandbox")
+    browser_args_list.append("--disable-dev-shm-usage")
     
     # Add --hide-scrollbars when in headless mode
     if not interactive:
