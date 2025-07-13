@@ -81,13 +81,9 @@ from shot_power_scraper.browser import create_browser_context, Config
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.cli import browser_args_option
 from shot_power_scraper.page_utils import evaluate_js, detect_navigation_error
-import time
 
 # Global browser instance for reuse
 browser_instance = None
-browser_lock = asyncio.Lock()
-# Global browser args from CLI - will be set before app creation
-global_browser_args = []
 
 # Configure logging
 logging.basicConfig(
@@ -106,7 +102,8 @@ async def lifespan(app: FastAPI):
     # Startup
     global browser_instance
     if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
-        await get_browser()
+        browser_args = getattr(app.state, 'browser_args', [])
+        await get_browser(browser_args)
 
     yield
 
@@ -119,22 +116,46 @@ async def lifespan(app: FastAPI):
         browser_instance = None
 
 
-# Create app after parsing CLI args (see main function)
-app = None
+# Create FastAPI app
+app = FastAPI(
+    title="Shot Power Scraper API",
+    version="1.0.0",
+    description="""
+    A powerful API for automated web screenshots and HTML extraction with anti-detection capabilities.
+
+    ## Features
+    - Screenshot capture with CSS/JS selectors
+    - HTML content extraction
+    - JavaScript execution before capture
+    - Cloudflare bypass support
+    - Full page screenshots
+    - Shared browser instance for performance
+
+    ## Authentication
+    Currently no authentication required. Set environment variables for production use.
+
+    ## Rate Limiting
+    No rate limiting implemented. Consider adding for production use.
+    """,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_tags=[
+        {"name": "screenshots", "description": "Screenshot capture operations"},
+        {"name": "content", "description": "HTML content extraction"},
+        {"name": "utility", "description": "Health checks and API information"}
+    ],
+    lifespan=lifespan
+)
 
 class ShotRequest(BaseModel):
     """Request model for screenshot endpoint"""
     url: str = Field(..., description="URL to screenshot")
     width: Optional[int] = Field(None, description="Viewport width in pixels")
     height: Optional[int] = Field(None, description="Viewport height in pixels")
-    selector: Optional[str] = Field(None, description="CSS selector for element to screenshot")
-    selectors: Optional[List[str]] = Field(None, description="Multiple CSS selectors")
-    selector_all: Optional[str] = Field(None, description="CSS selector for all matching elements")
-    selectors_all: Optional[List[str]] = Field(None, description="Multiple CSS selectors for all matches")
-    js_selector: Optional[str] = Field(None, description="JavaScript selector expression")
-    js_selectors: Optional[List[str]] = Field(None, description="Multiple JavaScript selectors")
-    js_selector_all: Optional[str] = Field(None, description="JavaScript selector for all matches")
-    js_selectors_all: Optional[List[str]] = Field(None, description="Multiple JavaScript selectors for all matches")
+    selectors: Optional[List[str]] = Field([], description="CSS selectors for elements to screenshot")
+    selectors_all: Optional[List[str]] = Field([], description="CSS selectors for all matching elements")
+    js_selectors: Optional[List[str]] = Field([], description="JavaScript selector expressions")
+    js_selectors_all: Optional[List[str]] = Field([], description="JavaScript selectors for all matches")
     padding: Optional[int] = Field(0, description="Padding around selected elements in pixels")
     javascript: Optional[str] = Field(None, description="JavaScript to execute before screenshot")
     quality: Optional[int] = Field(None, description="JPEG quality (1-100)")
@@ -147,8 +168,6 @@ class ShotRequest(BaseModel):
     wait_for_dom_ready_timeout: Optional[int] = Field(10000, description="DOM ready timeout in milliseconds")
     skip_wait_for_dom_ready: Optional[bool] = Field(False, description="Skip waiting for DOM ready")
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
-    auth_username: Optional[str] = Field(None, description="HTTP Basic Auth username")
-    auth_password: Optional[str] = Field(None, description="HTTP Basic Auth password")
 
     class Config:
         json_schema_extra = {
@@ -169,8 +188,6 @@ class HtmlRequest(BaseModel):
     wait: Optional[int] = Field(250, description="Wait time in milliseconds before extracting HTML")
     timeout: Optional[int] = Field(30000, description="Timeout in milliseconds")
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
-    auth_username: Optional[str] = Field(None, description="HTTP Basic Auth username")
-    auth_password: Optional[str] = Field(None, description="HTTP Basic Auth password")
 
     class Config:
         json_schema_extra = {
@@ -182,27 +199,27 @@ class HtmlRequest(BaseModel):
         }
 
 
-async def get_browser():
+async def get_browser(browser_args=None):
     """Get or create a shared browser instance"""
-    global browser_instance, global_browser_args
-    async with browser_lock:
-        if browser_instance is None:
-            Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
-            Config.silent = not Config.verbose
+    global browser_instance
+    if browser_instance is None:
+        Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
+        Config.silent = not Config.verbose
 
-            # Debug logging
-            if global_browser_args:
-                logger.info(f"Creating browser with args: {global_browser_args}")
+        # Debug logging
+        if browser_args:
+            logger.info(f"Creating browser with args: {browser_args}")
 
-            browser_instance = await create_browser_context(
-                browser="chromium",
-                browser_args=global_browser_args,
-                timeout=60000,
-            )
-            logger.info("Browser instance created successfully")
-        return browser_instance
+        browser_instance = await create_browser_context(
+            browser="chromium",
+            browser_args=browser_args or [],
+            timeout=60000,
+        )
+        logger.info("Browser instance created successfully")
+    return browser_instance
 
 
+@app.middleware("http")
 async def log_requests(request: Request, call_next):
     """Log all incoming requests and responses"""
     start_time = datetime.now()
@@ -228,8 +245,7 @@ async def log_requests(request: Request, call_next):
         raise
 
 
-
-
+@app.get("/", tags=["utility"], summary="API Information")
 async def root():
     """API documentation"""
     return {
@@ -254,11 +270,13 @@ async def root():
     }
 
 
+@app.get("/health", tags=["utility"], summary="Health Check")
 async def health():
     """Health check endpoint"""
     return {"status": "healthy"}
 
 
+@app.post("/shot", tags=["screenshots"], summary="Capture Screenshot")
 async def shot(request: ShotRequest):
     """Take a screenshot and return the image"""
     try:
@@ -270,10 +288,10 @@ async def shot(request: ShotRequest):
             "url": request.url,
             "width": request.width,
             "height": request.height,
-            "selectors": request.selectors or [],
-            "selectors_all": request.selectors_all or [],
-            "js_selectors": request.js_selectors or [],
-            "js_selectors_all": request.js_selectors_all or [],
+            "selectors": request.selectors,
+            "selectors_all": request.selectors_all,
+            "js_selectors": request.js_selectors,
+            "js_selectors_all": request.js_selectors_all,
             "padding": request.padding,
             "javascript": request.javascript,
             "quality": request.quality,
@@ -286,22 +304,6 @@ async def shot(request: ShotRequest):
             "wait_for_dom_ready_timeout": request.wait_for_dom_ready_timeout,
             "skip_wait_for_dom_ready": request.skip_wait_for_dom_ready,
         }
-
-        # Add single selector fields to arrays if provided
-        if request.selector:
-            shot_config["selectors"].append(request.selector)
-        if request.selector_all:
-            shot_config["selectors_all"].append(request.selector_all)
-        if request.js_selector:
-            shot_config["js_selectors"].append(request.js_selector)
-        if request.js_selector_all:
-            shot_config["js_selectors_all"].append(request.js_selector_all)
-
-        # Handle authentication
-        if request.auth_username and request.auth_password:
-            # Note: nodriver doesn't have built-in HTTP auth like Playwright
-            # This would need to be implemented via CDP or page manipulation
-            pass
 
         # Take the screenshot
         screenshot_bytes = await take_shot(
@@ -330,6 +332,7 @@ async def shot(request: ShotRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/html", tags=["content"], summary="Extract HTML Content")
 async def html(request: HtmlRequest):
     """Extract HTML content from a page"""
     try:
@@ -346,7 +349,7 @@ async def html(request: HtmlRequest):
 
         # Wait if specified
         if request.wait:
-            time.sleep(request.wait / 1000)
+            await asyncio.sleep(request.wait / 1000)
 
         # Execute JavaScript if provided
         if request.javascript:
@@ -366,11 +369,9 @@ async def html(request: HtmlRequest):
             "url": request.url,
             "html": html_content,
             "selector": request.selector,
-            "timestamp": time.time()
+            "timestamp": datetime.now().timestamp()
         }
 
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -398,66 +399,14 @@ def main(browser_args, host, port, reload):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
 
-    # Store browser args globally BEFORE creating the app
-    global global_browser_args, app
-    global_browser_args = list(browser_args)
-
-    # Now create the FastAPI app with the browser args already set
-    app = FastAPI(
-        title="Shot Power Scraper API",
-        version="1.0.0",
-        description="""
-        A powerful API for automated web screenshots and HTML extraction with anti-detection capabilities.
-
-        ## Features
-        - Screenshot capture with CSS/JS selectors
-        - HTML content extraction
-        - JavaScript execution before capture
-        - Cloudflare bypass support
-        - Full page screenshots
-        - Shared browser instance for performance
-
-        ## Authentication
-        Currently no authentication required. Set environment variables for production use.
-
-        ## Rate Limiting
-        No rate limiting implemented. Consider adding for production use.
-        """,
-        docs_url="/docs",
-        redoc_url="/redoc",
-        openapi_tags=[
-            {"name": "screenshots", "description": "Screenshot capture operations"},
-            {"name": "content", "description": "HTML content extraction"},
-            {"name": "utility", "description": "Health checks and API information"}
-        ],
-        lifespan=lifespan
-    )
-
-    # Add logging middleware
-    app.middleware("http")(log_requests)
-
-    # Register routes with tags
-    app.get("/", tags=["utility"], summary="API Information")(root)
-    app.get("/health", tags=["utility"], summary="Health Check")(health)
-    app.post("/shot", tags=["screenshots"], summary="Capture Screenshot")(shot)
-    app.post("/html", tags=["content"], summary="Extract HTML Content")(html)
+    # Store browser args in app state for lifespan to access
+    app.state.browser_args = list(browser_args)
 
     click.echo(f"Starting Shot Power Scraper API Server on {host}:{port}")
     click.echo(f"API documentation available at http://{host}:{port}/docs")
-    click.echo("\nAvailable endpoints:")
-    click.echo(f"  POST /shot - Take screenshots")
-    click.echo(f"  POST /html - Extract HTML content")
-    click.echo(f"  GET /health - Health check")
-    click.echo(f"  GET / - API information")
-    click.echo("\nConfiguration:")
-    click.echo(f"  HOST={host}")
-    click.echo(f"  PORT={port}")
-    click.echo(f"  RELOAD={reload}")
-    click.echo(f"  VERBOSE={os.getenv('VERBOSE', 'false')}")
-    click.echo(f"  PRELOAD_BROWSER={os.getenv('PRELOAD_BROWSER', 'true')}")
 
     if browser_args:
-        click.echo(f"  Browser args: {list(browser_args)}")
+        click.echo(f"Browser args: {list(browser_args)}")
 
     logger.info(f"Starting server on {host}:{port}")
 
