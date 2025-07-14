@@ -12,13 +12,11 @@ from shot_power_scraper.utils import get_default_user_agent
 
 import logging
 
-# Enable debug logging for nodriver
-logging.basicConfig(level=logging.DEBUG)
-
 class Config:
     """Global configuration state"""
     verbose = False
     silent = False
+    debug = False
 
 
 async def create_browser_context(

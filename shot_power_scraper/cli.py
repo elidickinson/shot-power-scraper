@@ -418,6 +418,12 @@ def cli():
     is_flag=True,
     help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
 )
+@click.option(
+    "--debug",
+    is_flag=True,
+    hidden=True,
+    help="Enable debug logging for nodriver"
+)
 def shot(
     url,
     auth,
@@ -458,6 +464,7 @@ def shot(
     ad_block,
     popup_block,
     trigger_lazy_load,
+    debug,
 ):
     """
     Take a single screenshot of a page or portion of a page.
@@ -492,6 +499,12 @@ def shot(
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
+    Config.debug = debug
+    
+    # Configure logging if debug is enabled
+    if debug:
+        import logging
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     if output is None:
         ext = "jpg" if quality else None
@@ -682,6 +695,12 @@ def shot(
     default=None,
     help="Enable/disable popup blocking (overrides config file setting)"
 )
+@click.option(
+    "--debug",
+    is_flag=True,
+    hidden=True,
+    help="Enable debug logging for nodriver"
+)
 def multi(
     config,
     auth,
@@ -708,6 +727,7 @@ def multi(
     verbose,
     ad_block,
     popup_block,
+    debug,
 ):
     """
     Take multiple screenshots or PDFs, defined by a YAML file
@@ -733,6 +753,12 @@ def multi(
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
+    Config.debug = debug
+    
+    # Configure logging if debug is enabled
+    if debug:
+        import logging
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     if (har or har_zip) and not har_file:
         har_file = filename_for_url(
@@ -1193,6 +1219,12 @@ def javascript(
     is_flag=True,
     help="Enable verbose logging to stdout"
 )
+@click.option(
+    "--debug",
+    is_flag=True,
+    hidden=True,
+    help="Enable debug logging for nodriver"
+)
 @browser_option
 @browser_args_option
 @user_agent_option
@@ -1223,6 +1255,7 @@ def pdf(
     browser_args,
     user_agent,
     reduced_motion,
+    debug,
 ):
     """
     Create a PDF of the specified page
@@ -1248,6 +1281,12 @@ def pdf(
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
+    Config.debug = debug
+    
+    # Configure logging if debug is enabled
+    if debug:
+        import logging
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     url = url_or_file_path(url, _check_and_absolutize)
 
@@ -1366,6 +1405,12 @@ def pdf(
     is_flag=True,
     help="Enable verbose logging to stdout"
 )
+@click.option(
+    "--debug",
+    is_flag=True,
+    hidden=True,
+    help="Enable debug logging for nodriver"
+)
 @log_console_option
 @browser_option
 @browser_args_option
@@ -1393,6 +1438,7 @@ def html(
     silent,
     auth_username,
     auth_password,
+    debug,
 ):
     """
     Output the final HTML of the specified page
@@ -1412,6 +1458,12 @@ def html(
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
+    Config.debug = debug
+    
+    # Configure logging if debug is enabled
+    if debug:
+        import logging
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     async def run_html():
         browser_obj = await create_browser_context(
