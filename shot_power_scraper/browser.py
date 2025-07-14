@@ -13,6 +13,7 @@ class Config:
     """Global configuration state"""
     verbose = False
     silent = False
+    debug = False
 
 
 async def create_browser_context(
