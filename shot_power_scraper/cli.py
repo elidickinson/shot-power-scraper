@@ -915,24 +915,63 @@ def multi(
 )
 @click.option("-j", "--javascript", help="Execute this JS prior to taking the snapshot")
 @click.option(
+    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the snapshot (default: 250)"
+)
+@click.option("--wait-for", help="Wait until this JS expression returns true")
+@click.option(
     "--timeout",
     type=int,
     help="Wait this many milliseconds before failing",
 )
+@click.option(
+    "--skip-cloudflare-check",
+    is_flag=True,
+    help="Skip Cloudflare challenge detection and waiting"
+)
+@click.option(
+    "--skip-wait-for-load",
+    is_flag=True,
+    help="Skip waiting for window load event"
+)
+@click.option(
+    "--trigger-lazy-load",
+    is_flag=True,
+    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
+)
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose logging to stdout"
+)
+@click.option(
+    "--debug",
+    is_flag=True,
+    hidden=True,
+    help="Enable debug logging for nodriver"
+)
 @log_console_option
 @skip_fail_options
 @bypass_csp_option
+@silent_option
 @http_auth_options
 def accessibility(
     url,
     auth,
     output,
     javascript,
+    wait,
+    wait_for,
     timeout,
+    skip_cloudflare_check,
+    skip_wait_for_load,
+    trigger_lazy_load,
+    verbose,
+    debug,
     log_console,
     skip,
     fail,
     bypass_csp,
+    silent,
     auth_username,
     auth_password,
 ):
@@ -943,31 +982,47 @@ def accessibility(
 
         shot-scraper accessibility https://datasette.io/
     """
-    url = url_or_file_path(url, _check_and_absolutize)
+    # Set global config
+    Config.verbose = verbose
+    Config.silent = silent
+    Config.debug = debug
+    
+    # Configure logging if debug is enabled
+    if debug:
+        import logging
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     async def run_accessibility():
         browser_obj = await create_browser_context(
-            auth,
+            auth=auth,
             timeout=timeout,
             bypass_csp=bypass_csp,
             auth_username=auth_username,
             auth_password=auth_password,
         )
 
-        # Get a blank page first to set up console logging
-        page = await browser_obj.get("about:blank")
+        # Create config dict for unified page setup
+        config = {
+            "skip_cloudflare_check": skip_cloudflare_check,
+            "skip_wait_for_load": skip_wait_for_load,
+            "timeout": timeout or 30,
+            "wait": wait,
+            "wait_for": wait_for,
+            "javascript": javascript,
+            "trigger_lazy_load": trigger_lazy_load,
+        }
 
-        # Set up console logging BEFORE navigating
-        if log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=False)
-            await console_logger.setup(page)
-
-        # Now navigate to the actual URL
-        await page.get(url)
-
-        if javascript:
-            await evaluate_js(page, javascript)
+        # Use unified page setup
+        from shot_power_scraper.page_utils import setup_page
+        page, response_handler = await setup_page(
+            browser_obj,
+            url,
+            config,
+            log_console=log_console,
+            skip=skip,
+            fail=fail,
+            silent=silent,
+        )
 
         # Accessibility not implemented
         snapshot = {"message": "Accessibility tree dumping not implemented"}
@@ -1066,6 +1121,41 @@ def har(
     is_flag=True,
     help="Output JSON strings as raw text",
 )
+@click.option(
+    "--wait", type=int, default=250, help="Wait this many milliseconds before executing JavaScript (default: 250)"
+)
+@click.option("--wait-for", help="Wait until this JS expression returns true")
+@click.option(
+    "--timeout",
+    type=int,
+    help="Wait this many milliseconds before failing",
+)
+@click.option(
+    "--skip-cloudflare-check",
+    is_flag=True,
+    help="Skip Cloudflare challenge detection and waiting"
+)
+@click.option(
+    "--skip-wait-for-load",
+    is_flag=True,
+    help="Skip waiting for window load event"
+)
+@click.option(
+    "--trigger-lazy-load",
+    is_flag=True,
+    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
+)
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose logging to stdout"
+)
+@click.option(
+    "--debug",
+    is_flag=True,
+    hidden=True,
+    help="Enable debug logging for nodriver"
+)
 @browser_option
 @browser_args_option
 @user_agent_option
@@ -1073,6 +1163,7 @@ def har(
 @log_console_option
 @skip_fail_options
 @bypass_csp_option
+@silent_option
 @http_auth_options
 def javascript(
     url,
@@ -1081,6 +1172,14 @@ def javascript(
     auth,
     output,
     raw,
+    wait,
+    wait_for,
+    timeout,
+    skip_cloudflare_check,
+    skip_wait_for_load,
+    trigger_lazy_load,
+    verbose,
+    debug,
     browser,
     browser_args,
     user_agent,
@@ -1089,6 +1188,7 @@ def javascript(
     skip,
     fail,
     bypass_csp,
+    silent,
     auth_username,
     auth_password,
 ):
@@ -1117,6 +1217,16 @@ def javascript(
 
     If a JavaScript error occurs an exit code of 1 will be returned.
     """
+    # Set global config
+    Config.verbose = verbose
+    Config.silent = silent
+    Config.debug = debug
+    
+    # Configure logging if debug is enabled
+    if debug:
+        import logging
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
     if not javascript:
         if input.startswith("gh:"):
             try:
@@ -1132,11 +1242,9 @@ def javascript(
             except Exception as e:
                 raise click.ClickException(f"Failed to read file '{input}': {e}")
 
-    url = url_or_file_path(url, _check_and_absolutize)
-
     async def run_javascript():
         browser_obj = await create_browser_context(
-            auth,
+            auth=auth,
             browser=browser,
             browser_args=browser_args,
             user_agent=user_agent,
@@ -1146,19 +1254,29 @@ def javascript(
             auth_password=auth_password,
         )
 
-        # Get a blank page first to set up console logging
-        page = await browser_obj.get("about:blank")
+        # Create config dict for unified page setup
+        config = {
+            "skip_cloudflare_check": skip_cloudflare_check,
+            "skip_wait_for_load": skip_wait_for_load,
+            "timeout": timeout or 30,
+            "wait": wait,
+            "wait_for": wait_for,
+            "javascript": javascript,  # The JS we want to execute
+            "trigger_lazy_load": trigger_lazy_load,
+        }
 
-        # Set up console logging BEFORE navigating
-        if log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=False)
-            await console_logger.setup(page)
-
-        # Now navigate to the actual URL
-        await page.get(url)
-
-        result = await evaluate_js(page, javascript)
+        # Use unified page setup
+        from shot_power_scraper.page_utils import setup_page
+        page, response_handler, result = await setup_page(
+            browser_obj,
+            url,
+            config,
+            log_console=log_console,
+            skip=skip,
+            fail=fail,
+            silent=silent,
+            return_js_result=True,
+        )
         await cleanup_browser(browser_obj)
         return result
 
@@ -1395,10 +1513,26 @@ def pdf(
 @click.option(
     "--wait", type=int, default=250, help="Wait this many milliseconds before taking the snapshot (default: 250)"
 )
+@click.option("--wait-for", help="Wait until this JS expression returns true")
 @click.option(
     "--timeout",
     type=int,
     help="Wait this many milliseconds before failing",
+)
+@click.option(
+    "--skip-cloudflare-check",
+    is_flag=True,
+    help="Skip Cloudflare challenge detection and waiting"
+)
+@click.option(
+    "--skip-wait-for-load",
+    is_flag=True,
+    help="Skip waiting for window load event"
+)
+@click.option(
+    "--trigger-lazy-load",
+    is_flag=True,
+    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
 )
 @click.option(
     "--verbose",
@@ -1426,7 +1560,11 @@ def html(
     javascript,
     selector,
     wait,
+    wait_for,
     timeout,
+    skip_cloudflare_check,
+    skip_wait_for_load,
+    trigger_lazy_load,
     verbose,
     log_console,
     browser,
@@ -1451,10 +1589,6 @@ def html(
 
         shot-scraper html https://datasette.io/ -o index.html
     """
-    url = url_or_file_path(url, _check_and_absolutize)
-    if output is None:
-        output = filename_for_url(url, ext="html", file_exists=os.path.exists)
-
     # Set global config
     Config.verbose = verbose
     Config.silent = silent
@@ -1465,63 +1599,45 @@ def html(
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+    if output is None:
+        output = filename_for_url(url, ext="html", file_exists=os.path.exists)
+
     async def run_html():
         browser_obj = await create_browser_context(
-            auth,
+            auth=auth,
             browser=browser,
             browser_args=browser_args,
             user_agent=user_agent,
+            timeout=timeout,
             bypass_csp=bypass_csp,
             auth_username=auth_username,
             auth_password=auth_password,
         )
 
-        # Get a blank page first to set up console logging
-        page = await browser_obj.get("about:blank")
+        # Create config dict for unified page setup
+        config = {
+            "skip_cloudflare_check": skip_cloudflare_check,
+            "skip_wait_for_load": skip_wait_for_load,
+            "timeout": timeout or 30,
+            "wait": wait,
+            "wait_for": wait_for,
+            "javascript": javascript,
+            "trigger_lazy_load": trigger_lazy_load,
+        }
 
-        # Set up console logging BEFORE navigating
-        console_logger = None
-        if log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=silent)
-            await console_logger.setup(page)
+        # Use unified page setup
+        from shot_power_scraper.page_utils import setup_page
+        page, response_handler = await setup_page(
+            browser_obj,
+            url,
+            config,
+            log_console=log_console,
+            skip=skip,
+            fail=fail,
+            silent=silent,
+        )
 
-        # Now navigate to the actual URL
-        await page.get(url)
-
-        # Check if page failed to load
-        from shot_power_scraper.page_utils import detect_navigation_error
-        has_error, error_msg = await detect_navigation_error(page, url)
-        if has_error:
-            full_msg = f"Page failed to load: {error_msg}"
-            if skip:
-                click.echo(f"{full_msg}, skipping", err=True)
-                raise SystemExit
-            elif fail:
-                raise click.ClickException(full_msg)
-            elif not silent:
-                click.echo(f"Warning: {full_msg}", err=True)
-
-        if wait:
-            if verbose:
-                click.echo(f"Waiting {wait}ms before processing...", err=True)
-            time.sleep(wait / 1000)
-        if javascript:
-            await evaluate_js(page, javascript)
-
-        # Wait for page to be ready with timeout
-        if timeout:
-            await page.evaluate(f"""
-                new Promise((resolve) => {{
-                    if (document.readyState === 'complete') {{
-                        resolve();
-                    }} else {{
-                        window.addEventListener('load', resolve);
-                        setTimeout(resolve, {timeout * 1000});
-                    }}
-                }});
-            """)
-
+        # Extract HTML content (command-specific logic)
         if selector:
             element = await page.select(selector)
             if element:

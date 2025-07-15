@@ -182,3 +182,158 @@ async def trigger_lazy_load(page, timeout_ms=5000):
 
     if Config.verbose:
         click.echo(f"Lazy load complete", err=True)
+
+
+async def setup_page(
+    browser_obj,
+    url,
+    config,
+    log_console=False,
+    skip=False,
+    fail=False,
+    silent=False,
+    log_requests=None,
+    return_js_result=False,
+):
+    """
+    Unified page setup function that handles common operations:
+    - Page navigation
+    - Console logging setup
+    - Response handling
+    - Cloudflare detection and bypass
+    - Navigation error detection
+    - Wait and JavaScript execution
+    - Lazy load triggering
+    
+    Returns: (page, response_handler) tuple
+    """
+    from shot_power_scraper.console_logger import ConsoleLogger
+    from shot_power_scraper.response_handler import ResponseHandler
+    from shot_power_scraper.utils import url_or_file_path
+    import pathlib
+    
+    def _check_and_absolutize(filepath):
+        """Check if a file exists and return its absolute path"""
+        try:
+            path = pathlib.Path(filepath)
+            if path.exists():
+                return path.absolute()
+            return False
+        except OSError:
+            return False
+    
+    # Convert URL to proper format
+    url = url_or_file_path(url, file_exists=_check_and_absolutize)
+    
+    if Config.verbose:
+        click.echo(f"Creating new page for: {url}", err=True)
+    
+    # Get a blank page first
+    page = await browser_obj.get("about:blank")
+    
+    # Set up console logging BEFORE navigating
+    console_logger = None
+    if log_console:
+        console_logger = ConsoleLogger(silent=silent)
+        await console_logger.setup(page)
+        if Config.verbose:
+            click.echo("Console logging enabled", err=True)
+    
+    # Set up response handler for HTTP status checking
+    response_handler = ResponseHandler()
+    page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
+    
+    # Navigate to the actual URL
+    if Config.verbose:
+        click.echo(f"Loading page: {url}", err=True)
+    await page.get(url)
+    
+    # Wait for window load event unless skipped
+    if not config.get("skip_wait_for_load", False):
+        if Config.verbose:
+            click.echo(f"Waiting for window load event...", err=True)
+        
+        timeout = config.get("timeout", 30)
+        await page.evaluate(f"""
+            new Promise((resolve) => {{
+                if (document.readyState === 'complete') {{
+                    resolve();
+                }} else {{
+                    window.addEventListener('load', resolve);
+                    setTimeout(resolve, {timeout * 1000});
+                }}
+            }});
+        """)
+    
+    # Check HTTP response status
+    response_status, response_url = await response_handler.wait_for_response(timeout=5)
+    if response_status is not None:
+        # Create a response-like object for skip_or_fail function
+        class ResponseObj:
+            def __init__(self, status, url):
+                self.status = status
+                self.url = url
+        
+        from shot_power_scraper.cli import skip_or_fail
+        skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
+    
+    # Automatic Cloudflare detection and waiting
+    if not config.get("skip_cloudflare_check", False) and await detect_cloudflare_challenge(page):
+        if not silent:
+            click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
+        success = await wait_for_cloudflare_bypass(page)
+        if not success:
+            if not silent:
+                click.echo("Warning: Cloudflare challenge may still be active", err=True)
+    
+    # Check if page failed to load
+    has_error, error_msg = await detect_navigation_error(page, url)
+    if has_error:
+        full_msg = f"Page failed to load: {error_msg}"
+        if skip:
+            click.echo(f"{full_msg}, skipping", err=True)
+            raise SystemExit
+        elif fail:
+            raise click.ClickException(full_msg)
+        elif not silent:
+            click.echo(f"Warning: {full_msg}", err=True)
+    
+    # Configure blocking extensions if enabled
+    if config.get("configure_extension"):
+        from shot_power_scraper.cli import configure_blocking_extension
+        await configure_blocking_extension(
+            page,
+            config.get("ad_block", False),
+            config.get("popup_block", False),
+            Config.verbose
+        )
+    
+    # Wait if specified
+    wait_ms = config.get("wait")
+    if wait_ms:
+        if Config.verbose:
+            click.echo(f"Waiting {wait_ms}ms before processing...", err=True)
+        await asyncio.sleep(wait_ms / 1000)
+    
+    # Execute JavaScript if provided
+    js_result = None
+    javascript = config.get("javascript")
+    if javascript:
+        if Config.verbose:
+            click.echo(f"Executing JavaScript: {javascript[:50]}{'...' if len(javascript) > 50 else ''}", err=True)
+        js_result = await evaluate_js(page, javascript)
+    
+    # Wait for condition if specified
+    wait_for = config.get("wait_for")
+    if wait_for:
+        timeout_seconds = config.get("timeout", 30)
+        await wait_for_condition(page, wait_for, timeout_seconds)
+    
+    # Trigger lazy load if requested
+    if config.get("trigger_lazy_load", False):
+        await trigger_lazy_load(page)
+    
+    if return_js_result:
+        return page, response_handler, js_result
+    else:
+        return page, response_handler
