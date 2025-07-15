@@ -1,4 +1,6 @@
 import urllib.parse
+import urllib.request
+import urllib.error
 import re
 import json
 import os
@@ -61,8 +63,6 @@ def load_github_script(github_path: str) -> str:
     file_path = "/".join(parts[2:])
 
     # Fetch from GitHub
-    import urllib.request
-
     url = f"https://raw.githubusercontent.com/{username}/{repo}/main/{file_path}"
     try:
         with urllib.request.urlopen(url) as response:

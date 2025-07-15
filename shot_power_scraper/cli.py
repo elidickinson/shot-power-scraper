@@ -14,7 +14,7 @@ import asyncio
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser
 from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport, generate_pdf
-from shot_power_scraper.page_utils import evaluate_js
+from shot_power_scraper.page_utils import evaluate_js, detect_cloudflare_challenge, wait_for_cloudflare_bypass
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -405,7 +405,7 @@ def cli():
 @click.option(
     "--ad-block/--no-ad-block",
     default=None,
-    help="Enable/disable ad blocking (overrides config file setting)"
+    help="Enable ad blocking using built-in filter lists"
 )
 @click.option(
     "--popup-block/--no-popup-block",
@@ -687,7 +687,7 @@ def shot(
 @click.option(
     "--ad-block/--no-ad-block",
     default=None,
-    help="Enable/disable ad blocking (overrides config file setting)"
+    help="Enable ad blocking using built-in filter lists"
 )
 @click.option(
     "--popup-block/--no-popup-block",
@@ -1525,7 +1525,7 @@ def html(
         if selector:
             element = await page.select(selector)
             if element:
-                html = await element.get_property("outerHTML")
+                html = await element.get_html()
             else:
                 raise click.ClickException(f"Selector '{selector}' not found")
         else:
