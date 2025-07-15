@@ -231,9 +231,6 @@ async def take_shot(
     if not config.url:
         raise click.ClickException("url is required")
 
-    if skip and fail:
-        raise click.ClickException("--skip and --fail cannot be used together")
-
     url = url_or_file_path(config.url, file_exists=_check_and_absolutize)
 
     if not config.output and not return_bytes:
@@ -289,14 +286,8 @@ async def take_shot(
         # Check HTTP response status
         response_status, response_url = await response_handler.wait_for_response(timeout=5)
         if response_status is not None:
-            # Create a response-like object for skip_or_fail function
-            class ResponseObj:
-                def __init__(self, status, url):
-                    self.status = status
-                    self.url = url
-
             from shot_power_scraper.cli import skip_or_fail
-            skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
+            skip_or_fail(response_status, response_url, skip, fail)
 
         # Automatic Cloudflare detection and waiting
         if not config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
@@ -569,9 +560,6 @@ async def take_pdf(
     if not config.url:
         raise click.ClickException("url is required")
 
-    if skip and fail:
-        raise click.ClickException("--skip and --fail cannot be used together")
-
     url = url_or_file_path(config.url, file_exists=_check_and_absolutize)
 
     if not config.output and not return_bytes:
@@ -627,14 +615,8 @@ async def take_pdf(
         # Check HTTP response status
         response_status, response_url = await response_handler.wait_for_response(timeout=5)
         if response_status is not None:
-            # Create a response-like object for skip_or_fail function
-            class ResponseObj:
-                def __init__(self, status, url):
-                    self.status = status
-                    self.url = url
-
             from shot_power_scraper.cli import skip_or_fail
-            skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
+            skip_or_fail(response_status, response_url, skip, fail)
 
         # Automatic Cloudflare detection and waiting
         if not config.skip_cloudflare_check and await detect_cloudflare_challenge(page):

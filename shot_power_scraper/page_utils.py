@@ -268,14 +268,8 @@ async def setup_page(
     # Check HTTP response status
     response_status, response_url = await response_handler.wait_for_response(timeout=5)
     if response_status is not None:
-        # Create a response-like object for skip_or_fail function
-        class ResponseObj:
-            def __init__(self, status, url):
-                self.status = status
-                self.url = url
-        
         from shot_power_scraper.cli import skip_or_fail
-        skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
+        skip_or_fail(response_status, response_url, skip, fail)
     
     # Automatic Cloudflare detection and waiting
     if not config.get("skip_cloudflare_check", False) and await detect_cloudflare_challenge(page):

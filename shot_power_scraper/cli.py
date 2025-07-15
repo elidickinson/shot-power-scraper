@@ -222,19 +222,19 @@ def http_auth_options(fn):
     return fn
 
 
-def skip_or_fail(response, skip, fail):
+def skip_or_fail(status_code, url, skip, fail):
     if skip and fail:
         raise click.ClickException("--skip and --fail cannot be used together")
-    if str(response.status)[0] in ("4", "5"):
+    if str(status_code)[0] in ("4", "5"):
         if skip:
             click.echo(
-                f"{response.status} error for {response.url}, skipping",
+                f"{status_code} error for {url}, skipping",
                 err=True,
             )
             # Exit with a 0 status code
             raise SystemExit
         elif fail:
-            raise click.ClickException(f"{response.status} error for {response.url}")
+            raise click.ClickException(f"{status_code} error for {url}")
 
 
 def scale_factor_options(fn):
