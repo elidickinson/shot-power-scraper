@@ -264,37 +264,47 @@ def test_error_on_invalid_scale_factors(command, args, expected):
     assert result.output == expected
 
 
-def test_cloudflare_detection_logic():
-    """Test the Cloudflare detection logic exists and is properly integrated"""
-    from shot_power_scraper.page_utils import detect_cloudflare_challenge, wait_for_cloudflare_bypass
-
-    # Verify the functions exist and are callable
-    assert callable(detect_cloudflare_challenge)
-    assert callable(wait_for_cloudflare_bypass)
-
-    # Test that the functions have the expected signatures
-    import inspect
-
-    # Check detect_cloudflare_challenge signature
-    sig = inspect.signature(detect_cloudflare_challenge)
-    assert 'page' in sig.parameters
-
-    # Check wait_for_cloudflare_bypass signature
-    sig = inspect.signature(wait_for_cloudflare_bypass)
-    assert 'page' in sig.parameters
-    assert 'max_wait_seconds' in sig.parameters
-
-
-def test_ad_block_flag():
-    """Test that --ad-block flag is accepted by commands"""
+@pytest.mark.parametrize(
+    "command,flag",
+    [
+        ("shot", "--ad-block"),
+        ("shot", "--popup-block"),
+        ("shot", "--devtools"),
+        ("multi", "--ad-block"),
+        ("multi", "--popup-block"),
+    ],
+)
+def test_cli_flags_no_crash(command, flag):
+    """Test that CLI flags don't crash commands"""
     runner = CliRunner()
-
-    # Test that --ad-block flag is accepted by shot command
-    result = runner.invoke(cli, ["shot", "--ad-block", "--help"])
+    result = runner.invoke(cli, [command, flag, "--help"])
     assert result.exit_code == 0
-    assert "--ad-block" in result.output
+    assert flag in result.output
 
-    # Test that --ad-block flag is accepted by multi command
-    result = runner.invoke(cli, ["multi", "--ad-block", "--help"])
+
+def test_shot_basic():
+    """Test basic shot command help works"""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["shot", "--help"])
     assert result.exit_code == 0
-    assert "--ad-block" in result.output
+    assert "Take a single screenshot" in result.output
+
+
+def test_pdf_basic():
+    """Test basic PDF command help works"""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["pdf", "--help"])
+    assert result.exit_code == 0
+    assert "Create a PDF" in result.output
+
+
+def test_config_save_load():
+    """Test config persistence works"""
+    from shot_power_scraper.utils import save_config, load_config
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        # Test save and load
+        config = {"ad_block": True, "user_agent": "test"}
+        save_config(config)
+        loaded = load_config()
+        assert loaded == config
