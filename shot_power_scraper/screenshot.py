@@ -11,16 +11,8 @@ import asyncio
 import click
 import nodriver as uc
 from shot_power_scraper.browser import Config
-from shot_power_scraper.page_utils import (
-    evaluate_js,
-    detect_cloudflare_challenge,
-    wait_for_cloudflare_bypass,
-    wait_for_condition,
-    detect_navigation_error
-)
+from shot_power_scraper.page_utils import evaluate_js
 from shot_power_scraper.utils import filename_for_url, url_or_file_path
-from shot_power_scraper.console_logger import ConsoleLogger
-from shot_power_scraper.response_handler import ResponseHandler
 
 
 class ShotConfig:
@@ -238,7 +230,7 @@ async def take_shot(
 
     if not use_existing_page:
         from shot_power_scraper.page_utils import setup_page
-        
+
         # Convert config object to dict for setup_page
         setup_config = {
             "skip_wait_for_load": config.skip_wait_for_load,
@@ -252,7 +244,7 @@ async def take_shot(
             "wait_for": config.wait_for,
             "trigger_lazy_load": config.trigger_lazy_load
         }
-        
+
         page, response_handler = await setup_page(
             context_or_page,
             url,
@@ -497,7 +489,7 @@ async def take_pdf(
 
     if not use_existing_page:
         from shot_power_scraper.page_utils import setup_page
-        
+
         # Convert config object to dict for setup_page
         setup_config = {
             "skip_wait_for_load": config.skip_wait_for_load,
@@ -511,7 +503,7 @@ async def take_pdf(
             "wait_for": config.wait_for,
             "trigger_lazy_load": config.trigger_lazy_load
         }
-        
+
         page, response_handler = await setup_page(
             context_or_page,
             url,

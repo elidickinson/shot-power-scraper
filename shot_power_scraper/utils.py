@@ -3,7 +3,6 @@ import urllib.request
 import urllib.error
 import re
 import json
-import os
 import pathlib
 
 disallowed_re = re.compile("[^a-zA-Z0-9_-]")
@@ -63,6 +62,8 @@ def load_github_script(github_path: str) -> str:
     file_path = "/".join(parts[2:])
 
     # Fetch from GitHub
+    import urllib.request
+
     url = f"https://raw.githubusercontent.com/{username}/{repo}/main/{file_path}"
     try:
         with urllib.request.urlopen(url) as response:
@@ -92,7 +93,7 @@ def load_config():
     config_file = get_config_file()
     if not config_file.exists():
         return {}
-    
+
     try:
         with open(config_file, 'r') as f:
             return json.load(f)
@@ -104,7 +105,7 @@ def save_config(config):
     """Save configuration to the config file"""
     config_dir = get_config_dir()
     config_dir.mkdir(parents=True, exist_ok=True)
-    
+
     config_file = get_config_file()
     with open(config_file, 'w') as f:
         json.dump(config, f, indent=2)

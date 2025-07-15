@@ -4,7 +4,6 @@ import time
 import json
 import os
 import pathlib
-from runpy import run_module
 from click_default_group import DefaultGroup
 import yaml
 import click
@@ -13,8 +12,7 @@ import asyncio
 
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser
-from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport, generate_pdf
-from shot_power_scraper.page_utils import evaluate_js, detect_cloudflare_challenge, wait_for_cloudflare_bypass
+from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -427,9 +425,9 @@ def cli():
 @browser_options
 @skip_fail_options
 @blocking_options
-def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_selectors_all, 
-         padding, javascript, retina, scale_factor, omit_background, quality, 
-         interactive, devtools, log_requests, save_html, 
+def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_selectors_all,
+         padding, javascript, retina, scale_factor, omit_background, quality,
+         interactive, devtools, log_requests, save_html,
          wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
          verbose, debug, silent, log_console, auth, auth_username, auth_password,
          browser, browser_args, user_agent, reduced_motion, bypass_csp,
@@ -467,7 +465,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
     Config.verbose = verbose
     Config.silent = silent
     Config.debug = debug
-    
+
     if debug:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -577,7 +575,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 @output_options
 @skip_fail_options
 @blocking_options
-def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outputs, 
+def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outputs,
          leave_server, har, har_zip, har_file,
          auth, auth_username, auth_password, browser, browser_args, user_agent, reduced_motion,
          verbose, debug, silent, log_console, skip, fail, ad_block, popup_block):
@@ -605,7 +603,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
     Config.verbose = verbose
     Config.silent = silent
     Config.debug = debug
-    
+
     if debug:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -724,7 +722,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 @output_options
 @auth_options
 @skip_fail_options
-def accessibility(url, output, javascript, wait, wait_for, timeout, skip_cloudflare_check, 
+def accessibility(url, output, javascript, wait, wait_for, timeout, skip_cloudflare_check,
                  skip_wait_for_load, trigger_lazy_load, verbose, debug, silent, log_console,
                  auth, auth_username, auth_password, skip, fail, bypass_csp):
     """
@@ -737,7 +735,7 @@ def accessibility(url, output, javascript, wait, wait_for, timeout, skip_cloudfl
     Config.verbose = verbose
     Config.silent = silent
     Config.debug = debug
-    
+
     if debug:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -844,7 +842,7 @@ def javascript(url, javascript, input, output, raw, wait, wait_for, timeout, ski
     Config.verbose = verbose
     Config.silent = silent
     Config.debug = debug
-    
+
     if debug:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -938,7 +936,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
     Config.verbose = verbose
     Config.silent = silent
     Config.debug = debug
-    
+
     if debug:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -963,7 +961,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
             "pdf_css": pdf_css, "wait": wait, "wait_for": wait_for, "timeout": timeout,
             "trigger_lazy_load": trigger_lazy_load
         }
-        
+
         pdf_data = await take_pdf(
             browser_obj, shot, return_bytes=True, log_console=log_console,
             skip=skip, fail=fail, silent=silent
@@ -1016,7 +1014,7 @@ def html(url, output, javascript, selector, wait, wait_for, timeout, skip_cloudf
     Config.verbose = verbose
     Config.silent = silent
     Config.debug = debug
-    
+
     if debug:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
