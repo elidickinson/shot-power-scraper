@@ -876,7 +876,7 @@ def multi(
                             )
                     except Exception as e:
                         if fail or fail_on_error:
-                            raise click.ClickException(str(e))
+                            raise e
                         else:
                             click.echo(str(e), err=True)
                             continue
@@ -1229,18 +1229,12 @@ def javascript(
 
     if not javascript:
         if input.startswith("gh:"):
-            try:
-                javascript = load_github_script(input[3:])
-            except ValueError as ex:
-                raise click.ClickException(str(ex))
+            javascript = load_github_script(input[3:])
         elif input == "-":
             javascript = sys.stdin.read()
         else:
-            try:
-                with open(input, "r") as f:
-                    javascript = f.read()
-            except Exception as e:
-                raise click.ClickException(f"Failed to read file '{input}': {e}")
+            with open(input, "r") as f:
+                javascript = f.read()
 
     async def run_javascript():
         browser_obj = await create_browser_context(
