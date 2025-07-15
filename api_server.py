@@ -80,7 +80,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from shot_power_scraper.browser import create_browser_context, Config
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.cli import browser_args_option
-from shot_power_scraper.page_utils import evaluate_js, detect_navigation_error
+from shot_power_scraper.page_utils import evaluate_js, detect_navigation_error, setup_page
 
 # Global browser instance for reuse
 browser_instance = None
@@ -162,11 +162,11 @@ class ShotRequest(BaseModel):
     wait: Optional[int] = Field(None, description="Wait time in milliseconds before screenshot")
     wait_for: Optional[str] = Field(None, description="JavaScript expression to wait for")
     timeout: Optional[int] = Field(30000, description="Timeout in milliseconds")
-    scale_factor: Optional[float] = Field(1.0, description="Scale factor for screenshot")
+    # Note: scale_factor not used by ShotConfig, removed
     omit_background: Optional[bool] = Field(False, description="Omit background for transparency")
     skip_cloudflare_check: Optional[bool] = Field(False, description="Skip Cloudflare challenge detection")
-    wait_for_dom_ready_timeout: Optional[int] = Field(10000, description="DOM ready timeout in milliseconds")
-    skip_wait_for_dom_ready: Optional[bool] = Field(False, description="Skip waiting for DOM ready")
+    skip_wait_for_load: Optional[bool] = Field(False, description="Skip waiting for page load")
+    trigger_lazy_load: Optional[bool] = Field(False, description="Trigger lazy loading of images")
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
 
     class Config:
@@ -176,6 +176,7 @@ class ShotRequest(BaseModel):
                 "width": 1280,
                 "height": 720,
                 "wait": 2000,
+                "trigger_lazy_load": True
             }
         }
 
@@ -297,12 +298,11 @@ async def shot(request: ShotRequest):
             "quality": request.quality,
             "wait": request.wait,
             "wait_for": request.wait_for,
-            "timeout": request.timeout,
-            "scale_factor": request.scale_factor,
+            "timeout": request.timeout // 1000 if request.timeout else 30,  # Convert to seconds
             "omit_background": request.omit_background,
             "skip_cloudflare_check": request.skip_cloudflare_check,
-            "wait_for_dom_ready_timeout": request.wait_for_dom_ready_timeout,
-            "skip_wait_for_dom_ready": request.skip_wait_for_dom_ready,
+            "skip_wait_for_load": request.skip_wait_for_load,
+            "trigger_lazy_load": request.trigger_lazy_load,
         }
 
         # Take the screenshot
@@ -339,27 +339,25 @@ async def html(request: HtmlRequest):
         # Get browser instance
         browser = await get_browser()
 
-        # Get a new page
-        page = await browser.get(request.url)
-
-        # Check if page failed to load
-        has_error, error_msg = await detect_navigation_error(page, request.url)
-        if has_error:
-            raise HTTPException(status_code=400, detail=f"Page failed to load: {error_msg}")
-
-        # Wait if specified
-        if request.wait:
-            await asyncio.sleep(request.wait / 1000)
-
-        # Execute JavaScript if provided
-        if request.javascript:
-            await evaluate_js(page, request.javascript)
+        # Use setup_page for consistent page setup including Cloudflare detection
+        setup_config = {
+            "timeout": request.timeout // 1000,  # Convert to seconds
+            "wait": request.wait,
+            "javascript": request.javascript
+        }
+        
+        page, response_handler = await setup_page(
+            browser,
+            request.url,
+            setup_config,
+            silent=True
+        )
 
         # Extract HTML
         if request.selector:
             element = await page.select(request.selector)
             if element:
-                html_content = await element.get_property("outerHTML")
+                html_content = await element.get_html()
             else:
                 raise HTTPException(status_code=404, detail=f"Selector '{request.selector}' not found")
         else:
