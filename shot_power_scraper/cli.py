@@ -272,6 +272,97 @@ def reduced_motion_option(fn):
     return fn
 
 
+# Option group decorators
+def browser_options(fn):
+    """Add browser-related options: browser, browser_args, user_agent, reduced_motion"""
+    fn = reduced_motion_option(fn)
+    fn = user_agent_option(fn)
+    fn = browser_args_option(fn)
+    fn = browser_option(fn)
+    return fn
+
+
+def wait_options(fn):
+    """Add wait-related options: wait, wait_for, timeout, skip_wait_for_load"""
+    click.option(
+        "--skip-wait-for-load",
+        is_flag=True,
+        help="Skip waiting for window load event"
+    )(fn)
+    click.option(
+        "--timeout",
+        type=int,
+        help="Wait this many milliseconds before failing",
+    )(fn)
+    click.option("--wait-for", help="Wait until this JS expression returns true")(fn)
+    click.option(
+        "--wait", type=int, default=250, help="Wait this many milliseconds before taking the screenshot (default: 250)"
+    )(fn)
+    return fn
+
+
+def page_options(fn):
+    """Add page interaction options: skip_cloudflare_check, trigger_lazy_load, bypass_csp"""
+    fn = bypass_csp_option(fn)
+    click.option(
+        "--trigger-lazy-load",
+        is_flag=True,
+        help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
+    )(fn)
+    click.option(
+        "--skip-cloudflare-check",
+        is_flag=True,
+        help="Skip Cloudflare challenge detection and waiting"
+    )(fn)
+    return fn
+
+
+def output_options(fn):
+    """Add output options: verbose, debug, silent, log_console"""
+    fn = log_console_option(fn)
+    fn = silent_option(fn)
+    click.option(
+        "--debug",
+        is_flag=True,
+        hidden=True,
+        help="Enable debug logging for nodriver"
+    )(fn)
+    click.option(
+        "--verbose",
+        is_flag=True,
+        help="Enable verbose logging to stdout"
+    )(fn)
+    return fn
+
+
+def auth_options(fn):
+    """Add authentication options: auth, auth_username, auth_password"""
+    fn = http_auth_options(fn)
+    click.option(
+        "-a",
+        "--auth",
+        type=click.File("r"),
+        help="Path to JSON authentication context file",
+    )(fn)
+    return fn
+
+
+def blocking_options(fn):
+    """Add ad/popup blocking options"""
+    click.option(
+        "--popup-block/--no-popup-block",
+        "--block-popups/--no-block-popups",
+        default=None,
+        help="Enable/disable popup blocking (overrides config file setting)"
+    )(fn)
+    click.option(
+        "--ad-block/--no-ad-block",
+        default=None,
+        help="Enable ad blocking using built-in filter lists"
+    )(fn)
+    return fn
+
+
 @click.group(
     cls=DefaultGroup,
     default="shot",
@@ -285,187 +376,60 @@ def cli():
 
 
 @cli.command()
-@click.argument("url")  # TODO: validate with custom type
+@click.argument("url")
 @click.option(
-    "-a",
-    "--auth",
-    type=click.File("r"),
-    help="Path to JSON authentication context file",
+    "--width", type=int, help="Width of browser window, defaults to 1280", default=1280,
 )
 @click.option(
-    "--width",
-    type=int,
-    help="Width of browser window, defaults to 1280",
-    default=1280,
+    "--height", type=int, help="Height of browser window and shot - defaults to the full height of the page",
 )
 @click.option(
-    "--height",
-    type=int,
-    help="Height of browser window and shot - defaults to the full height of the page",
+    "-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
 )
 @click.option(
-    "-o",
-    "--output",
-    type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
+    "selectors", "-s", "--selector", help="Take shot of first element matching this CSS selector", multiple=True,
 )
 @click.option(
-    "selectors",
-    "-s",
-    "--selector",
-    help="Take shot of first element matching this CSS selector",
-    multiple=True,
+    "selectors_all", "--selector-all", help="Take shot of all elements matching this CSS selector", multiple=True,
 )
 @click.option(
-    "selectors_all",
-    "--selector-all",
-    help="Take shot of all elements matching this CSS selector",
-    multiple=True,
+    "js_selectors", "--js-selector", help="Take shot of first element matching this JS (el) expression", multiple=True,
 )
 @click.option(
-    "js_selectors",
-    "--js-selector",
-    help="Take shot of first element matching this JS (el) expression",
-    multiple=True,
+    "js_selectors_all", "--js-selector-all", help="Take shot of all elements matching this JS (el) expression", multiple=True,
 )
 @click.option(
-    "js_selectors_all",
-    "--js-selector-all",
-    help="Take shot of all elements matching this JS (el) expression",
-    multiple=True,
-)
-@click.option(
-    "-p",
-    "--padding",
-    type=int,
-    help="When using selectors, add this much padding in pixels",
-    default=0,
+    "-p", "--padding", type=int, help="When using selectors, add this much padding in pixels", default=0,
 )
 @click.option("-j", "--javascript", help="Execute this JS prior to taking the shot")
 @scale_factor_options
 @click.option(
-    "--omit-background",
-    is_flag=True,
+    "--omit-background", is_flag=True,
     help="Omit the default browser background from the shot, making it possible take advantage of transparency. Does not work with JPEGs or when using --quality.",
 )
 @click.option("--quality", type=int, help="Save as JPEG with this quality, e.g. 80")
 @click.option(
-    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the screenshot (default: 250)"
-)
-@click.option("--wait-for", help="Wait until this JS expression returns true")
-@click.option(
-    "--timeout",
-    type=int,
-    help="Wait this many milliseconds before failing",
+    "-i", "--interactive", is_flag=True, help="Interact with the page in a browser before taking the shot",
 )
 @click.option(
-    "-i",
-    "--interactive",
-    is_flag=True,
-    help="Interact with the page in a browser before taking the shot",
+    "--devtools", is_flag=True, help="Interact mode with developer tools",
 )
 @click.option(
-    "--devtools",
-    is_flag=True,
-    help="Interact mode with developer tools",
+    "--log-requests", type=click.File("w"), help="Log details of all requests to this file",
 )
 @click.option(
-    "--log-requests",
-    type=click.File("w"),
-    help="Log details of all requests to this file",
+    "--save-html", is_flag=True, help="Save HTML content alongside the screenshot with the same base name"
 )
-@log_console_option
-@browser_option
-@browser_args_option
-@user_agent_option
-@reduced_motion_option
+@wait_options
+@page_options
+@output_options
+@auth_options
+@browser_options
 @skip_fail_options
-@bypass_csp_option
-@silent_option
-@http_auth_options
-@click.option(
-    "--skip-cloudflare-check",
-    is_flag=True,
-    help="Skip Cloudflare challenge detection and waiting"
-)
-@click.option(
-    "--skip-wait-for-load",
-    is_flag=True,
-    help="Skip waiting for window load event"
-)
-@click.option(
-    "--verbose",
-    is_flag=True,
-    help="Enable verbose logging to stdout"
-)
-@click.option(
-    "--save-html",
-    is_flag=True,
-    help="Save HTML content alongside the screenshot with the same base name"
-)
-@click.option(
-    "--ad-block/--no-ad-block",
-    default=None,
-    help="Enable ad blocking using built-in filter lists"
-)
-@click.option(
-    "--popup-block/--no-popup-block",
-    "--block-popups/--no-block-popups",
-    default=None,
-    help="Enable/disable popup blocking (overrides config file setting)"
-)
-@click.option(
-    "--trigger-lazy-load",
-    is_flag=True,
-    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
-)
-@click.option(
-    "--debug",
-    is_flag=True,
-    hidden=True,
-    help="Enable debug logging for nodriver"
-)
-def shot(
-    url,
-    auth,
-    output,
-    width,
-    height,
-    selectors,
-    selectors_all,
-    js_selectors,
-    js_selectors_all,
-    padding,
-    javascript,
-    retina,
-    scale_factor,
-    omit_background,
-    quality,
-    wait,
-    wait_for,
-    timeout,
-    interactive,
-    devtools,
-    log_requests,
-    log_console,
-    browser,
-    browser_args,
-    user_agent,
-    reduced_motion,
-    skip,
-    fail,
-    bypass_csp,
-    silent,
-    auth_username,
-    auth_password,
-    skip_cloudflare_check,
-    skip_wait_for_load,
-    verbose,
-    save_html,
-    ad_block,
-    popup_block,
-    trigger_lazy_load,
-    debug,
-):
+@blocking_options
+def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_selectors_all, 
+         padding, javascript, retina, scale_factor, omit_background, quality, 
+         interactive, devtools, log_requests, save_html, **kwargs):
     """
     Take a single screenshot of a page or portion of a page.
 
@@ -496,13 +460,11 @@ def shot(
 
         shot-scraper https://www.example.com/ --height 600 -o partial.png
     """
-    # Set global config
-    Config.verbose = verbose
-    Config.silent = silent
-    Config.debug = debug
+    Config.verbose = kwargs['verbose']
+    Config.silent = kwargs['silent']
+    Config.debug = kwargs['debug']
     
-    # Configure logging if debug is enabled
-    if debug:
+    if kwargs['debug']:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -511,34 +473,16 @@ def shot(
         output = filename_for_url(url, ext=ext, file_exists=os.path.exists)
 
     scale_factor = normalize_scale_factor(retina, scale_factor)
-
-    # Resolve ad_block and popup_block from config if not explicitly set
-    ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
+    ad_block, popup_block = resolve_blocking_config(kwargs['ad_block'], kwargs['popup_block'])
 
     shot = {
-        "url": url,
-        "selectors": selectors,
-        "selectors_all": selectors_all,
-        "js_selectors": js_selectors,
-        "js_selectors_all": js_selectors_all,
-        "javascript": javascript,
-        "width": width,
-        "height": height,
-        "quality": quality,
-        "wait": wait,
-        "wait_for": wait_for,
-        "timeout": timeout,
-        "padding": padding,
-        "omit_background": omit_background,
-        "scale_factor": scale_factor,
-        "skip_cloudflare_check": skip_cloudflare_check,
-        "skip_wait_for_load": skip_wait_for_load,
-        "verbose": verbose,
-        "save_html": save_html,
-        "configure_extension": ad_block or popup_block,
-        "ad_block": ad_block,
-        "popup_block": popup_block,
-        "trigger_lazy_load": trigger_lazy_load,
+        "url": url, "selectors": selectors, "selectors_all": selectors_all,
+        "js_selectors": js_selectors, "js_selectors_all": js_selectors_all,
+        "javascript": javascript, "width": width, "height": height, "quality": quality,
+        "padding": padding, "omit_background": omit_background, "scale_factor": scale_factor,
+        "save_html": save_html, "configure_extension": ad_block or popup_block,
+        "ad_block": ad_block, "popup_block": popup_block,
+        **{k: v for k, v in kwargs.items() if k in ['wait', 'wait_for', 'timeout', 'skip_cloudflare_check', 'skip_wait_for_load', 'trigger_lazy_load', 'verbose']}
     }
     interactive = interactive or devtools
 
@@ -546,28 +490,17 @@ def shot(
         use_existing_page = False
         browser_obj = None
         try:
-            # Add blocking extensions if requested
             extensions = []
             if ad_block or popup_block:
-                await setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent)
+                await setup_blocking_extensions(extensions, ad_block, popup_block, kwargs['verbose'], kwargs['silent'])
 
             browser_obj = await create_browser_context(
-                auth=auth,
-                interactive=interactive,
-                devtools=devtools,
-                scale_factor=scale_factor,
-                browser=browser,
-                browser_args=browser_args,
-                user_agent=user_agent,
-                timeout=timeout,
-                reduced_motion=reduced_motion,
-                bypass_csp=bypass_csp,
-                auth_username=auth_username,
-                auth_password=auth_password,
+                auth=kwargs['auth'], interactive=interactive, devtools=devtools, scale_factor=scale_factor,
+                browser=kwargs['browser'], browser_args=kwargs['browser_args'], user_agent=kwargs['user_agent'],
+                timeout=kwargs['timeout'], reduced_motion=kwargs['reduced_motion'], bypass_csp=kwargs['bypass_csp'],
+                auth_username=kwargs['auth_username'], auth_password=kwargs['auth_password'],
                 extensions=extensions if extensions else None,
             )
-
-            # Don't configure extension here - do it after page loads
 
             if not browser_obj:
                 raise click.ClickException("Browser initialization failed")
@@ -578,35 +511,23 @@ def shot(
                 if width or height:
                     viewport = get_viewport(width, height)
                     await page.set_window_size(viewport["width"], viewport["height"])
-                click.echo(
-                    "Hit <enter> to take the shot and close the browser window:", err=True
-                )
+                click.echo("Hit <enter> to take the shot and close the browser window:", err=True)
                 input()
                 context = page
             else:
                 context = browser_obj
             if output == "-":
                 shot_bytes = await take_shot(
-                    context,
-                    shot,
-                    return_bytes=True,
-                    use_existing_page=use_existing_page,
-                    log_requests=log_requests,
-                    log_console=log_console,
-                    silent=silent,
+                    context, shot, return_bytes=True, use_existing_page=use_existing_page,
+                    log_requests=log_requests, log_console=kwargs['log_console'], silent=kwargs['silent'],
                 )
                 sys.stdout.buffer.write(shot_bytes)
             else:
                 shot["output"] = str(output)
                 await take_shot(
-                    context,
-                    shot,
-                    use_existing_page=use_existing_page,
-                    log_requests=log_requests,
-                    log_console=log_console,
-                    skip=skip,
-                    fail=fail,
-                    silent=silent,
+                    context, shot, use_existing_page=use_existing_page,
+                    log_requests=log_requests, log_console=kwargs['log_console'],
+                    skip=kwargs['skip'], fail=kwargs['fail'], silent=kwargs['silent'],
                 )
         finally:
             if browser_obj:
@@ -619,116 +540,36 @@ def shot(
 
 @cli.command()
 @click.argument("config", type=click.File(mode="r"))
-@click.option(
-    "-a",
-    "--auth",
-    type=click.File("r"),
-    help="Path to JSON authentication context file",
-)
 @scale_factor_options
-@click.option(
-    "--timeout",
-    type=int,
-    help="Wait this many milliseconds before failing",
-)
-# Hidden because will be removed if I release shot-scraper 2.0
-# See https://github.com/simonw/shot-scraper/issues/103
 @click.option(
     "--fail-on-error", is_flag=True, help="Fail noisily on error", hidden=True
 )
 @click.option(
-    "noclobber",
-    "-n",
-    "--no-clobber",
-    is_flag=True,
-    help="Skip images that already exist",
+    "noclobber", "-n", "--no-clobber", is_flag=True, help="Skip images that already exist",
 )
 @click.option(
-    "outputs",
-    "-o",
-    "--output",
-    help="Just take shots matching these output files",
-    multiple=True,
-)
-@browser_option
-@browser_args_option
-@user_agent_option
-@reduced_motion_option
-@log_console_option
-@skip_fail_options
-@silent_option
-@http_auth_options
-@click.option(
-    "leave_server",
-    "--leave-server",
-    is_flag=True,
-    help="Leave servers running when script finishes",
+    "outputs", "-o", "--output", help="Just take shots matching these output files", multiple=True,
 )
 @click.option(
-    "--har",
-    is_flag=True,
-    help="Save all requests to trace.har file",
+    "leave_server", "--leave-server", is_flag=True, help="Leave servers running when script finishes",
 )
 @click.option(
-    "--har-zip",
-    is_flag=True,
-    help="Save all requests to trace.har.zip file",
+    "--har", is_flag=True, help="Save all requests to trace.har file",
 )
 @click.option(
-    "--har-file",
-    type=click.Path(file_okay=True, writable=True, dir_okay=False),
+    "--har-zip", is_flag=True, help="Save all requests to trace.har.zip file",
+)
+@click.option(
+    "--har-file", type=click.Path(file_okay=True, writable=True, dir_okay=False),
     help="Path to HAR file to save all requests",
 )
-@click.option(
-    "--verbose",
-    is_flag=True,
-    help="Enable verbose logging including DOM Ready timing"
-)
-@click.option(
-    "--ad-block/--no-ad-block",
-    default=None,
-    help="Enable ad blocking using built-in filter lists"
-)
-@click.option(
-    "--popup-block/--no-popup-block",
-    "--block-popups/--no-block-popups",
-    default=None,
-    help="Enable/disable popup blocking (overrides config file setting)"
-)
-@click.option(
-    "--debug",
-    is_flag=True,
-    hidden=True,
-    help="Enable debug logging for nodriver"
-)
-def multi(
-    config,
-    auth,
-    retina,
-    scale_factor,
-    timeout,
-    fail_on_error,
-    noclobber,
-    outputs,
-    browser,
-    browser_args,
-    user_agent,
-    reduced_motion,
-    log_console,
-    skip,
-    fail,
-    silent,
-    auth_username,
-    auth_password,
-    leave_server,
-    har,
-    har_zip,
-    har_file,
-    verbose,
-    ad_block,
-    popup_block,
-    debug,
-):
+@auth_options
+@browser_options
+@output_options
+@skip_fail_options
+@blocking_options
+def multi(config, retina, scale_factor, fail_on_error, noclobber, outputs, 
+         leave_server, har, har_zip, har_file, **kwargs):
     """
     Take multiple screenshots or PDFs, defined by a YAML file
 
@@ -750,13 +591,11 @@ def multi(
     PDF files are automatically detected by .pdf extension.
     All PDF options from the pdf command are supported in YAML format.
     """
-    # Set global config
-    Config.verbose = verbose
-    Config.silent = silent
-    Config.debug = debug
+    Config.verbose = kwargs['verbose']
+    Config.silent = kwargs['silent']
+    Config.debug = kwargs['debug']
     
-    # Configure logging if debug is enabled
-    if debug:
+    if kwargs['debug']:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -766,12 +605,9 @@ def multi(
         )
 
     scale_factor = normalize_scale_factor(retina, scale_factor)
-
-    # Resolve ad_block and popup_block from config if not explicitly set
-    ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
+    ad_block, popup_block = resolve_blocking_config(kwargs['ad_block'], kwargs['popup_block'])
     shots = yaml.safe_load(config)
 
-    # Special case: if we are recording a har_file output can be blank to skip a shot
     if har_file:
         for shot in shots:
             if not shot.get("output"):
@@ -783,42 +619,25 @@ def multi(
     if not isinstance(shots, list):
         raise click.ClickException("YAML file must contain a list")
 
-    # Set global config
-    Config.verbose = verbose
-    Config.silent = silent
-
     async def run_multi():
-        # Add blocking extensions if requested
         extensions = []
         if ad_block or popup_block:
-            await setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent)
+            await setup_blocking_extensions(extensions, ad_block, popup_block, kwargs['verbose'], kwargs['silent'])
 
         browser_obj = await create_browser_context(
-            auth=auth,
-            scale_factor=scale_factor,
-            browser=browser,
-            browser_args=browser_args,
-            user_agent=user_agent,
-            timeout=timeout,
-            reduced_motion=reduced_motion,
-            auth_username=auth_username,
-            auth_password=auth_password,
-            record_har_path=har_file or None,
-            extensions=extensions if extensions else None,
+            auth=kwargs['auth'], scale_factor=scale_factor, browser=kwargs['browser'],
+            browser_args=kwargs['browser_args'], user_agent=kwargs['user_agent'],
+            timeout=kwargs.get('timeout'), reduced_motion=kwargs['reduced_motion'],
+            auth_username=kwargs['auth_username'], auth_password=kwargs['auth_password'],
+            record_har_path=har_file or None, extensions=extensions if extensions else None,
         )
 
-        # Extension will be configured per-shot in take_shot() function
         try:
             for shot in shots:
-                if (
-                    noclobber
-                    and shot.get("output")
-                    and pathlib.Path(shot["output"]).exists()
-                ):
+                if (noclobber and shot.get("output") and pathlib.Path(shot["output"]).exists()):
                     continue
                 if outputs and shot.get("output") and shot.get("output") not in outputs:
                     continue
-                # Run "sh" key
                 if shot.get("sh"):
                     sh = shot["sh"]
                     if isinstance(sh, str):
@@ -827,11 +646,9 @@ def multi(
                         subprocess.run(sh)
                     else:
                         raise click.ClickException("- sh: must be a string or list")
-                # And "python" key
                 if shot.get("python"):
                     subprocess.run([sys.executable, "-c", shot["python"]])
                 if "server" in shot:
-                    # Start that subprocess and remember the pid
                     server = shot["server"]
                     proc = None
                     if isinstance(server, str):
@@ -843,39 +660,28 @@ def multi(
                     server_processes.append((proc, server))
                     time.sleep(1)
                 if "url" in shot:
-                    # Add extension configuration to each shot
                     if ad_block or popup_block:
                         shot["configure_extension"] = True
                         shot["ad_block"] = ad_block
                         shot["popup_block"] = popup_block
 
-                    # Set timeout if not already specified in the shot
-                    if timeout and "timeout" not in shot:
-                        shot["timeout"] = timeout
+                    if kwargs.get('timeout') and "timeout" not in shot:
+                        shot["timeout"] = kwargs['timeout']
 
                     try:
-                        # Check if this is a PDF output
                         output_file = shot.get("output", "")
                         if output_file.lower().endswith('.pdf'):
                             await take_pdf(
-                                browser_obj,
-                                shot,
-                                log_console=log_console,
-                                skip=skip,
-                                fail=fail,
-                                silent=silent,
+                                browser_obj, shot, log_console=kwargs['log_console'],
+                                skip=kwargs['skip'], fail=kwargs['fail'], silent=kwargs['silent'],
                             )
                         else:
                             await take_shot(
-                                browser_obj,
-                                shot,
-                                log_console=log_console,
-                                skip=skip,
-                                fail=fail,
-                                silent=silent,
+                                browser_obj, shot, log_console=kwargs['log_console'],
+                                skip=kwargs['skip'], fail=kwargs['fail'], silent=kwargs['silent'],
                             )
                     except Exception as e:
-                        if fail or fail_on_error:
+                        if kwargs['fail'] or fail_on_error:
                             raise e
                         else:
                             click.echo(str(e), err=True)
@@ -885,15 +691,12 @@ def multi(
                 await cleanup_browser(browser_obj)
             if leave_server:
                 for process, details in server_processes:
-                    click.echo(
-                        f"Leaving server PID: {process.pid} details: {details}",
-                        err=True,
-                    )
+                    click.echo(f"Leaving server PID: {process.pid} details: {details}", err=True)
             else:
                 if server_processes:
                     for process, _ in server_processes:
                         process.kill()
-            if har_file and not silent:
+            if har_file and not kwargs['silent']:
                 click.echo(f"Wrote to HAR file: {har_file}", err=True)
 
     run_async(run_with_browser_cleanup(run_multi()))
@@ -902,79 +705,15 @@ def multi(
 @cli.command()
 @click.argument("url")
 @click.option(
-    "-a",
-    "--auth",
-    type=click.File("r"),
-    help="Path to JSON authentication context file",
-)
-@click.option(
-    "-o",
-    "--output",
-    type=click.File("w"),
-    default="-",
+    "-o", "--output", type=click.File("w"), default="-",
 )
 @click.option("-j", "--javascript", help="Execute this JS prior to taking the snapshot")
-@click.option(
-    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the snapshot (default: 250)"
-)
-@click.option("--wait-for", help="Wait until this JS expression returns true")
-@click.option(
-    "--timeout",
-    type=int,
-    help="Wait this many milliseconds before failing",
-)
-@click.option(
-    "--skip-cloudflare-check",
-    is_flag=True,
-    help="Skip Cloudflare challenge detection and waiting"
-)
-@click.option(
-    "--skip-wait-for-load",
-    is_flag=True,
-    help="Skip waiting for window load event"
-)
-@click.option(
-    "--trigger-lazy-load",
-    is_flag=True,
-    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
-)
-@click.option(
-    "--verbose",
-    is_flag=True,
-    help="Enable verbose logging to stdout"
-)
-@click.option(
-    "--debug",
-    is_flag=True,
-    hidden=True,
-    help="Enable debug logging for nodriver"
-)
-@log_console_option
+@wait_options
+@page_options
+@output_options
+@auth_options
 @skip_fail_options
-@bypass_csp_option
-@silent_option
-@http_auth_options
-def accessibility(
-    url,
-    auth,
-    output,
-    javascript,
-    wait,
-    wait_for,
-    timeout,
-    skip_cloudflare_check,
-    skip_wait_for_load,
-    trigger_lazy_load,
-    verbose,
-    debug,
-    log_console,
-    skip,
-    fail,
-    bypass_csp,
-    silent,
-    auth_username,
-    auth_password,
-):
+def accessibility(url, output, javascript, **kwargs):
     """
     Dump the Chromium accessibility tree for the specifed page
 
@@ -982,51 +721,33 @@ def accessibility(
 
         shot-scraper accessibility https://datasette.io/
     """
-    # Set global config
-    Config.verbose = verbose
-    Config.silent = silent
-    Config.debug = debug
+    Config.verbose = kwargs['verbose']
+    Config.silent = kwargs['silent']
+    Config.debug = kwargs['debug']
     
-    # Configure logging if debug is enabled
-    if debug:
+    if kwargs['debug']:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     async def run_accessibility():
         browser_obj = await create_browser_context(
-            auth=auth,
-            timeout=timeout,
-            bypass_csp=bypass_csp,
-            auth_username=auth_username,
-            auth_password=auth_password,
+            auth=kwargs['auth'], timeout=kwargs.get('timeout'), bypass_csp=kwargs['bypass_csp'],
+            auth_username=kwargs['auth_username'], auth_password=kwargs['auth_password'],
         )
 
-        # Create config dict for unified page setup
         config = {
-            "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load,
-            "timeout": timeout or 30,
-            "wait": wait,
-            "wait_for": wait_for,
             "javascript": javascript,
-            "trigger_lazy_load": trigger_lazy_load,
+            **{k: v for k, v in kwargs.items() if k in ['skip_cloudflare_check', 'skip_wait_for_load', 'timeout', 'wait', 'wait_for', 'trigger_lazy_load']}
         }
+        config["timeout"] = config.get("timeout") or 30
 
-        # Use unified page setup
         from shot_power_scraper.page_utils import setup_page
         page, response_handler = await setup_page(
-            browser_obj,
-            url,
-            config,
-            log_console=log_console,
-            skip=skip,
-            fail=fail,
-            silent=silent,
+            browser_obj, url, config, log_console=kwargs['log_console'],
+            skip=kwargs['skip'], fail=kwargs['fail'], silent=kwargs['silent'],
         )
 
-        # Accessibility not implemented
         snapshot = {"message": "Accessibility tree dumping not implemented"}
-
         await cleanup_browser(browser_obj)
         return snapshot
 
@@ -1094,104 +815,23 @@ def har(
 @click.argument("url")
 @click.argument("javascript", required=False)
 @click.option(
-    "-i",
-    "--input",
-    default="-",
-    help=(
-        "Read input JavaScript from this file or use gh:username/script "
-        "to load from github.com/username/shot-scraper-scripts/script.js"
-    ),
+    "-i", "--input", default="-",
+    help=("Read input JavaScript from this file or use gh:username/script "
+          "to load from github.com/username/shot-scraper-scripts/script.js"),
 )
 @click.option(
-    "-a",
-    "--auth",
-    type=click.File("r"),
-    help="Path to JSON authentication context file",
+    "-o", "--output", type=click.File("w"), default="-", help="Save output JSON to this file",
 )
 @click.option(
-    "-o",
-    "--output",
-    type=click.File("w"),
-    default="-",
-    help="Save output JSON to this file",
+    "-r", "--raw", is_flag=True, help="Output JSON strings as raw text",
 )
-@click.option(
-    "-r",
-    "--raw",
-    is_flag=True,
-    help="Output JSON strings as raw text",
-)
-@click.option(
-    "--wait", type=int, default=250, help="Wait this many milliseconds before executing JavaScript (default: 250)"
-)
-@click.option("--wait-for", help="Wait until this JS expression returns true")
-@click.option(
-    "--timeout",
-    type=int,
-    help="Wait this many milliseconds before failing",
-)
-@click.option(
-    "--skip-cloudflare-check",
-    is_flag=True,
-    help="Skip Cloudflare challenge detection and waiting"
-)
-@click.option(
-    "--skip-wait-for-load",
-    is_flag=True,
-    help="Skip waiting for window load event"
-)
-@click.option(
-    "--trigger-lazy-load",
-    is_flag=True,
-    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
-)
-@click.option(
-    "--verbose",
-    is_flag=True,
-    help="Enable verbose logging to stdout"
-)
-@click.option(
-    "--debug",
-    is_flag=True,
-    hidden=True,
-    help="Enable debug logging for nodriver"
-)
-@browser_option
-@browser_args_option
-@user_agent_option
-@reduced_motion_option
-@log_console_option
+@wait_options
+@page_options
+@output_options
+@auth_options
+@browser_options
 @skip_fail_options
-@bypass_csp_option
-@silent_option
-@http_auth_options
-def javascript(
-    url,
-    javascript,
-    input,
-    auth,
-    output,
-    raw,
-    wait,
-    wait_for,
-    timeout,
-    skip_cloudflare_check,
-    skip_wait_for_load,
-    trigger_lazy_load,
-    verbose,
-    debug,
-    browser,
-    browser_args,
-    user_agent,
-    reduced_motion,
-    log_console,
-    skip,
-    fail,
-    bypass_csp,
-    silent,
-    auth_username,
-    auth_password,
-):
+def javascript(url, javascript, input, output, raw, **kwargs):
     """
     Execute JavaScript against the page and return the result as JSON
 
@@ -1217,13 +857,11 @@ def javascript(
 
     If a JavaScript error occurs an exit code of 1 will be returned.
     """
-    # Set global config
-    Config.verbose = verbose
-    Config.silent = silent
-    Config.debug = debug
+    Config.verbose = kwargs['verbose']
+    Config.silent = kwargs['silent']
+    Config.debug = kwargs['debug']
     
-    # Configure logging if debug is enabled
-    if debug:
+    if kwargs['debug']:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -1238,37 +876,22 @@ def javascript(
 
     async def run_javascript():
         browser_obj = await create_browser_context(
-            auth=auth,
-            browser=browser,
-            browser_args=browser_args,
-            user_agent=user_agent,
-            reduced_motion=reduced_motion,
-            bypass_csp=bypass_csp,
-            auth_username=auth_username,
-            auth_password=auth_password,
+            auth=kwargs['auth'], browser=kwargs['browser'], browser_args=kwargs['browser_args'],
+            user_agent=kwargs['user_agent'], reduced_motion=kwargs['reduced_motion'],
+            bypass_csp=kwargs['bypass_csp'], auth_username=kwargs['auth_username'],
+            auth_password=kwargs['auth_password'],
         )
 
-        # Create config dict for unified page setup
         config = {
-            "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load,
-            "timeout": timeout or 30,
-            "wait": wait,
-            "wait_for": wait_for,
-            "javascript": javascript,  # The JS we want to execute
-            "trigger_lazy_load": trigger_lazy_load,
+            "javascript": javascript,
+            **{k: v for k, v in kwargs.items() if k in ['skip_cloudflare_check', 'skip_wait_for_load', 'timeout', 'wait', 'wait_for', 'trigger_lazy_load']}
         }
+        config["timeout"] = config.get("timeout") or 30
 
-        # Use unified page setup
         from shot_power_scraper.page_utils import setup_page
         page, response_handler, result = await setup_page(
-            browser_obj,
-            url,
-            config,
-            log_console=log_console,
-            skip=skip,
-            fail=fail,
-            silent=silent,
+            browser_obj, url, config, log_console=kwargs['log_console'],
+            skip=kwargs['skip'], fail=kwargs['fail'], silent=kwargs['silent'],
             return_js_result=True,
         )
         await cleanup_browser(browser_obj)
@@ -1285,90 +908,25 @@ def javascript(
 @cli.command()
 @click.argument("url")
 @click.option(
-    "-a",
-    "--auth",
-    type=click.File("r"),
-    help="Path to JSON authentication context file",
-)
-@click.option(
-    "-o",
-    "--output",
-    type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
+    "-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
 )
 @click.option("-j", "--javascript", help="Execute this JS prior to creating the PDF")
-@click.option(
-    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the screenshot (default: 250)"
-)
-@click.option("--wait-for", help="Wait until this JS expression returns true")
-@click.option(
-    "--timeout",
-    type=int,
-    help="Wait this many milliseconds before failing",
-)
 @click.option(
     "--media-screen", is_flag=True, help="Use screen rather than print styles"
 )
 @click.option("--landscape", is_flag=True, help="Use landscape orientation")
 @click.option(
-    "--scale",
-    type=click.FloatRange(min=0.1, max=2.0),
-    help="Scale of the webpage rendering",
+    "--scale", type=click.FloatRange(min=0.1, max=2.0), help="Scale of the webpage rendering",
 )
 @click.option("--print-background", is_flag=True, help="Print background graphics")
 @click.option("--pdf-css", help="Inject custom CSS for PDF generation")
-@click.option(
-    "--trigger-lazy-load",
-    is_flag=True,
-    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
-)
-@log_console_option
+@wait_options
+@page_options
+@output_options
+@auth_options
+@browser_options
 @skip_fail_options
-@bypass_csp_option
-@silent_option
-@http_auth_options
-@click.option(
-    "--verbose",
-    is_flag=True,
-    help="Enable verbose logging to stdout"
-)
-@click.option(
-    "--debug",
-    is_flag=True,
-    hidden=True,
-    help="Enable debug logging for nodriver"
-)
-@browser_option
-@browser_args_option
-@user_agent_option
-@reduced_motion_option
-def pdf(
-    url,
-    auth,
-    output,
-    javascript,
-    wait,
-    wait_for,
-    timeout,
-    media_screen,
-    landscape,
-    scale,
-    print_background,
-    pdf_css,
-    trigger_lazy_load,
-    log_console,
-    skip,
-    fail,
-    bypass_csp,
-    silent,
-    auth_username,
-    auth_password,
-    verbose,
-    browser,
-    browser_args,
-    user_agent,
-    reduced_motion,
-    debug,
-):
+def pdf(url, output, javascript, media_screen, landscape, scale, print_background, pdf_css, **kwargs):
     """
     Create a PDF of the specified page
 
@@ -1390,13 +948,11 @@ def pdf(
 
         shot-power-scraper pdf https://www.example.com/ -o - > example.pdf
     """
-    # Set global config
-    Config.verbose = verbose
-    Config.silent = silent
-    Config.debug = debug
+    Config.verbose = kwargs['verbose']
+    Config.silent = kwargs['silent']
+    Config.debug = kwargs['debug']
     
-    # Configure logging if debug is enabled
-    if debug:
+    if kwargs['debug']:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -1407,41 +963,23 @@ def pdf(
 
     async def run_pdf():
         browser_obj = await create_browser_context(
-            auth=auth,
-            browser=browser,
-            browser_args=browser_args,
-            user_agent=user_agent,
-            timeout=timeout,
-            reduced_motion=reduced_motion,
-            bypass_csp=bypass_csp,
-            auth_username=auth_username,
-            auth_password=auth_password,
+            auth=kwargs['auth'], browser=kwargs['browser'], browser_args=kwargs['browser_args'],
+            user_agent=kwargs['user_agent'], timeout=kwargs.get('timeout'),
+            reduced_motion=kwargs['reduced_motion'], bypass_csp=kwargs['bypass_csp'],
+            auth_username=kwargs['auth_username'], auth_password=kwargs['auth_password'],
         )
 
-        # Use take_pdf function for consistent page setup including Cloudflare detection
         shot = {
-            "url": url,
-            "output": output,
-            "javascript": javascript,
-            "wait": wait,
-            "wait_for": wait_for,
-            "timeout": timeout,
-            "pdf_landscape": landscape,
-            "pdf_scale": scale or 1.0,
-            "pdf_print_background": print_background,
-            "pdf_media_screen": media_screen,
+            "url": url, "output": output, "javascript": javascript,
+            "pdf_landscape": landscape, "pdf_scale": scale or 1.0,
+            "pdf_print_background": print_background, "pdf_media_screen": media_screen,
             "pdf_css": pdf_css,
-            "trigger_lazy_load": trigger_lazy_load,
+            **{k: v for k, v in kwargs.items() if k in ['wait', 'wait_for', 'timeout', 'trigger_lazy_load']}
         }
         
         pdf_data = await take_pdf(
-            browser_obj,
-            shot,
-            return_bytes=True,
-            log_console=log_console,
-            skip=skip,
-            fail=fail,
-            silent=silent
+            browser_obj, shot, return_bytes=True, log_console=kwargs['log_console'],
+            skip=kwargs['skip'], fail=kwargs['fail'], silent=kwargs['silent']
         )
 
         await cleanup_browser(browser_obj)
@@ -1454,98 +992,26 @@ def pdf(
     else:
         with open(output, "wb") as f:
             f.write(pdf_data)
-        if not silent:
+        if not kwargs['silent']:
             click.echo(f"PDF created: {output}", err=True)
 
 
 @cli.command()
 @click.argument("url")
 @click.option(
-    "-a",
-    "--auth",
-    type=click.File("r"),
-    help="Path to JSON authentication context file",
-)
-@click.option(
-    "-o",
-    "--output",
-    type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
-    default="-",
+    "-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True), default="-",
 )
 @click.option("-j", "--javascript", help="Execute this JS prior to saving the HTML")
 @click.option(
-    "-s",
-    "--selector",
-    help="Return outerHTML of first element matching this CSS selector",
+    "-s", "--selector", help="Return outerHTML of first element matching this CSS selector",
 )
-@click.option(
-    "--wait", type=int, default=250, help="Wait this many milliseconds before taking the snapshot (default: 250)"
-)
-@click.option("--wait-for", help="Wait until this JS expression returns true")
-@click.option(
-    "--timeout",
-    type=int,
-    help="Wait this many milliseconds before failing",
-)
-@click.option(
-    "--skip-cloudflare-check",
-    is_flag=True,
-    help="Skip Cloudflare challenge detection and waiting"
-)
-@click.option(
-    "--skip-wait-for-load",
-    is_flag=True,
-    help="Skip waiting for window load event"
-)
-@click.option(
-    "--trigger-lazy-load",
-    is_flag=True,
-    help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes"
-)
-@click.option(
-    "--verbose",
-    is_flag=True,
-    help="Enable verbose logging to stdout"
-)
-@click.option(
-    "--debug",
-    is_flag=True,
-    hidden=True,
-    help="Enable debug logging for nodriver"
-)
-@log_console_option
-@browser_option
-@browser_args_option
-@user_agent_option
+@wait_options
+@page_options
+@output_options
+@auth_options
+@browser_options
 @skip_fail_options
-@bypass_csp_option
-@silent_option
-@http_auth_options
-def html(
-    url,
-    auth,
-    output,
-    javascript,
-    selector,
-    wait,
-    wait_for,
-    timeout,
-    skip_cloudflare_check,
-    skip_wait_for_load,
-    trigger_lazy_load,
-    verbose,
-    log_console,
-    browser,
-    browser_args,
-    user_agent,
-    skip,
-    fail,
-    bypass_csp,
-    silent,
-    auth_username,
-    auth_password,
-    debug,
-):
+def html(url, output, javascript, selector, **kwargs):
     """
     Output the final HTML of the specified page
 
@@ -1557,13 +1023,11 @@ def html(
 
         shot-scraper html https://datasette.io/ -o index.html
     """
-    # Set global config
-    Config.verbose = verbose
-    Config.silent = silent
-    Config.debug = debug
+    Config.verbose = kwargs['verbose']
+    Config.silent = kwargs['silent']
+    Config.debug = kwargs['debug']
     
-    # Configure logging if debug is enabled
-    if debug:
+    if kwargs['debug']:
         import logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -1572,40 +1036,24 @@ def html(
 
     async def run_html():
         browser_obj = await create_browser_context(
-            auth=auth,
-            browser=browser,
-            browser_args=browser_args,
-            user_agent=user_agent,
-            timeout=timeout,
-            bypass_csp=bypass_csp,
-            auth_username=auth_username,
-            auth_password=auth_password,
+            auth=kwargs['auth'], browser=kwargs['browser'], browser_args=kwargs['browser_args'],
+            user_agent=kwargs['user_agent'], timeout=kwargs.get('timeout'),
+            bypass_csp=kwargs['bypass_csp'], auth_username=kwargs['auth_username'],
+            auth_password=kwargs['auth_password'],
         )
 
-        # Create config dict for unified page setup
         config = {
-            "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load,
-            "timeout": timeout or 30,
-            "wait": wait,
-            "wait_for": wait_for,
             "javascript": javascript,
-            "trigger_lazy_load": trigger_lazy_load,
+            **{k: v for k, v in kwargs.items() if k in ['skip_cloudflare_check', 'skip_wait_for_load', 'timeout', 'wait', 'wait_for', 'trigger_lazy_load']}
         }
+        config["timeout"] = config.get("timeout") or 30
 
-        # Use unified page setup
         from shot_power_scraper.page_utils import setup_page
         page, response_handler = await setup_page(
-            browser_obj,
-            url,
-            config,
-            log_console=log_console,
-            skip=skip,
-            fail=fail,
-            silent=silent,
+            browser_obj, url, config, log_console=kwargs['log_console'],
+            skip=kwargs['skip'], fail=kwargs['fail'], silent=kwargs['silent'],
         )
 
-        # Extract HTML content (command-specific logic)
         if selector:
             element = await page.select(selector)
             if element:
@@ -1624,11 +1072,8 @@ def html(
         sys.stdout.write(html)
     else:
         open(output, "w").write(html)
-        if not silent:
-            click.echo(
-                f"HTML snapshot of '{url}' written to '{output}'",
-                err=True,
-            )
+        if not kwargs['silent']:
+            click.echo(f"HTML snapshot of '{url}' written to '{output}'", err=True)
 
 
 @cli.command()
@@ -1655,13 +1100,12 @@ def install(browser):
 
 @cli.command(name="set-default-user-agent")
 @click.option(
-    "--browser",
-    "-b",
-    default="chromium",
-    type=click.Choice(BROWSERS, case_sensitive=False),
+    "--browser", "-b", default="chromium", type=click.Choice(BROWSERS, case_sensitive=False),
     help="Which browser to use",
 )
-@browser_args_option
+@click.option(
+    "browser_args", "--browser-arg", multiple=True, help="Additional arguments to pass to the browser",
+)
 def set_default_user_agent_cmd(browser, browser_args):
     """
     Detect the browser's user agent, remove 'HeadlessChrome', and store as default.
@@ -1675,36 +1119,23 @@ def set_default_user_agent_cmd(browser, browser_args):
     config file for future use.
     """
     async def detect_and_set_user_agent():
-        # Create a browser instance to detect the user agent
-        browser_kwargs = dict(
-            headless=True,
-            browser_args=browser_args or []
-        )
-
+        browser_kwargs = dict(headless=True, browser_args=browser_args or [])
         browser_obj = await uc.start(**browser_kwargs)
 
         if browser_obj is None:
             raise click.ClickException("Failed to initialize browser")
 
         try:
-            # Get a page to execute JavaScript
             page = await browser_obj.get("about:blank")
-
-            # Get the user agent
             user_agent = await page.evaluate("navigator.userAgent")
 
             if not user_agent:
                 raise click.ClickException("Could not detect user agent")
 
-            # Remove 'HeadlessChrome' and replace with 'Chrome'
             modified_user_agent = user_agent.replace("HeadlessChrome", "Chrome")
-
-            # Store in config
             set_default_user_agent(modified_user_agent)
 
-            # Import here to avoid circular imports
             from shot_power_scraper.utils import get_config_file
-
             click.echo(f"Original user agent: {user_agent}")
             click.echo(f"Modified user agent: {modified_user_agent}")
             click.echo(f"Saved default user agent to: {get_config_file()}")
@@ -1791,15 +1222,12 @@ def config_cmd(ad_block, popup_block, user_agent, clear, show):
 @cli.command()
 @click.argument("url")
 @click.argument(
-    "context_file",
-    type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
+    "context_file", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
 )
-@browser_option
-@browser_args_option
-@user_agent_option
 @click.option("--devtools", is_flag=True, help="Open browser DevTools")
-@log_console_option
-def auth(url, context_file, browser, browser_args, user_agent, devtools, log_console):
+@browser_options
+@click.option("--log-console", "--console-log", is_flag=True, help="Write console.log() to stderr")
+def auth(url, context_file, devtools, **kwargs):
     """
     Open a browser so user can manually authenticate with the specified site,
     then save the resulting authentication context to a file.
@@ -1810,19 +1238,14 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
     """
     async def run_auth():
         browser_obj = await create_browser_context(
-            auth=None,
-            interactive=True,
-            devtools=devtools,
-            browser=browser,
-            browser_args=browser_args,
-            user_agent=user_agent,
+            auth=None, interactive=True, devtools=devtools,
+            browser=kwargs['browser'], browser_args=kwargs['browser_args'],
+            user_agent=kwargs['user_agent'],
         )
         page = await browser_obj.get(url)
         click.echo("Hit <enter> after you have signed in:", err=True)
         input()
 
-        # Get cookies and local storage for auth context
-        # nodriver doesn't have direct storage_state equivalent
         cookies = await page.send(uc.cdp.network.get_cookies())
         context_state = {
             "cookies": cookies.cookies if hasattr(cookies, 'cookies') else [],
@@ -1838,6 +1261,5 @@ def auth(url, context_file, browser, browser_args, user_agent, devtools, log_con
     else:
         with open(context_file, "w") as fp:
             fp.write(context_json)
-        # chmod 600 to avoid other users on the shared machine reading it
         if os.name != "nt":
             pathlib.Path(context_file).chmod(0o600)
