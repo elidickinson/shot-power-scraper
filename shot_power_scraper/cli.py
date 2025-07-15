@@ -1418,57 +1418,31 @@ def pdf(
             auth_password=auth_password,
         )
 
-        # Get a blank page first to set up console logging
-        page = await browser_obj.get("about:blank")
-
-        # Set up console logging BEFORE navigating
-        console_logger = None
-        if log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=silent)
-            await console_logger.setup(page)
-
-        # Now navigate to the actual URL
-        await page.get(url)
-
-        # Check if page failed to load
-        from shot_power_scraper.page_utils import detect_navigation_error
-        has_error, error_msg = await detect_navigation_error(page, url)
-        if has_error:
-            full_msg = f"Page failed to load: {error_msg}"
-            if skip:
-                click.echo(f"{full_msg}, skipping", err=True)
-                raise SystemExit
-            elif fail:
-                raise click.ClickException(full_msg)
-            elif not silent:
-                click.echo(f"Warning: {full_msg}", err=True)
-
-        if wait:
-            if verbose:
-                click.echo(f"Waiting {wait}ms before processing...", err=True)
-            time.sleep(wait / 1000)
-
-        if javascript:
-            await evaluate_js(page, javascript)
-
-        if wait_for:
-            if verbose:
-                click.echo(f"Waiting for condition: {wait_for}", err=True)
-            await page.wait_for(wait_for, timeout=timeout)
-
-        if trigger_lazy_load:
-            from shot_power_scraper.page_utils import trigger_lazy_load as trigger_lazy_load_func
-            await trigger_lazy_load_func(page)
-
-        # Generate PDF using CDP
-        pdf_data = await generate_pdf(page, {
-            "landscape": landscape,
-            "scale": scale or 1.0,
-            "print_background": print_background,
-            "media_screen": media_screen,
+        # Use take_pdf function for consistent page setup including Cloudflare detection
+        shot = {
+            "url": url,
+            "output": output,
+            "javascript": javascript,
+            "wait": wait,
+            "wait_for": wait_for,
+            "timeout": timeout,
+            "pdf_landscape": landscape,
+            "pdf_scale": scale or 1.0,
+            "pdf_print_background": print_background,
+            "pdf_media_screen": media_screen,
             "pdf_css": pdf_css,
-        })
+            "trigger_lazy_load": trigger_lazy_load,
+        }
+        
+        pdf_data = await take_pdf(
+            browser_obj,
+            shot,
+            return_bytes=True,
+            log_console=log_console,
+            skip=skip,
+            fail=fail,
+            silent=silent
+        )
 
         await cleanup_browser(browser_obj)
         return pdf_data
