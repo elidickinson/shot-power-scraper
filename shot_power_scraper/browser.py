@@ -58,10 +58,10 @@ async def create_browser_context(
             # Check if extension path exists and has manifest
             manifest_path = ext_path / "manifest.json"
             if not ext_path.exists():
-                click.echo(f"Warning: Extension path does not exist: {ext_path}", err=True)
+                click.warn(f"Warning: Extension path does not exist: {ext_path}", err=True)
                 continue
             if not manifest_path.exists():
-                click.echo(f"Warning: Extension manifest not found: {manifest_path}", err=True)
+                click.warn(f"Warning: Extension manifest not found: {manifest_path}", err=True)
                 continue
             if Config.verbose:
                 click.echo(f"Extension manifest found: {manifest_path}", err=True)
@@ -79,9 +79,6 @@ async def create_browser_context(
 
             # Enable extension loading from command line
             browser_args_list.append("--disable-features=DisableLoadExtensionCommandLineSwitch")
-
-            if Config.verbose:
-                click.echo(f"Added extension arguments: {extension_arg}", err=True)
 
     # Create temporary user data directory to avoid nodriver cleanup messages
     temp_user_data_dir = tempfile.mkdtemp(prefix="shot_scraper_")
@@ -121,12 +118,8 @@ async def create_browser_context(
         if "cookies" in storage_state:
             page = await browser_obj.get("about:blank")
             for cookie in storage_state["cookies"]:
-                try:
-                    await page.add_handler("Network.enable", lambda event: None)
-                    await page.send(uc.cdp.network.set_cookie(**cookie))
-                except Exception:
-                    # Ignore cookie setting errors for now
-                    pass
+                await page.add_handler("Network.enable", lambda event: None)
+                await page.send(uc.cdp.network.set_cookie(**cookie))
 
     # Store the temp directory on the browser object for later cleanup
     browser_obj._temp_user_data_dir = temp_user_data_dir

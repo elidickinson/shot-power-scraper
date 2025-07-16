@@ -70,16 +70,13 @@ async def run_browser_command(command_func, browser_kwargs=None, extensions_need
             browser_kwargs['extensions'] = extensions
 
         browser_obj = await create_browser_context(**browser_kwargs)
-        if not browser_obj:
-            raise click.ClickException("Browser initialization failed")
 
         # Execute the command
         result = await command_func(browser_obj, **kwargs)
 
         return result
     finally:
-        if 'browser_obj' in locals():
-            await cleanup_browser(browser_obj)
+        await cleanup_browser(browser_obj)
 
 
 def setup_common_config(verbose, debug, silent):
@@ -426,7 +423,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
             browser_args=browser_args, user_agent=user_agent,
             timeout=timeout, reduced_motion=reduced_motion,
             auth_username=auth_username, auth_password=auth_password,
-            record_har_path=har_file or None, extensions=extensions if extensions else None,
+            record_har_path=har_file, extensions=extensions,
         )
 
         try:
@@ -483,8 +480,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
                             click.echo(str(e), err=True)
                             continue
         finally:
-            if browser_obj:
-                await cleanup_browser(browser_obj)
+            await cleanup_browser(browser_obj)
             if leave_server:
                 for process, details in server_processes:
                     click.echo(f"Leaving server PID: {process.pid} details: {details}", err=True)
@@ -511,7 +507,7 @@ def accessibility(url, output, javascript,
                  auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
                  auth_username, auth_password):
     """
-    Dump the Chromium accessibility tree for the specifed page
+    (NOT IMPLEMENTED) Dump the Chromium accessibility tree for the specifed page
 
     Usage:
 
@@ -527,7 +523,7 @@ def accessibility(url, output, javascript,
 
         config = {
             "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout or 30,
+            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
             "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load
         }
 
@@ -636,7 +632,7 @@ def javascript(url, javascript, input, output, raw,
 
         config = {
             "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout or 30,
+            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
             "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load
         }
 
@@ -782,7 +778,7 @@ def html(url, output, javascript, selector,
 
         config = {
             "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout or 30,
+            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
             "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load
         }
 
