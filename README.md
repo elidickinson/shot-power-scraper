@@ -39,9 +39,9 @@ Unlike Playwright and other automation frameworks, **nodriver** provides built-i
 
 ### Required: Set Up Stealth User Agent
 
-For stealth features to work when running in headless mode (the default) you must run this command once to set up the correct user agent:
+For stealth features to work when running in headless mode (the default) you must run the install command once to set up the correct user agent:
 
-    shot-power-scraper set-default-user-agent
+    shot-power-scraper install
 
 
 ### Ad and Popup Blocking
@@ -54,20 +54,18 @@ This can be enabled by default using the `config` command.
 
 ## ⚠️ Important: Differences from Original shot-scraper
 
-This fork has significant differences from the original.
+This fork has some important differences from the original. It only supports Chrome/Chromium and some features aren't fully implemented.
 
-### 🚫 **Commands That Don't Work**
-- `shot-power-scraper har` - HAR file recording is not implemented.
-- `shot-power-scraper accessibility` - Returns placeholder data only.
+### 🚫 **Commands & Features That Don't Work**
+- `shot-power-scraper har` - Not implemented.
+- `shot-power-scraper accessibility` - Not implemented.
+- `--log-requests` option is not implemented.
+- Selectors like `-s` don't currently work correctly with screenshots
+- `--quality` to specify JPEG quality not implemented.
 
 ### 🔄 **Commands With Limited Functionality**
 - Console logging (`--log-console`) - Basic CDP implementation, may miss some message types.
 - Browser selection (`--browser`) - Only Chrome/Chromium is supported.
-- The `--log-requests` option is not implemented.
-
-### ⚠️ **Missing Features from Original**
-- **Multi-browser support** - Firefox and WebKit/Safari automation is not available.
-- **Advanced network features** - HAR recording and request interception are not available.
 
 ## 📋 **Command Status**
 
@@ -77,8 +75,7 @@ This fork has significant differences from the original.
 - ✅ `javascript`: Fully Implemented
 - ✅ `html`: Fully Implemented
 - ✅ `auth`: Fully Implemented
-- ✅ `install`: Fully Implemented. Checks for a valid browser and prints the path.
-- ✅ `set-default-user-agent`: Fully Implemented
+- ✅ `install`: Fully Implemented - also sets up user agent for stealth mode
 - ✅ `config`: Fully Implemented
 
 ## Configuration & Defaults

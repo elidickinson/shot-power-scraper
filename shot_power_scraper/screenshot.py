@@ -11,67 +11,10 @@ import asyncio
 import click
 import nodriver as uc
 from shot_power_scraper.browser import Config
-from shot_power_scraper.page_utils import (
-    evaluate_js,
-    detect_cloudflare_challenge,
-    wait_for_cloudflare_bypass,
-    wait_for_condition,
-    detect_navigation_error
-)
+from shot_power_scraper.page_utils import evaluate_js
 from shot_power_scraper.utils import filename_for_url, url_or_file_path
-from shot_power_scraper.console_logger import ConsoleLogger
-from shot_power_scraper.response_handler import ResponseHandler
+from shot_power_scraper.shot_config import ShotConfig
 
-
-class ShotConfig:
-    """Configuration for screenshot operations"""
-    def __init__(self, shot):
-        self.url = shot.get("url") or ""
-        self.output = (shot.get("output") or "").strip()
-        self.quality = shot.get("quality")
-        self.omit_background = shot.get("omit_background")
-        self.wait = shot.get("wait")
-        self.wait_for = shot.get("wait_for")
-        self.padding = shot.get("padding") or 0
-        self.skip_cloudflare_check = shot.get("skip_cloudflare_check", False)
-        self.timeout = shot.get("timeout") or 30
-        self.skip_wait_for_load = shot.get("skip_wait_for_load", False)
-        self.javascript = shot.get("javascript")
-        self.full_page = not shot.get("height")
-        self.configure_extension = shot.get("configure_extension")
-        self.ad_block = shot.get("ad_block", False)
-        self.popup_block = shot.get("popup_block", False)
-        self.skip_shot = shot.get("skip_shot")
-        self.save_html = shot.get("save_html")
-        self.width = shot.get("width")
-        self.height = shot.get("height")
-        self.trigger_lazy_load = shot.get("trigger_lazy_load", False)
-
-        # PDF specific options
-        self.pdf_landscape = shot.get("pdf_landscape", False)
-        self.pdf_scale = shot.get("pdf_scale", 1.0)
-        self.pdf_print_background = shot.get("pdf_print_background", False)
-        self.pdf_media_screen = shot.get("pdf_media_screen", False)
-
-        # Process selectors
-        self.selectors = list(shot.get("selectors") or [])
-        self.selectors_all = list(shot.get("selectors_all") or [])
-        self.js_selectors = list(shot.get("js_selectors") or [])
-        self.js_selectors_all = list(shot.get("js_selectors_all") or [])
-
-        # Add single selectors to their respective lists
-        if shot.get("selector"):
-            self.selectors.append(shot["selector"])
-        if shot.get("selector_all"):
-            self.selectors_all.append(shot["selector_all"])
-        if shot.get("js_selector"):
-            self.js_selectors.append(shot["js_selector"])
-        if shot.get("js_selector_all"):
-            self.js_selectors_all.append(shot["js_selector_all"])
-
-    def has_selectors(self):
-        """Check if any selectors are defined"""
-        return bool(self.selectors or self.js_selectors or self.selectors_all or self.js_selectors_all)
 
 
 async def _save_screenshot_with_temp_file(page, format, quality, full_page):
@@ -87,10 +30,11 @@ async def _save_screenshot_with_temp_file(page, format, quality, full_page):
 
 async def _save_screenshot(page, output, format, quality, full_page):
     """Save screenshot to file"""
-    if format == "jpeg" and quality:
-        await page.save_screenshot(output, format=format, quality=quality, full_page=full_page)
-    else:
-        await page.save_screenshot(output, format=format, full_page=full_page)
+    # Note: nodriver doesn't support quality parameter for JPEG screenshots
+    if format == "jpeg" and quality and not getattr(_save_screenshot, '_quality_warning_shown', False):
+        click.echo("Warning: JPEG quality parameter is not supported by nodriver and will be ignored", err=True)
+        _save_screenshot._quality_warning_shown = True
+    await page.save_screenshot(output, format=format, full_page=full_page)
 
 
 def _check_and_absolutize(filepath):
@@ -216,168 +160,63 @@ def selector_javascript(selectors, selectors_all, padding=0):
 
 async def take_shot(
     context_or_page,
-    shot,
+    shot_config,
     return_bytes=False,
     use_existing_page=False,
-    log_requests=None,
-    log_console=False,
-    skip=False,
-    fail=False,
-    silent=False,
 ):
     """Take a screenshot based on the provided configuration"""
-    config = ShotConfig(shot)
 
-    if not config.url:
+    if not shot_config.url:
         raise click.ClickException("url is required")
 
-    if skip and fail:
-        raise click.ClickException("--skip and --fail cannot be used together")
+    url = url_or_file_path(shot_config.url, file_exists=_check_and_absolutize)
 
-    url = url_or_file_path(config.url, file_exists=_check_and_absolutize)
-
-    if not config.output and not return_bytes:
-        config.output = filename_for_url(url, ext="png", file_exists=os.path.exists)
+    if not shot_config.output and not return_bytes:
+        shot_config.output = filename_for_url(url, ext="png", file_exists=os.path.exists)
 
     if not use_existing_page:
-        # Create a new tab first to set up console logging before navigation
-        if Config.verbose:
-            click.echo(f"Creating new page for: {url}", err=True)
+        from shot_power_scraper.page_utils import setup_page
 
-        # Get a blank page first
-        page = await context_or_page.get("about:blank")
-
-        # Set up console logging BEFORE navigating to the actual URL
-        console_logger = None
-        if log_console:
-            console_logger = ConsoleLogger(silent=silent)
-            await console_logger.setup(page)
-            if Config.verbose:
-                click.echo("Console logging enabled", err=True)
-
-        # Set up response handler for HTTP status checking
-        response_handler = ResponseHandler()
-        import nodriver as uc
-        page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
-
-        # Now navigate to the actual URL
-        if Config.verbose:
-            click.echo(f"Loading page: {url}", err=True)
-        await page.get(url)
-
-        # Wait for the window load event (all resources including images) unless skipped
-        if not config.skip_wait_for_load:
-            if Config.verbose:
-                click.echo(f"Waiting for window load event...", err=True)
-
-            await page.evaluate(f"""
-                new Promise((resolve) => {{
-                    if (document.readyState === 'complete') {{
-                        resolve();
-                    }} else {{
-                        window.addEventListener('load', resolve);
-                        setTimeout(resolve, {config.timeout * 1000});
-                    }}
-                }});
-            """)
-
-        if log_requests:
-            # nodriver doesn't have direct response events like Playwright
-            # We can implement this later using CDP if needed
-            pass
-
-        # Check HTTP response status
-        response_status, response_url = await response_handler.wait_for_response(timeout=5)
-        if response_status is not None:
-            # Create a response-like object for skip_or_fail function
-            class ResponseObj:
-                def __init__(self, status, url):
-                    self.status = status
-                    self.url = url
-
-            from shot_power_scraper.cli import skip_or_fail
-            skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
-
-        # Automatic Cloudflare detection and waiting
-        if not config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
-            if not silent:
-                click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
-            success = await wait_for_cloudflare_bypass(page)
-            if not success:
-                if not silent:
-                    click.echo("Warning: Cloudflare challenge may still be active", err=True)
-
-        # Check if page failed to load
-        has_error, error_msg = await detect_navigation_error(page, url)
-        if has_error:
-            full_msg = f"Page failed to load: {error_msg}"
-            if skip:
-                click.echo(f"{full_msg}, skipping", err=True)
-                raise SystemExit
-            elif fail:
-                raise click.ClickException(full_msg)
-            elif not silent:
-                click.echo(f"Warning: {full_msg}", err=True)
-
+        page, response_handler = await setup_page(
+            context_or_page,
+            shot_config,
+        )
     else:
         page = context_or_page
         # Set up console logging for existing page
         console_logger = None
-        if log_console:
-            console_logger = ConsoleLogger(silent=silent)
+        if shot_config.log_console:
+            from shot_power_scraper.console_logger import ConsoleLogger
+            console_logger = ConsoleLogger(silent=Config.silent)
             await console_logger.setup(page)
 
-    viewport = get_viewport(config.width, config.height)
+    viewport = get_viewport(shot_config.width, shot_config.height)
     if viewport:
         # nodriver doesn't have set_viewport_size, we'll use window size instead
         await page.set_window_size(viewport["width"], viewport["height"])
 
-    # Configure blocking extensions if enabled
-    if config.configure_extension:
-        from shot_power_scraper.cli import configure_blocking_extension
-        await configure_blocking_extension(
-            page,
-            config.ad_block,
-            config.popup_block,
-            Config.verbose
-        )
-
-    if config.wait:
-        if Config.verbose:
-            click.echo(f"Waiting {config.wait}ms before processing...", err=True)
-        await asyncio.sleep(config.wait / 1000)
-
-    if config.javascript:
-        if Config.verbose:
-            click.echo(f"Executing JavaScript: {config.javascript[:50]}{'...' if len(config.javascript) > 50 else ''}", err=True)
-        await evaluate_js(page, config.javascript)
-
-    if config.wait_for:
-        await wait_for_condition(page, config.wait_for)
-
-    if config.trigger_lazy_load:
-        from shot_power_scraper.page_utils import trigger_lazy_load
-        await trigger_lazy_load(page)
+    # Note: wait, javascript, wait_for, and trigger_lazy_load
+    # are now handled by setup_page() for new pages
 
     # Determine format based on quality parameter
-    format = "jpeg" if config.quality else "png"
-    full_page = config.full_page if not config.has_selectors() else True
+    format = "jpeg" if shot_config.quality else "png"
+    full_page = shot_config.full_page if not shot_config.has_selectors() else True
 
-    if config.js_selectors or config.js_selectors_all:
+    if shot_config.js_selectors or shot_config.js_selectors_all:
         # Evaluate JavaScript adding classes we can select on
         (
             js_selector_js,
             extra_selectors,
             extra_selectors_all,
-        ) = js_selector_javascript(config.js_selectors, config.js_selectors_all)
-        config.selectors.extend(extra_selectors)
-        config.selectors_all.extend(extra_selectors_all)
+        ) = js_selector_javascript(shot_config.js_selectors, shot_config.js_selectors_all)
+        shot_config.selectors.extend(extra_selectors)
+        shot_config.selectors_all.extend(extra_selectors_all)
         await evaluate_js(page, js_selector_js)
 
-    if config.has_selectors():
+    if shot_config.has_selectors():
         # Use JavaScript to create a box around those elements
         selector_js, selector_to_shoot = selector_javascript(
-            config.selectors, config.selectors_all, config.padding
+            shot_config.selectors, shot_config.selectors_all, shot_config.padding
         )
         await evaluate_js(page, selector_js)
         try:
@@ -385,13 +224,13 @@ async def take_shot(
             element = await page.select(selector_to_shoot)
             if element:
                 if return_bytes:
-                    return await _save_screenshot_with_temp_file(page, format, config.quality, full_page)
+                    return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page)
                 else:
                     if Config.verbose:
                         click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
-                    await _save_screenshot(page, config.output, format, config.quality, full_page)
+                    await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page)
                     message = "Screenshot of '{}' on '{}' written to '{}'".format(
-                        ", ".join(list(config.selectors) + list(config.selectors_all)), url, config.output
+                        ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), url, shot_config.output
                     )
             else:
                 raise click.ClickException(f"Could not find element matching selector: {selector_to_shoot}")
@@ -400,45 +239,45 @@ async def take_shot(
                 f"Timed out while waiting for element to become available.\n\n{e}"
             )
     else:
-        if config.skip_shot:
+        if shot_config.skip_shot:
             message = "Skipping screenshot of '{}'".format(url)
         else:
             # Whole page
             if return_bytes:
-                return await _save_screenshot_with_temp_file(page, format, config.quality, full_page)
+                return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page)
             else:
                 if Config.verbose:
                     click.echo(f"Taking screenshot (full_page={full_page})", err=True)
-                await _save_screenshot(page, config.output, format, config.quality, full_page)
-                message = f"Screenshot of '{url}' written to '{config.output}'"
+                await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page)
+                message = f"Screenshot of '{url}' written to '{shot_config.output}'"
 
     # Save HTML if requested
-    if config.save_html and not return_bytes:
+    if shot_config.save_html and not return_bytes:
         try:
             # Get the HTML content
             html_content = await page.get_content()
 
             # Determine HTML filename from screenshot output
-            if config.output and config.output != "-":
+            if shot_config.output and shot_config.output != "-":
                 # Get the base name without extension
-                output_path = pathlib.Path(config.output)
+                output_path = pathlib.Path(shot_config.output)
                 html_filename = output_path.with_suffix('.html')
 
                 # Write HTML content to file
                 with open(html_filename, 'w', encoding='utf-8') as f:
                     f.write(html_content)
 
-                if not silent:
+                if not Config.silent:
                     click.echo(f"HTML content saved to '{html_filename}'", err=True)
             else:
-                if not silent:
+                if not Config.silent:
                     click.echo("Cannot save HTML when output is stdout", err=True)
 
         except Exception as e:
-            if not silent:
+            if not Config.silent:
                 click.echo(f"Failed to save HTML: {e}", err=True)
 
-    if not silent:
+    if not Config.silent:
         click.echo(message, err=True)
 
     # Always return something for consistency
@@ -450,7 +289,6 @@ async def generate_pdf(page, options):
 
     # Build CDP print options - always use letter size (8.5x11 inches)
     print_options = {
-        "landscape": options.get("landscape"),
         "display_header_footer": False,
         "print_background": options.get("print_background"),
         "scale": options.get("scale"),
@@ -462,10 +300,7 @@ async def generate_pdf(page, options):
         "paper_height": 11,   # Letter size height
     }
 
-    # If landscape, swap width and height
-    if options.get("landscape"):
-        print_options["paper_width"] = 11
-        print_options["paper_height"] = 8.5
+
 
     # Handle media type
     if options.get("media_screen"):
@@ -554,155 +389,51 @@ async def generate_pdf(page, options):
 
 async def take_pdf(
     context_or_page,
-    shot,
+    shot_config,
     return_bytes=False,
     use_existing_page=False,
-    log_requests=None,
-    log_console=False,
-    skip=False,
-    fail=False,
-    silent=False,
 ):
     """Generate a PDF based on the provided configuration"""
-    config = ShotConfig(shot)
 
-    if not config.url:
+    if not shot_config.url:
         raise click.ClickException("url is required")
 
-    if skip and fail:
-        raise click.ClickException("--skip and --fail cannot be used together")
+    url = url_or_file_path(shot_config.url, file_exists=_check_and_absolutize)
 
-    url = url_or_file_path(config.url, file_exists=_check_and_absolutize)
-
-    if not config.output and not return_bytes:
-        config.output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
+    if not shot_config.output and not return_bytes:
+        shot_config.output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
 
     if not use_existing_page:
-        # Create a new tab first to set up console logging before navigation
-        if Config.verbose:
-            click.echo(f"Creating new page for PDF: {url}", err=True)
+        from shot_power_scraper.page_utils import setup_page
 
-        # Get a blank page first
-        page = await context_or_page.get("about:blank")
-
-        # Set up console logging BEFORE navigating to the actual URL
-        console_logger = None
-        if log_console:
-            console_logger = ConsoleLogger(silent=silent)
-            await console_logger.setup(page)
-            if Config.verbose:
-                click.echo("Console logging enabled", err=True)
-
-        # Set up response handler for HTTP status checking
-        response_handler = ResponseHandler()
-        import nodriver as uc
-        page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
-
-        # Now navigate to the actual URL
-        if Config.verbose:
-            click.echo(f"Loading page: {url}", err=True)
-        await page.get(url)
-
-        # Wait for the window load event (all resources including images) unless skipped
-        if not config.skip_wait_for_load:
-            if Config.verbose:
-                click.echo(f"Waiting for window load event...", err=True)
-
-            await page.evaluate(f"""
-                new Promise((resolve) => {{
-                    if (document.readyState === 'complete') {{
-                        resolve();
-                    }} else {{
-                        window.addEventListener('load', resolve);
-                        setTimeout(resolve, {config.timeout * 1000});
-                    }}
-                }});
-            """)
-
-        if log_requests:
-            # nodriver doesn't have direct response events like Playwright
-            # We can implement this later using CDP if needed
-            pass
-
-        # Check HTTP response status
-        response_status, response_url = await response_handler.wait_for_response(timeout=5)
-        if response_status is not None:
-            # Create a response-like object for skip_or_fail function
-            class ResponseObj:
-                def __init__(self, status, url):
-                    self.status = status
-                    self.url = url
-
-            from shot_power_scraper.cli import skip_or_fail
-            skip_or_fail(ResponseObj(response_status, response_url), skip, fail)
-
-        # Automatic Cloudflare detection and waiting
-        if not config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
-            if not silent:
-                click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
-            success = await wait_for_cloudflare_bypass(page)
-            if not success:
-                if not silent:
-                    click.echo("Warning: Cloudflare challenge may still be active", err=True)
-
-        # Check if page failed to load
-        has_error, error_msg = await detect_navigation_error(page, url)
-        if has_error:
-            full_msg = f"Page failed to load: {error_msg}"
-            if skip:
-                click.echo(f"{full_msg}, skipping", err=True)
-                raise SystemExit
-            elif fail:
-                raise click.ClickException(full_msg)
-            elif not silent:
-                click.echo(f"Warning: {full_msg}", err=True)
-
+        page, response_handler = await setup_page(
+            context_or_page,
+            shot_config,
+        )
     else:
         page = context_or_page
         # Set up console logging for existing page
         console_logger = None
-        if log_console:
-            console_logger = ConsoleLogger(silent=silent)
+        if shot_config.log_console:
+            from shot_power_scraper.console_logger import ConsoleLogger
+            console_logger = ConsoleLogger(silent=Config.silent)
             await console_logger.setup(page)
 
-    viewport = get_viewport(config.width, config.height)
+    viewport = get_viewport(shot_config.width, shot_config.height)
     if viewport:
         # nodriver doesn't have set_viewport_size, we'll use window size instead
         await page.set_window_size(viewport["width"], viewport["height"])
 
-    # Configure blocking extensions if enabled
-    if config.configure_extension:
-        from shot_power_scraper.cli import configure_blocking_extension
-        await configure_blocking_extension(
-            page,
-            config.ad_block,
-            config.popup_block,
-            Config.verbose
-        )
-
-    if config.wait:
-        if Config.verbose:
-            click.echo(f"Waiting {config.wait}ms before processing...", err=True)
-        await asyncio.sleep(config.wait / 1000)
-
-    if config.javascript:
-        if Config.verbose:
-            click.echo(f"Executing JavaScript: {config.javascript[:50]}{'...' if len(config.javascript) > 50 else ''}", err=True)
-        await evaluate_js(page, config.javascript)
-
-    if config.wait_for:
-        await wait_for_condition(page, config.wait_for)
-
-    if config.trigger_lazy_load:
-        from shot_power_scraper.page_utils import trigger_lazy_load
-        await trigger_lazy_load(page)
+    # Note: wait, javascript, wait_for, and trigger_lazy_load
+    # are now handled by setup_page() for new pages
 
     # Generate PDF
     pdf_options = {
-        "landscape": config.pdf_landscape,
-        "scale": config.pdf_scale,
-        "print_background": config.pdf_print_background,
-        "media_screen": config.pdf_media_screen,
+        "landscape": shot_config.pdf_landscape,
+        "scale": shot_config.pdf_scale,
+        "print_background": shot_config.pdf_print_background,
+        "media_screen": shot_config.pdf_media_screen,
+        "pdf_css": shot_config.pdf_css,
     }
 
     if Config.verbose:
@@ -713,16 +444,16 @@ async def take_pdf(
     if return_bytes:
         return pdf_data
     else:
-        if config.output == "-":
+        if shot_config.output == "-":
             import sys
             sys.stdout.buffer.write(pdf_data)
             message = f"PDF of '{url}' written to stdout"
         else:
-            with open(config.output, "wb") as f:
+            with open(shot_config.output, "wb") as f:
                 f.write(pdf_data)
-            message = f"PDF of '{url}' written to '{config.output}'"
+            message = f"PDF of '{url}' written to '{shot_config.output}'"
 
-    if not silent:
+    if not Config.silent:
         click.echo(message, err=True)
 
     return None
