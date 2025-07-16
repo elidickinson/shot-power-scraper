@@ -30,7 +30,6 @@ class ShotConfig:
         self.skip_wait_for_load = shot.get("skip_wait_for_load", False)
         self.javascript = shot.get("javascript")
         self.full_page = not shot.get("height")
-        self.configure_extension = shot.get("configure_extension")
         self.ad_block = shot.get("ad_block", False)
         self.popup_block = shot.get("popup_block", False)
         self.skip_shot = shot.get("skip_shot")
@@ -236,7 +235,6 @@ async def take_shot(
             "skip_wait_for_load": config.skip_wait_for_load,
             "timeout": config.timeout,
             "skip_cloudflare_check": config.skip_cloudflare_check,
-            "configure_extension": config.configure_extension,
             "ad_block": config.ad_block,
             "popup_block": config.popup_block,
             "wait": config.wait,
@@ -269,7 +267,7 @@ async def take_shot(
         # nodriver doesn't have set_viewport_size, we'll use window size instead
         await page.set_window_size(viewport["width"], viewport["height"])
 
-    # Note: wait, javascript, wait_for, trigger_lazy_load, and configure_extension
+    # Note: wait, javascript, wait_for, and trigger_lazy_load
     # are now handled by setup_page() for new pages
 
     # Determine format based on quality parameter
@@ -495,7 +493,6 @@ async def take_pdf(
             "skip_wait_for_load": config.skip_wait_for_load,
             "timeout": config.timeout,
             "skip_cloudflare_check": config.skip_cloudflare_check,
-            "configure_extension": config.configure_extension,
             "ad_block": config.ad_block,
             "popup_block": config.popup_block,
             "wait": config.wait,
@@ -528,7 +525,7 @@ async def take_pdf(
         # nodriver doesn't have set_viewport_size, we'll use window size instead
         await page.set_window_size(viewport["width"], viewport["height"])
 
-    # Note: wait, javascript, wait_for, trigger_lazy_load, and configure_extension
+    # Note: wait, javascript, wait_for, and trigger_lazy_load
     # are now handled by setup_page() for new pages
 
     # Generate PDF

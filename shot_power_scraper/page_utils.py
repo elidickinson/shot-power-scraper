@@ -292,15 +292,6 @@ async def setup_page(
         elif not silent:
             click.echo(f"Warning: {full_msg}", err=True)
     
-    # Configure blocking extensions if enabled
-    if config.get("configure_extension"):
-        from shot_power_scraper.cli import configure_blocking_extension
-        await configure_blocking_extension(
-            page,
-            config.get("ad_block", False),
-            config.get("popup_block", False),
-            Config.verbose
-        )
     
     # Wait if specified
     wait_ms = config.get("wait")
