@@ -214,8 +214,8 @@ def cli():
 
 @cli.command()
 @click.argument("url")
-@click.option("--width", type=int, help="Width of browser window, defaults to 1280", default=1280)
-@click.option("--height", type=int, help="Height of browser window and shot - defaults to the full height of the page")
+@click.option("--width", "-w", type=int, help="Width of browser window, defaults to 1280", default=1280)
+@click.option("--height", "-h", type=int, help="Height of browser window and shot - defaults to the full height of the page")
 @click.option("-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True))
 @click.option("selectors", "-s", "--selector", help="Take shot of first element matching this CSS selector", multiple=True)
 @click.option("selectors_all", "--selector-all", help="Take shot of all elements matching this CSS selector", multiple=True)
@@ -338,9 +338,6 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 @cli.command()
 @click.argument("config", type=click.File(mode="r"))
 @scale_factor_options
-@click.option(
-    "--timeout", type=int, help="Wait this many milliseconds before failing",
-)
 @click.option(
     "--fail-on-error", is_flag=True, help="Fail noisily on error", hidden=True
 )
@@ -518,34 +515,7 @@ def accessibility(url, output, javascript,
 
         shot-scraper accessibility https://datasette.io/
     """
-    setup_common_config(verbose, debug, silent)
-
-    async def run_accessibility():
-        browser_obj = await create_browser_context(
-            auth=auth, timeout=timeout, bypass_csp=bypass_csp,
-            auth_username=auth_username, auth_password=auth_password,
-        )
-
-        shot_config = ShotConfig({
-            "url": url,
-            "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
-            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
-            "log_console": log_console, "skip": skip, "fail": fail, "silent": silent
-        })
-
-        from shot_power_scraper.page_utils import setup_page
-        page, response_handler = await setup_page(
-            browser_obj, shot_config,
-        )
-
-        snapshot = {"message": "Accessibility tree dumping not implemented"}
-        await cleanup_browser(browser_obj)
-        return snapshot
-
-    snapshot = run_async(run_with_browser_cleanup(run_accessibility()))
-    output.write(json.dumps(snapshot, indent=4))
-    output.write("\n")
+    raise NotImplementedError("Accessibility tree dumping is not implemented in shot-power-scraper")
 
 
 @cli.command()

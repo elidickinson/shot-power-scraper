@@ -30,10 +30,11 @@ async def _save_screenshot_with_temp_file(page, format, quality, full_page):
 
 async def _save_screenshot(page, output, format, quality, full_page):
     """Save screenshot to file"""
-    if format == "jpeg" and quality:
-        await page.save_screenshot(output, format=format, quality=quality, full_page=full_page)
-    else:
-        await page.save_screenshot(output, format=format, full_page=full_page)
+    # Note: nodriver doesn't support quality parameter for JPEG screenshots
+    if format == "jpeg" and quality and not getattr(_save_screenshot, '_quality_warning_shown', False):
+        click.echo("Warning: JPEG quality parameter is not supported by nodriver and will be ignored", err=True)
+        _save_screenshot._quality_warning_shown = True
+    await page.save_screenshot(output, format=format, full_page=full_page)
 
 
 def _check_and_absolutize(filepath):
