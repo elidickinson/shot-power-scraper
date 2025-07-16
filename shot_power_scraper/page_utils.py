@@ -318,6 +318,31 @@ async def setup_page(
     # Trigger lazy load if requested
     if shot_config.trigger_lazy_load:
         await trigger_lazy_load(page)
+    
+    # Apply viewport expansion to fix intersection observers when blocking is enabled
+    elif shot_config.popup_block or shot_config.ad_block:
+        if Config.verbose:
+            click.echo("Applying viewport expansion to fix intersection observers...", err=True)
+        
+        # Get viewport width and document height
+        viewport_width = await page.evaluate("window.innerWidth")
+        document_height = await page.evaluate("document.documentElement.scrollHeight")
+        
+        # Use document height, minimum 10000px
+        viewport_height = max(document_height, 10000)
+        
+        await page.send(uc.cdp.emulation.set_device_metrics_override(
+            width=viewport_width,
+            height=viewport_height,
+            device_scale_factor=1,
+            mobile=False
+        ))
+        
+        # Wait a moment for lazy loading to trigger
+        await asyncio.sleep(0.5)
+        
+        # Clear the override to restore normal viewport
+        await page.send(uc.cdp.emulation.clear_device_metrics_override())
 
     if shot_config.return_js_result:
         return page, response_handler, js_result
