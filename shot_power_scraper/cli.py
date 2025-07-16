@@ -10,7 +10,7 @@ import click
 import nodriver as uc
 import asyncio
 
-from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
+from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser, setup_blocking_extensions
 from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport
 from shot_power_scraper.shot_config import ShotConfig
@@ -18,49 +18,48 @@ from shot_power_scraper.shot_config import ShotConfig
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
 
-async def run_with_browser_cleanup(coro):
-    """Run an async function and give nodriver time to cleanup afterwards."""
+def run_nodriver_async(coro):
+    """Run an async coroutine with nodriver event loop, cleanup warnings, and delay"""
     import warnings
-
     # Suppress harmless cleanup warnings from nodriver
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore",
                               message=".*Task was destroyed but it is pending.*",
                               category=RuntimeWarning)
 
-        result = await coro
-        await asyncio.sleep(0.1)  # Give nodriver time to cleanup background processes
-        return result
+        async def coro_with_cleanup():
+            result = await coro
+            await asyncio.sleep(0.1)  # Give nodriver time to cleanup background processes
+            return result
+
+        # Use nodriver's event loop as recommended in their docs
+        loop = uc.loop()
+        return loop.run_until_complete(coro_with_cleanup())
 
 
-def run_async(coro):
-    """Run an async coroutine using uc.loop() as in nodriver examples."""
-    # Use nodriver's event loop as recommended in their docs
-    loop = uc.loop()
-    return loop.run_until_complete(coro)
+def run_browser_command(command_func, browser_kwargs=None, ad_block=False, popup_block=False, **kwargs):
+    """ Execute command async with browser lifecycle management """
+    async def browser_execution():
+        browser_obj = None
+        try:
+            extensions = []
+            if ad_block or popup_block:
+                await setup_blocking_extensions(extensions, ad_block, popup_block)
 
+            # Create browser with common parameters
+            browser_kwargs_final = browser_kwargs or {}
+            if extensions:
+                browser_kwargs_final['extensions'] = extensions
 
-# Common command execution pattern
-async def run_browser_command(command_func, browser_kwargs=None, ad_block=False, popup_block=False, **kwargs):
-    """Unified command execution pattern that handles browser setup/cleanup"""
-    try:
-        extensions = []
-        if ad_block or popup_block:
-            await setup_blocking_extensions(extensions, ad_block, popup_block)
+            browser_obj = await create_browser_context(**browser_kwargs_final)
 
-        # Create browser with common parameters
-        browser_kwargs = browser_kwargs or {}
-        if extensions:
-            browser_kwargs['extensions'] = extensions
+            # Execute the command
+            result = await command_func(browser_obj, **kwargs)
+            return result
+        finally:
+            await cleanup_browser(browser_obj)
 
-        browser_obj = await create_browser_context(**browser_kwargs)
-
-        # Execute the command
-        result = await command_func(browser_obj, **kwargs)
-
-        return result
-    finally:
-        await cleanup_browser(browser_obj)
+    return run_nodriver_async(browser_execution())
 
 
 def setup_common_config(verbose, debug, silent, skip, fail):
@@ -263,7 +262,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         "log_requests": log_requests
     })
 
-    async def execute_shot(browser_obj, **kwargs):
+    async def shot_execution(browser_obj):
         if interactive:
             page = await browser_obj.get(url)
             if width or height:
@@ -297,9 +296,10 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         'auth_password': auth_password
     }
 
-    run_async(run_with_browser_cleanup(
-        run_browser_command(execute_shot, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block)
-    ))
+    run_browser_command(
+        shot_execution, browser_kwargs,
+        ad_block=shot_config.ad_block, popup_block=shot_config.popup_block
+    )
 
 
 
@@ -451,7 +451,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
             if har_file and not silent:
                 click.echo(f"Wrote to HAR file: {har_file}", err=True)
 
-    run_async(run_with_browser_cleanup(run_multi()))
+    run_nodriver_async(run_multi())
 
 
 @cli.command()
@@ -585,9 +585,9 @@ def javascript(url, javascript, input, output, raw,
     })
 
 
-    result = run_async(run_with_browser_cleanup(
-        run_browser_command(execute_js, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block)
-    ))
+    result = run_browser_command(
+        execute_js, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block
+    )
 
     if raw:
         output.write(str(result))
@@ -662,9 +662,9 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
         'auth_username': auth_username, 'auth_password': auth_password,
     }
 
-    pdf_data = run_async(run_with_browser_cleanup(
-        run_browser_command(execute_pdf, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block)
-    ))
+    pdf_data = run_browser_command(
+        execute_pdf, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block
+    )
 
     if output == "-":
         sys.stdout.buffer.write(pdf_data)
@@ -739,9 +739,9 @@ def html(url, output, javascript, selector,
         'auth_password': auth_password,
     }
 
-    html_content = run_async(run_with_browser_cleanup(
-        run_browser_command(execute_html, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block)
-    ))
+    html_content = run_browser_command(
+        execute_html, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block
+    )
 
     if output == "-":
         sys.stdout.write(html_content)
@@ -780,32 +780,23 @@ def install(browser, browser_args):
     click.echo()
     click.echo("Setting up default user agent for stealth mode...")
 
-    async def detect_and_set_user_agent():
-        browser_kwargs = dict(headless=True, browser_args=browser_args or [])
-        browser_obj = await uc.start(**browser_kwargs)
 
-        if browser_obj is None:
-            raise click.ClickException("Failed to initialize browser")
+    async def set_user_agent_wrapper(browser_obj):
+        page = await browser_obj.get("about:blank")
+        user_agent = await page.evaluate("navigator.userAgent")
 
-        try:
-            page = await browser_obj.get("about:blank")
-            user_agent = await page.evaluate("navigator.userAgent")
+        if not user_agent:
+            raise click.ClickException("Could not detect user agent")
 
-            if not user_agent:
-                raise click.ClickException("Could not detect user agent")
+        modified_user_agent = user_agent.replace("HeadlessChrome", "Chrome")
+        set_default_user_agent(modified_user_agent)
 
-            modified_user_agent = user_agent.replace("HeadlessChrome", "Chrome")
-            set_default_user_agent(modified_user_agent)
+        from shot_power_scraper.utils import get_config_file
+        click.echo(f"Original user agent: {user_agent}")
+        click.echo(f"Modified user agent: {modified_user_agent}")
+        click.echo(f"Saved default user agent to: {get_config_file()}")
 
-            from shot_power_scraper.utils import get_config_file
-            click.echo(f"Original user agent: {user_agent}")
-            click.echo(f"Modified user agent: {modified_user_agent}")
-            click.echo(f"Saved default user agent to: {get_config_file()}")
-
-        finally:
-            await cleanup_browser(browser_obj)
-
-    run_async(run_with_browser_cleanup(detect_and_set_user_agent()))
+    run_browser_command(set_user_agent_wrapper, dict(headless=True, browser_args=browser_args or []))
 
 
 
@@ -917,9 +908,9 @@ def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced
         'user_agent': user_agent,
     }
 
-    context_state = run_async(run_with_browser_cleanup(
-        run_browser_command(execute_auth, browser_kwargs)
-    ))
+    context_state = run_browser_command(
+        execute_auth, browser_kwargs
+    )
 
     context_json = json.dumps(context_state, indent=2) + "\n"
     if context_file == "-":

@@ -1,13 +1,11 @@
 """Core screenshot functionality for shot-scraper"""
 import os
-import time
 import json
 import secrets
 import textwrap
 import tempfile
 import pathlib
 import base64
-import asyncio
 import click
 import nodriver as uc
 from shot_power_scraper.browser import Config
