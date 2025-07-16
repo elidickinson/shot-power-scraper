@@ -40,30 +40,13 @@ def run_async(coro):
     return loop.run_until_complete(coro)
 
 
-def resolve_blocking_config(ad_block, popup_block):
-    """Resolve ad_block and popup_block values from config if not explicitly set."""
-    if ad_block is None:
-        ad_block = get_default_ad_block()
-    if popup_block is None:
-        popup_block = get_default_popup_block()
-    return ad_block, popup_block
-
-
-
-
-
-
 # Common command execution pattern
-async def run_browser_command(command_func, browser_kwargs=None, extensions_needed=False, **kwargs):
+async def run_browser_command(command_func, browser_kwargs=None, ad_block=False, popup_block=False, **kwargs):
     """Unified command execution pattern that handles browser setup/cleanup"""
     try:
         extensions = []
-        if extensions_needed:
-            ad_block = kwargs.get('ad_block', False)
-            popup_block = kwargs.get('popup_block', False)
-            verbose = kwargs.get('verbose', False)
-            silent = kwargs.get('silent', False)
-            await setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent)
+        if ad_block or popup_block:
+            await setup_blocking_extensions(extensions, ad_block, popup_block)
 
         # Create browser with common parameters
         browser_kwargs = browser_kwargs or {}
@@ -80,11 +63,16 @@ async def run_browser_command(command_func, browser_kwargs=None, extensions_need
         await cleanup_browser(browser_obj)
 
 
-def setup_common_config(verbose, debug, silent):
+def setup_common_config(verbose, debug, silent, skip, fail):
     """Setup common configuration used by all commands"""
     Config.verbose = verbose
     Config.silent = silent
     Config.debug = debug
+    Config.skip = skip
+    Config.fail = fail
+
+    if skip and fail:
+        raise click.ClickException("--skip and --fail cannot be used together")
 
     if debug:
         import logging
@@ -101,23 +89,6 @@ def _check_and_absolutize(filepath):
     if path.exists():
         return path.absolute()
     return False
-
-
-
-
-def skip_or_fail(status_code, url, skip, fail):
-    if skip and fail:
-        raise click.ClickException("--skip and --fail cannot be used together")
-    if str(status_code)[0] in ("4", "5"):
-        if skip:
-            click.echo(
-                f"{status_code} error for {url}, skipping",
-                err=True,
-            )
-            # Exit with a 0 status code
-            raise SystemExit
-        elif fail:
-            raise click.ClickException(f"{status_code} error for {url}")
 
 
 def scale_factor_options(fn):
@@ -268,14 +239,13 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 
         shot-scraper https://www.example.com/ --height 600 -o partial.png
     """
-    setup_common_config(verbose, debug, silent)
+    setup_common_config(verbose, debug, silent, skip, fail)
 
     if output is None:
         ext = "jpg" if quality else None
         output = filename_for_url(url, ext=ext, file_exists=os.path.exists)
 
     scale_factor = normalize_scale_factor(retina, scale_factor)
-    ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
     interactive = interactive or devtools
 
     shot_config = ShotConfig({
@@ -289,7 +259,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         "skip_cloudflare_check": skip_cloudflare_check,
         "skip_wait_for_load": skip_wait_for_load,
         "trigger_lazy_load": trigger_lazy_load, "verbose": verbose,
-        "log_console": log_console, "skip": skip, "fail": fail, "silent": silent,
+        "log_console": log_console,
         "log_requests": log_requests
     })
 
@@ -328,8 +298,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
     }
 
     run_async(run_with_browser_cleanup(
-        run_browser_command(execute_shot, browser_kwargs, extensions_needed=ad_block or popup_block,
-                          verbose=verbose, silent=silent, ad_block=ad_block, popup_block=popup_block)
+        run_browser_command(execute_shot, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block)
     ))
 
 
@@ -388,7 +357,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
     PDF files are automatically detected by .pdf extension.
     All PDF options from the pdf command are supported in YAML format.
     """
-    setup_common_config(verbose, debug, silent)
+    setup_common_config(verbose, debug, silent, skip, fail)
 
     if (har or har_zip) and not har_file:
         har_file = filename_for_url(
@@ -396,7 +365,6 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
         )
 
     scale_factor = normalize_scale_factor(retina, scale_factor)
-    ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
     shots = yaml.safe_load(config)
 
     if har_file:
@@ -412,9 +380,6 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 
     async def run_multi():
         extensions = []
-        if ad_block or popup_block:
-            await setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent)
-
         browser_obj = await create_browser_context(
             auth=auth, scale_factor=scale_factor, browser=browser,
             browser_args=browser_args, user_agent=user_agent,
@@ -451,10 +416,6 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
                     server_processes.append((proc, server))
                     time.sleep(1)
                 if "url" in shot:
-                    if ad_block or popup_block:
-                        shot["ad_block"] = ad_block
-                        shot["popup_block"] = popup_block
-
                     if timeout and "timeout" not in shot:
                         shot["timeout"] = timeout
 
@@ -462,9 +423,6 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
                         # Add execution parameters to shot dict before creating ShotConfig
                         shot.update({
                             "log_console": log_console,
-                            "skip": skip,
-                            "fail": fail,
-                            "silent": silent
                         })
                         shot_config = ShotConfig(shot)
                         if shot_config.output and shot_config.output.lower().endswith('.pdf'):
@@ -476,7 +434,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
                                 browser_obj, shot_config,
                             )
                     except Exception as e:
-                        if fail or fail_on_error:
+                        if Config.fail or fail_on_error:
                             raise e
                         else:
                             click.echo(str(e), err=True)
@@ -587,7 +545,7 @@ def javascript(url, javascript, input, output, raw,
 
     If a JavaScript error occurs an exit code of 1 will be returned.
     """
-    setup_common_config(verbose, debug, silent)
+    setup_common_config(verbose, debug, silent, skip, fail)
 
     if not javascript:
         if input.startswith("gh:"):
@@ -598,20 +556,14 @@ def javascript(url, javascript, input, output, raw,
             with open(input, "r") as f:
                 javascript = f.read()
 
-    async def run_javascript():
-        browser_obj = await create_browser_context(
-            auth=auth, browser=browser, browser_args=browser_args,
-            user_agent=user_agent, reduced_motion=reduced_motion,
-            bypass_csp=bypass_csp, auth_username=auth_username,
-            auth_password=auth_password,
-        )
-
+    async def execute_js(browser_obj, **kwargs):
         shot_config = ShotConfig({
             "url": url,
             "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
             "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
             "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
-            "log_console": log_console, "skip": skip, "fail": fail, "silent": silent,
+            "log_console": log_console,
+            "ad_block": ad_block, "popup_block": popup_block,
             "return_js_result": True
         })
 
@@ -619,10 +571,24 @@ def javascript(url, javascript, input, output, raw,
         page, response_handler, result = await setup_page(
             browser_obj, shot_config,
         )
-        await cleanup_browser(browser_obj)
         return result
 
-    result = run_async(run_with_browser_cleanup(run_javascript()))
+    browser_kwargs = {
+        'auth': auth, 'browser': browser, 'browser_args': browser_args,
+        'user_agent': user_agent, 'reduced_motion': reduced_motion,
+        'bypass_csp': bypass_csp, 'auth_username': auth_username,
+        'auth_password': auth_password, 'timeout': timeout,
+    }
+
+    shot_config = ShotConfig({
+        "ad_block": ad_block, "popup_block": popup_block
+    })
+
+
+    result = run_async(run_with_browser_cleanup(
+        run_browser_command(execute_js, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block)
+    ))
+
     if raw:
         output.write(str(result))
         return
@@ -630,19 +596,14 @@ def javascript(url, javascript, input, output, raw,
     output.write("\n")
 
 
+
 @cli.command()
 @click.argument("url")
-@click.option(
-    "-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
-)
+@click.option("-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),)
 @click.option("-j", "--javascript", help="Execute this JS prior to creating the PDF")
-@click.option(
-    "--media-screen", is_flag=True, help="Use screen rather than print styles"
-)
+@click.option("--media-screen", is_flag=True, help="Use screen rather than print styles")
 @click.option("--landscape", is_flag=True, help="Use landscape orientation")
-@click.option(
-    "--scale", type=click.FloatRange(min=0.1, max=2.0), help="Scale of the webpage rendering",
-)
+@click.option("--scale", type=click.FloatRange(min=0.1, max=2.0), help="Scale of the webpage rendering",)
 @click.option("--print-background", is_flag=True, help="Print background graphics")
 @click.option("--pdf-css", help="Inject custom CSS for PDF generation")
 @common_shot_options
@@ -672,37 +633,38 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 
         shot-power-scraper pdf https://www.example.com/ -o - > example.pdf
     """
-    setup_common_config(verbose, debug, silent)
+    setup_common_config(verbose, debug, silent, skip, fail)
 
     url = url_or_file_path(url, _check_and_absolutize)
 
     if output is None:
         output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
 
-    async def run_pdf():
-        browser_obj = await create_browser_context(
-            auth=auth, browser=browser, browser_args=browser_args,
-            user_agent=user_agent, timeout=timeout,
-            reduced_motion=reduced_motion, bypass_csp=bypass_csp,
-            auth_username=auth_username, auth_password=auth_password,
-        )
+    shot_config = ShotConfig({
+        "url": url, "output": output, "javascript": javascript,
+        "pdf_landscape": landscape, "pdf_scale": scale or 1.0,
+        "pdf_print_background": print_background, "pdf_media_screen": media_screen,
+        "pdf_css": pdf_css, "wait": wait, "wait_for": wait_for, "timeout": timeout,
+        "trigger_lazy_load": trigger_lazy_load,
+        "ad_block": ad_block, "popup_block": popup_block
+    })
 
-        shot = ShotConfig({
-            "url": url, "output": output, "javascript": javascript,
-            "pdf_landscape": landscape, "pdf_scale": scale or 1.0,
-            "pdf_print_background": print_background, "pdf_media_screen": media_screen,
-            "pdf_css": pdf_css, "wait": wait, "wait_for": wait_for, "timeout": timeout,
-            "trigger_lazy_load": trigger_lazy_load
-        })
-
+    async def execute_pdf(browser_obj, **kwargs):
         pdf_data = await take_pdf(
-            browser_obj, shot, return_bytes=True
+            browser_obj, shot_config, return_bytes=True
         )
-
-        await cleanup_browser(browser_obj)
         return pdf_data
 
-    pdf_data = run_async(run_with_browser_cleanup(run_pdf()))
+    browser_kwargs = {
+        'auth': auth, 'browser': browser, 'browser_args': browser_args,
+        'user_agent': user_agent, 'timeout': timeout,
+        'reduced_motion': reduced_motion, 'bypass_csp': bypass_csp,
+        'auth_username': auth_username, 'auth_password': auth_password,
+    }
+
+    pdf_data = run_async(run_with_browser_cleanup(
+        run_browser_command(execute_pdf, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block)
+    ))
 
     if output == "-":
         sys.stdout.buffer.write(pdf_data)
@@ -739,27 +701,21 @@ def html(url, output, javascript, selector,
 
         shot-scraper html https://datasette.io/ -o index.html
     """
-    setup_common_config(verbose, debug, silent)
+    setup_common_config(verbose, debug, silent, skip, fail)
 
     if output is None:
         output = filename_for_url(url, ext="html", file_exists=os.path.exists)
 
-    async def run_html():
-        browser_obj = await create_browser_context(
-            auth=auth, browser=browser, browser_args=browser_args,
-            user_agent=user_agent, timeout=timeout,
-            bypass_csp=bypass_csp, auth_username=auth_username,
-            auth_password=auth_password,
-        )
+    shot_config = ShotConfig({
+        "url": url,
+        "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
+        "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
+        "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
+        "log_console": log_console,
+        "ad_block": ad_block, "popup_block": popup_block
+    })
 
-        shot_config = ShotConfig({
-            "url": url,
-            "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
-            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
-            "log_console": log_console, "skip": skip, "fail": fail, "silent": silent
-        })
-
+    async def execute_html(browser_obj, **kwargs):
         from shot_power_scraper.page_utils import setup_page
         page, response_handler = await setup_page(
             browser_obj, shot_config,
@@ -768,21 +724,30 @@ def html(url, output, javascript, selector,
         if selector:
             element = await page.select(selector)
             if element:
-                html = await element.get_html()
+                html_content = await element.get_html()
             else:
                 raise click.ClickException(f"Selector '{selector}' not found")
         else:
-            html = await page.get_content()
+            html_content = await page.get_content()
 
-        await cleanup_browser(browser_obj)
-        return html
+        return html_content
 
-    html = run_async(run_with_browser_cleanup(run_html()))
+    browser_kwargs = {
+        'auth': auth, 'browser': browser, 'browser_args': browser_args,
+        'user_agent': user_agent, 'timeout': timeout,
+        'bypass_csp': bypass_csp, 'auth_username': auth_username,
+        'auth_password': auth_password,
+    }
+
+    html_content = run_async(run_with_browser_cleanup(
+        run_browser_command(execute_html, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block)
+    ))
 
     if output == "-":
-        sys.stdout.write(html)
+        sys.stdout.write(html_content)
     else:
-        open(output, "w").write(html)
+        with open(output, "w") as f:
+            f.write(html_content)
         if not silent:
             click.echo(f"HTML snapshot of '{url}' written to '{output}'", err=True)
 
@@ -795,40 +760,26 @@ def html(url, output, javascript, selector,
     type=click.Choice(BROWSERS, case_sensitive=False),
     help="Which browser to use (nodriver automatically manages browsers)",
 )
-def install(browser):
+@click.option(
+    "browser_args", "--browser-arg", multiple=True, help="Additional arguments to pass to the browser",
+)
+def install(browser, browser_args):
     """
     Install note: nodriver automatically manages Chrome/Chromium installation.
+    Also detects and sets the default user agent for stealth mode.
 
     Usage:
 
         shot-scraper install
 
     No manual browser installation is required with nodriver.
+    This command will also detect the browser's user agent and set it as default.
     """
     click.echo("nodriver... does not require any drivers.")
     click.echo("Just needs Chrome or Chromium to be installed")
+    click.echo()
+    click.echo("Setting up default user agent for stealth mode...")
 
-
-@cli.command(name="set-default-user-agent")
-@click.option(
-    "--browser", "-b", default="chromium", type=click.Choice(BROWSERS, case_sensitive=False),
-    help="Which browser to use",
-)
-@click.option(
-    "browser_args", "--browser-arg", multiple=True, help="Additional arguments to pass to the browser",
-)
-def set_default_user_agent_cmd(browser, browser_args):
-    """
-    Detect the browser's user agent, remove 'HeadlessChrome', and store as default.
-
-    Usage:
-
-        shot-scraper set-default-user-agent
-
-    This will launch a browser instance, detect its user agent, modify it to
-    remove 'HeadlessChrome' (replacing with 'Chrome'), and store it in the
-    config file for future use.
-    """
     async def detect_and_set_user_agent():
         browser_kwargs = dict(headless=True, browser_args=browser_args or [])
         browser_obj = await uc.start(**browser_kwargs)
@@ -855,6 +806,7 @@ def set_default_user_agent_cmd(browser, browser_args):
             await cleanup_browser(browser_obj)
 
     run_async(run_with_browser_cleanup(detect_and_set_user_agent()))
+
 
 
 @cli.command(name="config")
@@ -947,12 +899,7 @@ def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced
 
         shot-scraper auth https://github.com/ auth.json
     """
-    async def run_auth():
-        browser_obj = await create_browser_context(
-            auth=None, interactive=True, devtools=devtools,
-            browser=browser, browser_args=browser_args,
-            user_agent=user_agent,
-        )
+    async def execute_auth(browser_obj, **kwargs):
         page = await browser_obj.get(url)
         click.echo("Hit <enter> after you have signed in:", err=True)
         input()
@@ -962,10 +909,18 @@ def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced
             "cookies": cookies.cookies if hasattr(cookies, 'cookies') else [],
             "origins": []
         }
-        await cleanup_browser(browser_obj)
         return context_state
 
-    context_state = run_async(run_with_browser_cleanup(run_auth()))
+    browser_kwargs = {
+        'interactive': True, 'devtools': devtools,
+        'browser': browser, 'browser_args': browser_args,
+        'user_agent': user_agent,
+    }
+
+    context_state = run_async(run_with_browser_cleanup(
+        run_browser_command(execute_auth, browser_kwargs)
+    ))
+
     context_json = json.dumps(context_state, indent=2) + "\n"
     if context_file == "-":
         click.echo(context_json)

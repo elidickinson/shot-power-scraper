@@ -1,4 +1,5 @@
 """Configuration classes for shot-power-scraper"""
+from shot_power_scraper.utils import get_default_ad_block, get_default_popup_block
 
 
 class ShotConfig:
@@ -16,8 +17,8 @@ class ShotConfig:
         self.skip_wait_for_load = shot.get("skip_wait_for_load", False)
         self.javascript = shot.get("javascript")
         self.full_page = not shot.get("height")
-        self.ad_block = shot.get("ad_block", False)
-        self.popup_block = shot.get("popup_block", False)
+        self.ad_block = shot.get("ad_block")
+        self.popup_block = shot.get("popup_block")
         self.skip_shot = shot.get("skip_shot")
         self.save_html = shot.get("save_html")
         self.width = shot.get("width")
@@ -29,12 +30,10 @@ class ShotConfig:
         self.pdf_scale = shot.get("pdf_scale", 1.0)
         self.pdf_print_background = shot.get("pdf_print_background", False)
         self.pdf_media_screen = shot.get("pdf_media_screen", False)
+        self.pdf_css = shot.get("pdf_css")
 
         # Execution options
         self.log_console = shot.get("log_console", False)
-        self.skip = shot.get("skip", False)
-        self.fail = shot.get("fail", False)
-        self.silent = shot.get("silent", False)
         self.return_js_result = shot.get("return_js_result", False)
         self.log_requests = shot.get("log_requests")
 
@@ -53,6 +52,15 @@ class ShotConfig:
             self.js_selectors.append(shot["js_selector"])
         if shot.get("js_selector_all"):
             self.js_selectors_all.append(shot["js_selector_all"])
+
+        self._resolve_blocking_config()
+
+    def _resolve_blocking_config(self):
+        """Resolve ad_block and popup_block values from config if not explicitly set."""
+        if self.ad_block is None:
+            self.ad_block = get_default_ad_block()
+        if self.popup_block is None:
+            self.popup_block = get_default_popup_block()
 
     def has_selectors(self):
         """Check if any selectors are defined"""

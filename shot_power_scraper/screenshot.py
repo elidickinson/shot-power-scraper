@@ -187,7 +187,7 @@ async def take_shot(
         console_logger = None
         if shot_config.log_console:
             from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=shot_config.silent)
+            console_logger = ConsoleLogger(silent=Config.silent)
             await console_logger.setup(page)
 
     viewport = get_viewport(shot_config.width, shot_config.height)
@@ -267,17 +267,17 @@ async def take_shot(
                 with open(html_filename, 'w', encoding='utf-8') as f:
                     f.write(html_content)
 
-                if not shot_config.silent:
+                if not Config.silent:
                     click.echo(f"HTML content saved to '{html_filename}'", err=True)
             else:
-                if not shot_config.silent:
+                if not Config.silent:
                     click.echo("Cannot save HTML when output is stdout", err=True)
 
         except Exception as e:
-            if not shot_config.silent:
+            if not Config.silent:
                 click.echo(f"Failed to save HTML: {e}", err=True)
 
-    if not shot_config.silent:
+    if not Config.silent:
         click.echo(message, err=True)
 
     # Always return something for consistency
@@ -289,7 +289,6 @@ async def generate_pdf(page, options):
 
     # Build CDP print options - always use letter size (8.5x11 inches)
     print_options = {
-        "landscape": options.get("landscape"),
         "display_header_footer": False,
         "print_background": options.get("print_background"),
         "scale": options.get("scale"),
@@ -301,10 +300,7 @@ async def generate_pdf(page, options):
         "paper_height": 11,   # Letter size height
     }
 
-    # If landscape, swap width and height
-    if options.get("landscape"):
-        print_options["paper_width"] = 11
-        print_options["paper_height"] = 8.5
+
 
     # Handle media type
     if options.get("media_screen"):
@@ -420,7 +416,7 @@ async def take_pdf(
         console_logger = None
         if shot_config.log_console:
             from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=shot_config.silent)
+            console_logger = ConsoleLogger(silent=Config.silent)
             await console_logger.setup(page)
 
     viewport = get_viewport(shot_config.width, shot_config.height)
@@ -437,6 +433,7 @@ async def take_pdf(
         "scale": shot_config.pdf_scale,
         "print_background": shot_config.pdf_print_background,
         "media_screen": shot_config.pdf_media_screen,
+        "pdf_css": shot_config.pdf_css,
     }
 
     if Config.verbose:
@@ -456,7 +453,7 @@ async def take_pdf(
                 f.write(pdf_data)
             message = f"PDF of '{url}' written to '{shot_config.output}'"
 
-    if not shot_config.silent:
+    if not Config.silent:
         click.echo(message, err=True)
 
     return None

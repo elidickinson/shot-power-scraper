@@ -15,6 +15,9 @@ class Config:
     verbose = False
     silent = False
     debug = False
+    skip = False
+    fail = False
+
 
 
 async def create_browser_context(
@@ -127,7 +130,7 @@ async def create_browser_context(
     return browser_obj
 
 
-async def setup_blocking_extensions(extensions, ad_block, popup_block, verbose, silent):
+async def setup_blocking_extensions(extensions, ad_block, popup_block):
     """Setup blocking extensions based on requested flags"""
     import tempfile
     import shutil
@@ -135,7 +138,7 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, verbose, 
     base_extension_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
 
     if not os.path.exists(base_extension_path):
-        if not silent:
+        if not Config.silent:
             click.echo(f"Warning: Base extension not found at {base_extension_path}", err=True)
         return
 
@@ -147,11 +150,11 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, verbose, 
 
     # Create custom rules.json based on selected filters
     rules_path = os.path.join(temp_ext_dir, "rules.json")
-    create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path, verbose)
+    create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path)
 
     extensions.append(temp_ext_dir)
 
-    if verbose:
+    if Config.verbose:
         enabled_filters = []
         if ad_block:
             enabled_filters.append("ad blocking")
@@ -160,7 +163,7 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, verbose, 
         click.echo(f"Blocking enabled: {', '.join(enabled_filters)}", err=True)
 
 
-def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path, verbose):
+def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path):
     """Create a rules.json file with only the selected filter categories"""
     import os
 
@@ -178,7 +181,7 @@ def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path
                 rule["id"] = rule_id
                 rule_id += 1
             combined_rules.extend(rules)
-            if verbose:
+            if Config.verbose:
                 click.echo(f"Added {len(rules)} ad-block rules", err=True)
 
     # Popup blocking rules
@@ -191,20 +194,20 @@ def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path
                 rule["id"] = rule_id
                 rule_id += 1
             combined_rules.extend(rules)
-            if verbose:
+            if Config.verbose:
                 click.echo(f"Added {len(rules)} popup-block rules", err=True)
 
     # Limit to Chrome's 30,000 rule limit
     if len(combined_rules) > 30000:
         combined_rules = combined_rules[:30000]
-        if verbose:
+        if Config.verbose:
             click.echo(f"Limited rules to 30,000 (Chrome's limit)", err=True)
 
     # Write combined rules
     with open(rules_path, 'w') as f:
         json.dump(combined_rules, f, indent=2)
 
-    if verbose:
+    if Config.verbose:
         click.echo(f"Created {len(combined_rules)} total blocking rules", err=True)
 
 
