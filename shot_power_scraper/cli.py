@@ -396,10 +396,6 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
     """
     setup_common_config(verbose, debug, silent)
 
-    if debug:
-        import logging
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
     if (har or har_zip) and not har_file:
         har_file = filename_for_url(
             "trace", ext="har.zip" if har_zip else "har", file_exists=os.path.exists
@@ -523,10 +519,6 @@ def accessibility(url, output, javascript,
     """
     setup_common_config(verbose, debug, silent)
 
-    if debug:
-        import logging
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
     async def run_accessibility():
         browser_obj = await create_browser_context(
             auth=auth, timeout=timeout, bypass_csp=bypass_csp,
@@ -624,10 +616,6 @@ def javascript(url, javascript, input, output, raw,
     If a JavaScript error occurs an exit code of 1 will be returned.
     """
     setup_common_config(verbose, debug, silent)
-
-    if debug:
-        import logging
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     if not javascript:
         if input.startswith("gh:"):
@@ -780,10 +768,6 @@ def html(url, output, javascript, selector,
         shot-scraper html https://datasette.io/ -o index.html
     """
     setup_common_config(verbose, debug, silent)
-
-    if debug:
-        import logging
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     if output is None:
         output = filename_for_url(url, ext="html", file_exists=os.path.exists)
