@@ -79,6 +79,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from shot_power_scraper.browser import create_browser_context, Config
 from shot_power_scraper.screenshot import take_shot
+from shot_power_scraper.shot_config import ShotConfig
 from shot_power_scraper.cli import browser_args_option
 from shot_power_scraper.page_utils import evaluate_js, detect_navigation_error, setup_page
 
@@ -285,7 +286,7 @@ async def shot(request: ShotRequest):
         browser = await get_browser()
 
         # Build shot configuration
-        shot_config = {
+        shot_config = ShotConfig({
             "url": request.url,
             "width": request.width,
             "height": request.height,
@@ -303,14 +304,14 @@ async def shot(request: ShotRequest):
             "skip_cloudflare_check": request.skip_cloudflare_check,
             "skip_wait_for_load": request.skip_wait_for_load,
             "trigger_lazy_load": request.trigger_lazy_load,
-        }
+            "silent": True
+        })
 
         # Take the screenshot
         screenshot_bytes = await take_shot(
             browser,
             shot_config,
             return_bytes=True,
-            silent=True
         )
 
         # Determine content type based on quality setting
@@ -340,17 +341,17 @@ async def html(request: HtmlRequest):
         browser = await get_browser()
 
         # Use setup_page for consistent page setup including Cloudflare detection
-        setup_config = {
+        shot_config = ShotConfig({
+            "url": request.url,
             "timeout": request.timeout // 1000,  # Convert to seconds
             "wait": request.wait,
-            "javascript": request.javascript
-        }
+            "javascript": request.javascript,
+            "silent": True
+        })
         
         page, response_handler = await setup_page(
             browser,
-            request.url,
-            setup_config,
-            silent=True
+            shot_config,
         )
 
         # Extract HTML

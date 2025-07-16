@@ -186,14 +186,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
 
 async def setup_page(
     browser_obj,
-    url,
-    config,
-    log_console=False,
-    skip=False,
-    fail=False,
-    silent=False,
-    log_requests=None,
-    return_js_result=False,
+    shot_config,
 ):
     """
     Unified page setup function that handles common operations:
@@ -223,7 +216,7 @@ async def setup_page(
             return False
     
     # Convert URL to proper format
-    url = url_or_file_path(url, file_exists=_check_and_absolutize)
+    url = url_or_file_path(shot_config.url, file_exists=_check_and_absolutize)
     
     if Config.verbose:
         click.echo(f"Creating new page for: {url}", err=True)
@@ -233,8 +226,8 @@ async def setup_page(
     
     # Set up console logging BEFORE navigating
     console_logger = None
-    if log_console:
-        console_logger = ConsoleLogger(silent=silent)
+    if shot_config.log_console:
+        console_logger = ConsoleLogger(silent=shot_config.silent)
         await console_logger.setup(page)
         if Config.verbose:
             click.echo("Console logging enabled", err=True)
@@ -249,11 +242,11 @@ async def setup_page(
     await page.get(url)
     
     # Wait for window load event unless skipped
-    if not config.get("skip_wait_for_load", False):
+    if not shot_config.skip_wait_for_load:
         if Config.verbose:
             click.echo(f"Waiting for window load event...", err=True)
         
-        timeout = config.get("timeout", 30)
+        timeout = shot_config.timeout
         await page.evaluate(f"""
             new Promise((resolve) => {{
                 if (document.readyState === 'complete') {{
@@ -269,15 +262,15 @@ async def setup_page(
     response_status, response_url = await response_handler.wait_for_response(timeout=5)
     if response_status is not None:
         from shot_power_scraper.cli import skip_or_fail
-        skip_or_fail(response_status, response_url, skip, fail)
+        skip_or_fail(response_status, response_url, shot_config.skip, shot_config.fail)
     
     # Automatic Cloudflare detection and waiting
-    if not config.get("skip_cloudflare_check", False) and await detect_cloudflare_challenge(page):
-        if not silent:
+    if not shot_config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
+        if not shot_config.silent:
             click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
         success = await wait_for_cloudflare_bypass(page)
         if not success:
-            if not silent:
+            if not shot_config.silent:
                 click.echo("Warning: Cloudflare challenge may still be active", err=True)
     
     # Check if page failed to load
@@ -294,7 +287,7 @@ async def setup_page(
     
     
     # Wait if specified
-    wait_ms = config.get("wait")
+    wait_ms = shot_config.wait
     if wait_ms:
         if Config.verbose:
             click.echo(f"Waiting {wait_ms}ms before processing...", err=True)
@@ -302,23 +295,23 @@ async def setup_page(
     
     # Execute JavaScript if provided
     js_result = None
-    javascript = config.get("javascript")
+    javascript = shot_config.javascript
     if javascript:
         if Config.verbose:
             click.echo(f"Executing JavaScript: {javascript[:50]}{'...' if len(javascript) > 50 else ''}", err=True)
         js_result = await evaluate_js(page, javascript)
     
     # Wait for condition if specified
-    wait_for = config.get("wait_for")
+    wait_for = shot_config.wait_for
     if wait_for:
-        timeout_seconds = config.get("timeout", 30)
+        timeout_seconds = shot_config.timeout
         await wait_for_condition(page, wait_for, timeout_seconds)
     
     # Trigger lazy load if requested
-    if config.get("trigger_lazy_load", False):
+    if shot_config.trigger_lazy_load:
         await trigger_lazy_load(page)
     
-    if return_js_result:
+    if shot_config.return_js_result:
         return page, response_handler, js_result
     else:
         return page, response_handler

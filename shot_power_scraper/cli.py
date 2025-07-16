@@ -13,6 +13,7 @@ import asyncio
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent, get_default_ad_block, get_default_popup_block
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser, setup_blocking_extensions
 from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport
+from shot_power_scraper.shot_config import ShotConfig
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -277,7 +278,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
     ad_block, popup_block = resolve_blocking_config(ad_block, popup_block)
     interactive = interactive or devtools
 
-    shot_config = {
+    shot_config = ShotConfig({
         "url": url, "selectors": selectors, "selectors_all": selectors_all,
         "js_selectors": js_selectors, "js_selectors_all": js_selectors_all,
         "javascript": javascript, "width": width, "height": height, "quality": quality,
@@ -287,8 +288,10 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         "wait": wait, "wait_for": wait_for, "timeout": timeout,
         "skip_cloudflare_check": skip_cloudflare_check,
         "skip_wait_for_load": skip_wait_for_load,
-        "trigger_lazy_load": trigger_lazy_load, "verbose": verbose
-    }
+        "trigger_lazy_load": trigger_lazy_load, "verbose": verbose,
+        "log_console": log_console, "skip": skip, "fail": fail, "silent": silent,
+        "log_requests": log_requests
+    })
 
     async def execute_shot(browser_obj, **kwargs):
         if interactive:
@@ -307,15 +310,12 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         if output == "-":
             shot_bytes = await take_shot(
                 context, shot_config, return_bytes=True, use_existing_page=use_existing_page,
-                log_requests=log_requests, log_console=log_console, silent=silent,
             )
             sys.stdout.buffer.write(shot_bytes)
         else:
-            shot_config["output"] = str(output)
+            shot_config.output = str(output)
             await take_shot(
                 context, shot_config, use_existing_page=use_existing_page,
-                log_requests=log_requests, log_console=log_console,
-                skip=skip, fail=fail, silent=silent,
             )
 
     browser_kwargs = {
@@ -462,16 +462,21 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
                         shot["timeout"] = timeout
 
                     try:
-                        output_file = shot.get("output", "")
-                        if output_file.lower().endswith('.pdf'):
+                        # Add execution parameters to shot dict before creating ShotConfig
+                        shot.update({
+                            "log_console": log_console,
+                            "skip": skip,
+                            "fail": fail,
+                            "silent": silent
+                        })
+                        shot_config = ShotConfig(shot)
+                        if shot_config.output and shot_config.output.lower().endswith('.pdf'):
                             await take_pdf(
-                                browser_obj, shot, log_console=log_console,
-                                skip=skip, fail=fail, silent=silent,
+                                browser_obj, shot_config,
                             )
                         else:
                             await take_shot(
-                                browser_obj, shot, log_console=log_console,
-                                skip=skip, fail=fail, silent=silent,
+                                browser_obj, shot_config,
                             )
                     except Exception as e:
                         if fail or fail_on_error:
@@ -521,16 +526,17 @@ def accessibility(url, output, javascript,
             auth_username=auth_username, auth_password=auth_password,
         )
 
-        config = {
+        shot_config = ShotConfig({
+            "url": url,
             "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
             "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
-            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load
-        }
+            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
+            "log_console": log_console, "skip": skip, "fail": fail, "silent": silent
+        })
 
         from shot_power_scraper.page_utils import setup_page
         page, response_handler = await setup_page(
-            browser_obj, url, config, log_console=log_console,
-            skip=skip, fail=fail, silent=silent,
+            browser_obj, shot_config,
         )
 
         snapshot = {"message": "Accessibility tree dumping not implemented"}
@@ -630,17 +636,18 @@ def javascript(url, javascript, input, output, raw,
             auth_password=auth_password,
         )
 
-        config = {
+        shot_config = ShotConfig({
+            "url": url,
             "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
             "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
-            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load
-        }
+            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
+            "log_console": log_console, "skip": skip, "fail": fail, "silent": silent,
+            "return_js_result": True
+        })
 
         from shot_power_scraper.page_utils import setup_page
         page, response_handler, result = await setup_page(
-            browser_obj, url, config, log_console=log_console,
-            skip=skip, fail=fail, silent=silent,
-            return_js_result=True,
+            browser_obj, shot_config,
         )
         await cleanup_browser(browser_obj)
         return result
@@ -710,17 +717,16 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
             auth_username=auth_username, auth_password=auth_password,
         )
 
-        shot = {
+        shot = ShotConfig({
             "url": url, "output": output, "javascript": javascript,
             "pdf_landscape": landscape, "pdf_scale": scale or 1.0,
             "pdf_print_background": print_background, "pdf_media_screen": media_screen,
             "pdf_css": pdf_css, "wait": wait, "wait_for": wait_for, "timeout": timeout,
             "trigger_lazy_load": trigger_lazy_load
-        }
+        })
 
         pdf_data = await take_pdf(
-            browser_obj, shot, return_bytes=True, log_console=log_console,
-            skip=skip, fail=fail, silent=silent
+            browser_obj, shot, return_bytes=True
         )
 
         await cleanup_browser(browser_obj)
@@ -776,16 +782,17 @@ def html(url, output, javascript, selector,
             auth_password=auth_password,
         )
 
-        config = {
+        shot_config = ShotConfig({
+            "url": url,
             "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
             "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
-            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load
-        }
+            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
+            "log_console": log_console, "skip": skip, "fail": fail, "silent": silent
+        })
 
         from shot_power_scraper.page_utils import setup_page
         page, response_handler = await setup_page(
-            browser_obj, url, config, log_console=log_console,
-            skip=skip, fail=fail, silent=silent,
+            browser_obj, shot_config,
         )
 
         if selector:

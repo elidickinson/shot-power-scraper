@@ -91,7 +91,8 @@ def test_multi_error_on_non_list(input):
     ),
 )
 def test_multi_noclobber(mocker, args, expected_shot_count):
-    take_shot = mocker.patch("shot_power_scraper.cli.take_shot")
+    # Mock the take_shot function where it's imported in cli.py
+    take_shot = mocker.patch("shot_power_scraper.cli.take_shot", new_callable=mocker.AsyncMock)
     runner = CliRunner()
     with runner.isolated_filesystem():
         yaml = textwrap.dedent(
@@ -298,13 +299,15 @@ def test_pdf_basic():
     assert "Create a PDF" in result.output
 
 
-def test_config_save_load():
+def test_config_save_load(mocker, tmp_path):
     """Test config persistence works"""
     from shot_power_scraper.utils import save_config, load_config
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        # Test save and load
-        config = {"ad_block": True, "user_agent": "test"}
-        save_config(config)
-        loaded = load_config()
-        assert loaded == config
+    
+    # Mock the config directory to use a temporary path
+    mocker.patch("shot_power_scraper.utils.get_config_dir", return_value=tmp_path)
+    
+    # Test save and load
+    config = {"ad_block": True, "user_agent": "test"}
+    save_config(config)
+    loaded = load_config()
+    assert loaded == config
