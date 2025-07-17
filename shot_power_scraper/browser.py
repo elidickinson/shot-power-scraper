@@ -7,7 +7,7 @@ import nodriver as uc
 import pathlib
 import tempfile
 import shutil
-from shot_power_scraper.utils import get_default_user_agent
+from shot_power_scraper.shot_config import get_default_user_agent
 
 
 class Config:
@@ -39,10 +39,6 @@ async def create_browser_context(
     """Create and configure a browser instance with nodriver"""
     # Convert browser_args tuple to list and add user agent if needed
     browser_args_list = list(browser_args) if browser_args else []
-
-    # Use stored default user agent if no explicit user agent is provided
-    if not user_agent:
-        user_agent = get_default_user_agent()
 
     # Add user agent to browser args if specified or found in config
     if user_agent:
@@ -77,8 +73,8 @@ async def create_browser_context(
             browser_args_list.append(extension_arg)
 
             # Only allow our extensions (disable built-in ones)
-            for ext_path in extension_paths:
-                browser_args_list.append(f"--disable-extensions-except-{ext_path}")
+            # for ext_path in extension_paths:
+            #     browser_args_list.append(f"--disable-extensions-except-{ext_path}")
 
             # Enable extension loading from command line
             browser_args_list.append("--disable-features=DisableLoadExtensionCommandLineSwitch")

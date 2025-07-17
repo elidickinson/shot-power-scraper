@@ -10,10 +10,10 @@ import click
 import nodriver as uc
 import asyncio
 
-from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent
+from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser, setup_blocking_extensions
 from shot_power_scraper.screenshot import take_shot, take_pdf
-from shot_power_scraper.shot_config import ShotConfig
+from shot_power_scraper.shot_config import ShotConfig, set_default_user_agent
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -287,7 +287,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
     browser_kwargs = {
         'auth': auth, 'interactive': interactive, 'devtools': devtools,
         'scale_factor': scale_factor, 'browser': browser,
-        'browser_args': browser_args, 'user_agent': user_agent,
+        'browser_args': browser_args, 'user_agent': shot_config.user_agent,
         'timeout': timeout, 'reduced_motion': reduced_motion,
         'bypass_csp': bypass_csp, 'auth_username': auth_username,
         'auth_password': auth_password
@@ -561,6 +561,7 @@ def javascript(url, javascript, input, output, raw,
             "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
             "log_console": log_console,
             "ad_block": ad_block, "popup_block": popup_block,
+            "user_agent": user_agent,
             "return_js_result": True
         })
 
@@ -570,16 +571,16 @@ def javascript(url, javascript, input, output, raw,
         )
         return result
 
+    shot_config = ShotConfig({
+        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent
+    })
+
     browser_kwargs = {
         'auth': auth, 'browser': browser, 'browser_args': browser_args,
-        'user_agent': user_agent, 'reduced_motion': reduced_motion,
+        'user_agent': shot_config.user_agent, 'reduced_motion': reduced_motion,
         'bypass_csp': bypass_csp, 'auth_username': auth_username,
         'auth_password': auth_password, 'timeout': timeout,
     }
-
-    shot_config = ShotConfig({
-        "ad_block": ad_block, "popup_block": popup_block
-    })
 
 
     result = run_browser_command(
@@ -643,7 +644,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
         "pdf_print_background": print_background, "pdf_media_screen": media_screen,
         "pdf_css": pdf_css, "wait": wait, "wait_for": wait_for, "timeout": timeout,
         "trigger_lazy_load": trigger_lazy_load,
-        "ad_block": ad_block, "popup_block": popup_block
+        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent
     })
 
     async def execute_pdf(browser_obj, **kwargs):
@@ -654,7 +655,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 
     browser_kwargs = {
         'auth': auth, 'browser': browser, 'browser_args': browser_args,
-        'user_agent': user_agent, 'timeout': timeout,
+        'user_agent': shot_config.user_agent, 'timeout': timeout,
         'reduced_motion': reduced_motion, 'bypass_csp': bypass_csp,
         'auth_username': auth_username, 'auth_password': auth_password,
     }
@@ -709,7 +710,7 @@ def html(url, output, javascript, selector,
         "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
         "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
         "log_console": log_console,
-        "ad_block": ad_block, "popup_block": popup_block
+        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent
     })
 
     async def execute_html(browser_obj, **kwargs):
@@ -731,7 +732,7 @@ def html(url, output, javascript, selector,
 
     browser_kwargs = {
         'auth': auth, 'browser': browser, 'browser_args': browser_args,
-        'user_agent': user_agent, 'timeout': timeout,
+        'user_agent': shot_config.user_agent, 'timeout': timeout,
         'bypass_csp': bypass_csp, 'auth_username': auth_username,
         'auth_password': auth_password,
     }
@@ -788,7 +789,7 @@ def install(browser, browser_args):
         modified_user_agent = user_agent.replace("HeadlessChrome", "Chrome")
         set_default_user_agent(modified_user_agent)
 
-        from shot_power_scraper.utils import get_config_file
+        from shot_power_scraper.shot_config import get_config_file
         click.echo(f"Original user agent: {user_agent}")
         click.echo(f"Modified user agent: {modified_user_agent}")
         click.echo(f"Saved default user agent to: {get_config_file()}")
@@ -833,7 +834,7 @@ def config_cmd(ad_block, popup_block, user_agent, clear, show):
         shot-power-scraper config --clear
         shot-power-scraper config --show
     """
-    from shot_power_scraper.utils import load_config, set_default_ad_block, set_default_popup_block, set_default_user_agent, get_config_file
+    from shot_power_scraper.shot_config import load_config, set_default_ad_block, set_default_popup_block, set_default_user_agent, get_config_file
     import os
 
     if clear:
@@ -899,10 +900,12 @@ def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced
         }
         return context_state
 
+    shot_config = ShotConfig({"user_agent": user_agent})
+
     browser_kwargs = {
         'interactive': True, 'devtools': devtools,
         'browser': browser, 'browser_args': browser_args,
-        'user_agent': user_agent,
+        'user_agent': shot_config.user_agent,
     }
 
     context_state = run_browser_command(
