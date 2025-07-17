@@ -12,7 +12,7 @@ import asyncio
 
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path, set_default_user_agent
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser, setup_blocking_extensions
-from shot_power_scraper.screenshot import take_shot, take_pdf, get_viewport
+from shot_power_scraper.screenshot import take_shot, take_pdf
 from shot_power_scraper.shot_config import ShotConfig
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
@@ -128,8 +128,7 @@ def common_shot_options(fn):
     click.option("--skip-wait-for-load", is_flag=True, help="Skip waiting for window load event")(fn)
     click.option("--timeout", type=int, help="Wait this many milliseconds before failing")(fn)
     click.option("--wait-for", help="Wait until this JS expression returns true")(fn)
-    click.option("--wait", type=int, default=250,
-                help="Wait this many milliseconds before taking the screenshot (default: 250)")(fn)
+    click.option("--wait", type=int, help="Wait this many milliseconds before taking the screenshot (default: 250)")(fn)
 
     # Browser options
     click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")(fn)
@@ -265,9 +264,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
     async def shot_execution(browser_obj):
         if interactive:
             page = await browser_obj.get(url)
-            if width or height:
-                viewport = get_viewport(width, height)
-                await page.set_window_size(viewport["width"], viewport["height"])
+            await page.set_window_size(shot_config.width, shot_config.height)
             click.echo("Hit <enter> to take the shot and close the browser window:", err=True)
             input()
             context = page

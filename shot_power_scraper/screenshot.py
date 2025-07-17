@@ -14,25 +14,30 @@ from shot_power_scraper.utils import filename_for_url, url_or_file_path
 from shot_power_scraper.shot_config import ShotConfig
 
 
-
-async def _save_screenshot_with_temp_file(page, format, quality, full_page):
+async def _save_screenshot_with_temp_file(page_or_element, format, quality=None, full_page=False):
     """Save screenshot to temporary file and return bytes"""
     suffix = '.jpg' if format == "jpeg" else '.png'
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-        await _save_screenshot(page, tmp.name, format, quality, full_page)
+        await _save_screenshot(page_or_element, tmp.name, format, quality, full_page)
         with open(tmp.name, 'rb') as f:
             bytes_data = f.read()
         os.unlink(tmp.name)
         return bytes_data
 
 
-async def _save_screenshot(page, output, format, quality, full_page):
+async def _save_screenshot(page_or_element, output, format, quality=None, full_page=False):
     """Save screenshot to file"""
-    # Note: nodriver doesn't support quality parameter for JPEG screenshots
+    # nodriver doesn't support `quality` param
     if format == "jpeg" and quality and not getattr(_save_screenshot, '_quality_warning_shown', False):
         click.echo("Warning: JPEG quality parameter is not supported by nodriver and will be ignored", err=True)
         _save_screenshot._quality_warning_shown = True
-    await page.save_screenshot(output, format=format, full_page=full_page)
+
+    # omit the full_page param when it's not true becaues on a page (tab) the default is false
+    # and for an element it doesn't have full_page at all.
+    if full_page:
+        await page_or_element.save_screenshot(output, format=format, full_page=True)
+    else:
+        await page_or_element.save_screenshot(output, format=format)
 
 
 def _check_and_absolutize(filepath):
@@ -45,17 +50,6 @@ def _check_and_absolutize(filepath):
     except OSError:
         # On Windows, instantiating a Path object on `http://` or `https://` will raise an exception
         return False
-
-
-def get_viewport(width, height):
-    """Get viewport configuration"""
-    if width or height:
-        return {
-            "width": width or 1280,
-            "height": height or 720,
-        }
-    else:
-        return {}
 
 
 def js_selector_javascript(js_selectors, js_selectors_all):
@@ -84,9 +78,7 @@ def js_selector_javascript(js_selectors, js_selectors_all):
         Array.from(
           document.getElementsByTagName('*')
         ).filter(el => {}).forEach(el => el.classList.add("{}"));
-        """.format(
-                    js_selector_all, klass
-                )
+        """.format(js_selector_all, klass)
             )
         )
     js_selector_javascript = "() => {" + "\n".join(js_blocks) + "}"
@@ -188,10 +180,8 @@ async def take_shot(
             console_logger = ConsoleLogger(silent=Config.silent)
             await console_logger.setup(page)
 
-    viewport = get_viewport(shot_config.width, shot_config.height)
-    if viewport:
-        # nodriver doesn't have set_viewport_size, we'll use window size instead
-        await page.set_window_size(viewport["width"], viewport["height"])
+    # Set window size using shot_config dimensions
+    await page.set_window_size(shot_config.width, shot_config.height)
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
     # are now handled by setup_page() for new pages
@@ -209,6 +199,7 @@ async def take_shot(
         ) = js_selector_javascript(shot_config.js_selectors, shot_config.js_selectors_all)
         shot_config.selectors.extend(extra_selectors)
         shot_config.selectors_all.extend(extra_selectors_all)
+        print(js_selector_js)
         await evaluate_js(page, js_selector_js)
 
     if shot_config.has_selectors():
@@ -217,25 +208,20 @@ async def take_shot(
             shot_config.selectors, shot_config.selectors_all, shot_config.padding
         )
         await evaluate_js(page, selector_js)
-        try:
-            # nodriver element screenshot with selector
-            element = await page.select(selector_to_shoot)
-            if element:
-                if return_bytes:
-                    return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page)
-                else:
-                    if Config.verbose:
-                        click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
-                    await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page)
-                    message = "Screenshot of '{}' on '{}' written to '{}'".format(
-                        ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), url, shot_config.output
-                    )
+        # nodriver element screenshot with selector
+        element = await page.select(selector_to_shoot)
+        if element:
+            if return_bytes:
+                return await _save_screenshot_with_temp_file(element, format, shot_config.quality, full_page)
             else:
-                raise click.ClickException(f"Could not find element matching selector: {selector_to_shoot}")
-        except Exception as e:
-            raise click.ClickException(
-                f"Timed out while waiting for element to become available.\n\n{e}"
-            )
+                if Config.verbose:
+                    click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
+                await _save_screenshot(element, shot_config.output, format, shot_config.quality)
+                message = "Screenshot of '{}' on '{}' written to '{}'".format(
+                    ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), url, shot_config.output
+                )
+        else:
+            raise click.ClickException(f"Could not find element matching selector: {selector_to_shoot}")
     else:
         if shot_config.skip_shot:
             message = "Skipping screenshot of '{}'".format(url)
@@ -417,10 +403,8 @@ async def take_pdf(
             console_logger = ConsoleLogger(silent=Config.silent)
             await console_logger.setup(page)
 
-    viewport = get_viewport(shot_config.width, shot_config.height)
-    if viewport:
-        # nodriver doesn't have set_viewport_size, we'll use window size instead
-        await page.set_window_size(viewport["width"], viewport["height"])
+    # Set window size using shot_config dimensions
+    await page.set_window_size(shot_config.width, shot_config.height)
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
     # are now handled by setup_page() for new pages
