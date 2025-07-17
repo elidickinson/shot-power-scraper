@@ -102,3 +102,46 @@ The following examples use the original `shot-scraper`, but the concepts can be 
 - The [Datasette Documentation](https://docs.datasette.io/en/latest/) uses screenshots taken by `shot-scraper`.
 - Ben Welsh built [@newshomepages](https://twitter.com/newshomepages), a Twitter bot that uses `shot-scraper` and GitHub Actions to take and publish screenshots of news homepages.
 - [scrape-hacker-news-by-domain](https://github.com/simonw/scrape-hacker-news-by-domain) uses `shot-scraper javascript` to scrape a web page.
+
+## Code Architecture: `shot-power-scraper shot` Execution Path
+
+This section outlines the major code path and functions called when executing `shot-power-scraper shot ...`.
+
+### Entry Point and Flow
+1. **CLI Entry** (`cli.py:shot()`) - Parse arguments, create centralized `ShotConfig` object with all parameters
+2. **Browser Command** (`cli.py:run_browser_command()`) - Orchestrate browser lifecycle using `shot_config`
+3. **Extension Setup** (`browser.py:setup_blocking_extensions()`) - Configure ad/popup blocking based on `shot_config`
+4. **Browser Context** (`browser.py:create_browser_context()`) - Initialize nodriver browser using `shot_config` parameters
+5. **Screenshot Execution** (`cli.py:execute_shot()`) - Handle interactive mode and viewport
+6. **Core Screenshot** (`screenshot.py:take_shot()`) - Main screenshot logic with `shot_config`
+7. **Page Setup** (`page_utils.py:navigate_to_page()`) - Navigate, wait, handle errors using `shot_config`
+8. **Screenshot Capture** (`screenshot.py:_save_screenshot()`) - Take and save image
+9. **Browser Cleanup** (`browser.py:cleanup_browser()`) - Stop browser and cleanup
+10. **Async Wrapper** (`cli.py:run_nodriver_async()`) - Setup nodriver event loop
+
+### Key Modules and Responsibilities
+- **cli.py** - Main entry point, CLI parsing, command orchestration
+- **shot_config.py** - Centralized configuration object with all parameters (browser, screenshot, execution options) and config file management
+- **browser.py** - Browser instance management, extension setup, cleanup
+- **screenshot.py** - Core screenshot logic, selector handling, image capture
+- **page_utils.py** - Page navigation, error detection, Cloudflare handling, JavaScript execution
+- **utils.py** - Utility functions for filename generation, URL processing, GitHub script loading
+
+### Architecture Design
+- **Centralized Configuration**: All parameters (browser options, screenshot settings, execution flags) are consolidated in `ShotConfig`
+- **Simplified Interfaces**: `run_browser_command()` takes just `command_func` and `shot_config` parameters
+- **Config File Integration**: Configuration file loading and defaults are handled directly in `ShotConfig.__init__()`
+- **Consistent Pattern**: All CLI commands follow the same `ShotConfig` → `run_browser_command()` pattern
+
+### Major Operations
+- Configuration parsing, validation, and config file fallback handling
+- Browser context initialization with anti-detection features using consolidated configuration
+- Optional extension loading for ad/popup blocking
+- Page navigation with error detection and Cloudflare bypass
+- JavaScript execution and custom waiting conditions
+- Element selector processing (CSS/JS selectors)
+- Screenshot capture (full page or element-specific)
+- Optional HTML content saving
+- Comprehensive cleanup of browser and temporary files
+
+The architecture is fully async-based using nodriver for enhanced stealth capabilities and automatic anti-detection. All configuration is centralized through `ShotConfig` for consistency and maintainability.

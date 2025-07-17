@@ -263,16 +263,16 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
     })
 
     async def shot_execution(browser_obj):
+        context = browser_obj
+        use_existing_page = False
         if interactive:
-            page = await browser_obj.get(url)
+            from shot_power_scraper.page_utils import navigate_to_page
+            page, response_handler = await navigate_to_page(browser_obj, shot_config)
             await page.set_window_size(shot_config.width, shot_config.height)
             click.echo("Hit <enter> to take the shot and close the browser window:", err=True)
             input()
             context = page
             use_existing_page = True
-        else:
-            context = browser_obj
-            use_existing_page = False
 
         if output == "-":
             shot_bytes = await take_shot(
@@ -560,8 +560,8 @@ def javascript(url, javascript, input, output, raw,
             "return_js_result": True
         })
 
-        from shot_power_scraper.page_utils import setup_page
-        page, response_handler, result = await setup_page(
+        from shot_power_scraper.page_utils import navigate_to_page
+        page, response_handler, result = await navigate_to_page(
             browser_obj, shot_config,
         )
         return result
@@ -699,8 +699,8 @@ def html(url, output, javascript, selector,
     })
 
     async def execute_html(browser_obj, **kwargs):
-        from shot_power_scraper.page_utils import setup_page
-        page, response_handler = await setup_page(
+        from shot_power_scraper.page_utils import navigate_to_page
+        page, response_handler = await navigate_to_page(
             browser_obj, shot_config,
         )
 

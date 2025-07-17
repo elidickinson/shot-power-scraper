@@ -165,26 +165,20 @@ async def take_shot(
         shot_config.output = filename_for_url(url, ext="png", file_exists=os.path.exists)
 
     if not use_existing_page:
-        from shot_power_scraper.page_utils import setup_page
+        from shot_power_scraper.page_utils import navigate_to_page
 
-        page, response_handler = await setup_page(
+        page, response_handler = await navigate_to_page(
             context_or_page,
             shot_config,
         )
     else:
         page = context_or_page
-        # Set up console logging for existing page
-        console_logger = None
-        if shot_config.log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=Config.silent)
-            await console_logger.setup(page)
 
     # Set window size using shot_config dimensions
     await page.set_window_size(shot_config.width, shot_config.height)
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
-    # are now handled by setup_page() for new pages
+    # are now handled by navigate_to_page() for new pages
 
     # Determine format based on quality parameter
     format = "jpeg" if shot_config.quality else "png"
@@ -388,26 +382,20 @@ async def take_pdf(
         shot_config.output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
 
     if not use_existing_page:
-        from shot_power_scraper.page_utils import setup_page
+        from shot_power_scraper.page_utils import navigate_to_page
 
-        page, response_handler = await setup_page(
+        page, response_handler = await navigate_to_page(
             context_or_page,
             shot_config,
         )
     else:
         page = context_or_page
-        # Set up console logging for existing page
-        console_logger = None
-        if shot_config.log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=Config.silent)
-            await console_logger.setup(page)
 
     # Set window size using shot_config dimensions
     await page.set_window_size(shot_config.width, shot_config.height)
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
-    # are now handled by setup_page() for new pages
+    # are now handled by navigate_to_page() for new pages
 
     # Generate PDF
     pdf_options = {

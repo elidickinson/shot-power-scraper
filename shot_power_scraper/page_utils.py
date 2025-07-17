@@ -184,12 +184,12 @@ async def trigger_lazy_load(page, timeout_ms=5000):
         click.echo(f"Lazy load complete", err=True)
 
 
-async def setup_page(
+async def navigate_to_page(
     browser_obj,
     shot_config,
 ):
     """
-    Unified page setup function that handles common operations:
+    Navigate to a page and handle common operations:
     - Page navigation
     - Console logging setup
     - Response handling
