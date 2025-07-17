@@ -37,21 +37,17 @@ def run_nodriver_async(coro):
         return loop.run_until_complete(coro_with_cleanup())
 
 
-def run_browser_command(command_func, browser_kwargs=None, ad_block=False, popup_block=False, **kwargs):
+def run_browser_command(command_func, shot_config, **kwargs):
     """ Execute command async with browser lifecycle management """
     async def browser_execution():
         browser_obj = None
         try:
             extensions = []
-            if ad_block or popup_block:
-                await setup_blocking_extensions(extensions, ad_block, popup_block)
+            if shot_config.ad_block or shot_config.popup_block:
+                await setup_blocking_extensions(extensions, shot_config.ad_block, shot_config.popup_block)
 
-            # Create browser with common parameters
-            browser_kwargs_final = browser_kwargs or {}
-            if extensions:
-                browser_kwargs_final['extensions'] = extensions
-
-            browser_obj = await create_browser_context(**browser_kwargs_final)
+            # Create browser with shot_config parameters
+            browser_obj = await create_browser_context(shot_config, extensions)
 
             # Execute the command
             result = await command_func(browser_obj, **kwargs)
@@ -258,7 +254,12 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         "skip_wait_for_load": skip_wait_for_load,
         "trigger_lazy_load": trigger_lazy_load, "verbose": verbose,
         "log_console": log_console,
-        "log_requests": log_requests
+        "log_requests": log_requests,
+        # Browser options
+        "auth": auth, "interactive": interactive, "devtools": devtools,
+        "browser": browser, "browser_args": browser_args, "user_agent": user_agent,
+        "reduced_motion": reduced_motion, "bypass_csp": bypass_csp,
+        "auth_username": auth_username, "auth_password": auth_password
     })
 
     async def shot_execution(browser_obj):
@@ -284,19 +285,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
                 context, shot_config, use_existing_page=use_existing_page,
             )
 
-    browser_kwargs = {
-        'auth': auth, 'interactive': interactive, 'devtools': devtools,
-        'scale_factor': scale_factor, 'browser': browser,
-        'browser_args': browser_args, 'user_agent': shot_config.user_agent,
-        'timeout': timeout, 'reduced_motion': reduced_motion,
-        'bypass_csp': bypass_csp, 'auth_username': auth_username,
-        'auth_password': auth_password
-    }
-
-    run_browser_command(
-        shot_execution, browser_kwargs,
-        ad_block=shot_config.ad_block, popup_block=shot_config.popup_block
-    )
+    run_browser_command(shot_execution, shot_config)
 
 
 
@@ -377,13 +366,19 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 
     async def run_multi():
         extensions = []
-        browser_obj = await create_browser_context(
-            auth=auth, scale_factor=scale_factor, browser=browser,
-            browser_args=browser_args, user_agent=user_agent,
-            timeout=timeout, reduced_motion=reduced_motion,
-            auth_username=auth_username, auth_password=auth_password,
-            record_har_path=har_file, extensions=extensions,
-        )
+        if ad_block or popup_block:
+            await setup_blocking_extensions(extensions, ad_block, popup_block)
+
+        # Create browser config for multi command
+        browser_shot_config = ShotConfig({
+            "auth": auth, "scale_factor": scale_factor, "browser": browser,
+            "browser_args": browser_args, "user_agent": user_agent,
+            "timeout": timeout, "reduced_motion": reduced_motion,
+            "auth_username": auth_username, "auth_password": auth_password,
+            "record_har_path": har_file
+        })
+
+        browser_obj = await create_browser_context(browser_shot_config, extensions)
 
         try:
             for shot in shots:
@@ -572,20 +567,13 @@ def javascript(url, javascript, input, output, raw,
         return result
 
     shot_config = ShotConfig({
-        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent
+        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent,
+        "auth": auth, "browser": browser, "browser_args": browser_args,
+        "reduced_motion": reduced_motion, "bypass_csp": bypass_csp,
+        "auth_username": auth_username, "auth_password": auth_password, "timeout": timeout
     })
 
-    browser_kwargs = {
-        'auth': auth, 'browser': browser, 'browser_args': browser_args,
-        'user_agent': shot_config.user_agent, 'reduced_motion': reduced_motion,
-        'bypass_csp': bypass_csp, 'auth_username': auth_username,
-        'auth_password': auth_password, 'timeout': timeout,
-    }
-
-
-    result = run_browser_command(
-        execute_js, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block
-    )
+    result = run_browser_command(execute_js, shot_config)
 
     if raw:
         output.write(str(result))
@@ -644,7 +632,10 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
         "pdf_print_background": print_background, "pdf_media_screen": media_screen,
         "pdf_css": pdf_css, "wait": wait, "wait_for": wait_for, "timeout": timeout,
         "trigger_lazy_load": trigger_lazy_load,
-        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent
+        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent,
+        "auth": auth, "browser": browser, "browser_args": browser_args,
+        "reduced_motion": reduced_motion, "bypass_csp": bypass_csp,
+        "auth_username": auth_username, "auth_password": auth_password
     })
 
     async def execute_pdf(browser_obj, **kwargs):
@@ -653,16 +644,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
         )
         return pdf_data
 
-    browser_kwargs = {
-        'auth': auth, 'browser': browser, 'browser_args': browser_args,
-        'user_agent': shot_config.user_agent, 'timeout': timeout,
-        'reduced_motion': reduced_motion, 'bypass_csp': bypass_csp,
-        'auth_username': auth_username, 'auth_password': auth_password,
-    }
-
-    pdf_data = run_browser_command(
-        execute_pdf, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block
-    )
+    pdf_data = run_browser_command(execute_pdf, shot_config)
 
     if output == "-":
         sys.stdout.buffer.write(pdf_data)
@@ -710,7 +692,10 @@ def html(url, output, javascript, selector,
         "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
         "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
         "log_console": log_console,
-        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent
+        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent,
+        "auth": auth, "browser": browser, "browser_args": browser_args,
+        "bypass_csp": bypass_csp, "auth_username": auth_username,
+        "auth_password": auth_password
     })
 
     async def execute_html(browser_obj, **kwargs):
@@ -730,16 +715,7 @@ def html(url, output, javascript, selector,
 
         return html_content
 
-    browser_kwargs = {
-        'auth': auth, 'browser': browser, 'browser_args': browser_args,
-        'user_agent': shot_config.user_agent, 'timeout': timeout,
-        'bypass_csp': bypass_csp, 'auth_username': auth_username,
-        'auth_password': auth_password,
-    }
-
-    html_content = run_browser_command(
-        execute_html, browser_kwargs, ad_block=shot_config.ad_block, popup_block=shot_config.popup_block
-    )
+    html_content = run_browser_command(execute_html, shot_config)
 
     if output == "-":
         sys.stdout.write(html_content)
@@ -794,7 +770,8 @@ def install(browser, browser_args):
         click.echo(f"Modified user agent: {modified_user_agent}")
         click.echo(f"Saved default user agent to: {get_config_file()}")
 
-    run_browser_command(set_user_agent_wrapper, dict(headless=True, browser_args=browser_args or []))
+    shot_config = ShotConfig({"interactive": False, "browser_args": browser_args or []})
+    run_browser_command(set_user_agent_wrapper, shot_config)
 
 
 
@@ -900,17 +877,12 @@ def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced
         }
         return context_state
 
-    shot_config = ShotConfig({"user_agent": user_agent})
+    shot_config = ShotConfig({
+        "user_agent": user_agent, "interactive": True, "devtools": devtools,
+        "browser": browser, "browser_args": browser_args
+    })
 
-    browser_kwargs = {
-        'interactive': True, 'devtools': devtools,
-        'browser': browser, 'browser_args': browser_args,
-        'user_agent': shot_config.user_agent,
-    }
-
-    context_state = run_browser_command(
-        execute_auth, browser_kwargs
-    )
+    context_state = run_browser_command(execute_auth, shot_config)
 
     context_json = json.dumps(context_state, indent=2) + "\n"
     if context_file == "-":

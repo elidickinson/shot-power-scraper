@@ -45,22 +45,22 @@ shot-power-scraper 'https://www.owlsnearme.com/?place=127871' \
   -o examples/owlsnearme-wait.jpg \
   --wait-for "!!document.querySelector('section.secondary')"
 # Accessibility
-shot-power-scraper accessibility https://datasette.io/ \
-  > examples/datasette-accessibility.json
-shot-power-scraper accessibility https://simonwillison.net \
-  --javascript "document.getElementById('wrapper').style.display='none'" \
-  > examples/simonwillison-accessibility-javascript.json
-shot-power-scraper accessibility https://simonwillison.net \
-  --javascript "document.getElementById('wrapper').style.display='none'" \
-  --output examples/simonwillison-accessibility-javascript-and-dash-output.json
-shot-power-scraper accessibility examples/local.html -o examples/local-accessibility.json
+# shot-power-scraper accessibility https://datasette.io/ \
+#   > examples/datasette-accessibility.json
+# shot-power-scraper accessibility https://simonwillison.net \
+#   --javascript "document.getElementById('wrapper').style.display='none'" \
+#   > examples/simonwillison-accessibility-javascript.json
+# shot-power-scraper accessibility https://simonwillison.net \
+#   --javascript "document.getElementById('wrapper').style.display='none'" \
+#   --output examples/simonwillison-accessibility-javascript-and-dash-output.json
+# shot-power-scraper accessibility examples/local.html -o examples/local-accessibility.json
 # PDF
 (cd examples && shot-power-scraper pdf https://datasette.io/tools)
 shot-power-scraper pdf https://datasette.io \
   --landscape -o examples/datasette-landscape.pdf
 shot-power-scraper pdf https://datasette.io/tutorials/learn-sql \
   -o - > examples/learn-sql.pdf
-shot-power-scraper pdf examples/local.html -o examples/local.pdf
+# shot-power-scraper pdf examples/local.html -o examples/local.pdf
 ## JavaScript
 shot-power-scraper javascript https://datasette.io/ "document.title" \
   > examples/datasette-io-title.json
@@ -76,10 +76,10 @@ new Promise(done => setInterval(
 # Different browsers
 shot-power-scraper https://tools.simonwillison.net/user-agent \
   -o examples/useragent-default-chromium.png -h 400 -w 800
-shot-power-scraper https://tools.simonwillison.net/user-agent \
-  -o examples/useragent-firefox.png -h 400 -w 800 -b firefox
-shot-power-scraper https://tools.simonwillison.net/user-agent \
-  -o examples/useragent-webkit.png -h 400 -w 800 -b webkit
+# shot-power-scraper https://tools.simonwillison.net/user-agent \
+#   -o examples/useragent-firefox.png -h 400 -w 800 -b firefox
+# shot-power-scraper https://tools.simonwillison.net/user-agent \
+#   -o examples/useragent-webkit.png -h 400 -w 800 -b webkit
 # Default font-render-hinting
 shot-power-scraper https://shot-power-scraper.datasette.io/en/stable/screenshots.html \
   -w 800 -h 600 -o examples/font-hinting-default.png
@@ -151,9 +151,9 @@ shot-power-scraper multi empty.yml
   padding: 20
 # js_selector
 - output: js-selector-from-multi.png
-  url: https://github.com/simonw/shot-power-scraper
+  url: https://github.com/simonw/shot-scraper
   js_selector: |-
-    el.tagName == "P" && el.innerText.includes("shot-power-scraper")
+    el.tagName == "P" && el.innerText.includes("shot-scraper")
   padding: 20
 # Local page on disk
 - url: local.html

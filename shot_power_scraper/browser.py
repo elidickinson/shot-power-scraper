@@ -7,7 +7,6 @@ import nodriver as uc
 import pathlib
 import tempfile
 import shutil
-from shot_power_scraper.shot_config import get_default_user_agent
 
 
 class Config:
@@ -20,29 +19,14 @@ class Config:
 
 
 
-async def create_browser_context(
-    auth=None,
-    interactive=False,
-    devtools=False,
-    scale_factor=None,
-    browser="chromium",
-    browser_args=None,
-    user_agent=None,
-    timeout=None,
-    reduced_motion=False,
-    bypass_csp=False,
-    auth_username=None,
-    auth_password=None,
-    record_har_path=None,
-    extensions=None,
-):
+async def create_browser_context(shot_config, extensions=None):
     """Create and configure a browser instance with nodriver"""
     # Convert browser_args tuple to list and add user agent if needed
-    browser_args_list = list(browser_args) if browser_args else []
+    browser_args_list = list(shot_config.browser_args) if shot_config.browser_args else []
 
     # Add user agent to browser args if specified or found in config
-    if user_agent:
-        browser_args_list.append(f"--user-agent={user_agent}")
+    if shot_config.user_agent:
+        browser_args_list.append(f"--user-agent={shot_config.user_agent}")
 
     # Add extensions if provided
     if extensions:
@@ -84,10 +68,10 @@ async def create_browser_context(
 
     # Create browser config
     config = uc.Config(user_data_dir=temp_user_data_dir)
-    config.headless = not interactive
+    config.headless = not shot_config.interactive
 
     # Add --hide-scrollbars when in headless mode
-    if not interactive:
+    if not shot_config.interactive:
         browser_args_list.append("--hide-scrollbars")
 
     # Add browser args (including extension args)
@@ -110,8 +94,8 @@ async def create_browser_context(
         await asyncio.sleep(2.5)
 
     # Handle auth state if provided
-    if auth:
-        storage_state = json.load(auth)
+    if shot_config.auth:
+        storage_state = json.load(shot_config.auth)
         # nodriver doesn't have direct storage_state support,
         # but we can set cookies manually
         if "cookies" in storage_state:

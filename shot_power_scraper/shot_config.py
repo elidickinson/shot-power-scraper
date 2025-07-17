@@ -104,6 +104,19 @@ class ShotConfig:
         self.return_js_result = shot.get("return_js_result", False)
         self.log_requests = shot.get("log_requests", False)
 
+        # Browser options
+        self.auth = shot.get("auth")
+        self.interactive = shot.get("interactive", False)
+        self.devtools = shot.get("devtools", False)
+        self.scale_factor = shot.get("scale_factor")
+        self.browser = shot.get("browser", "chromium")
+        self.browser_args = shot.get("browser_args")
+        self.reduced_motion = shot.get("reduced_motion", False)
+        self.bypass_csp = shot.get("bypass_csp", False)
+        self.auth_username = shot.get("auth_username")
+        self.auth_password = shot.get("auth_password")
+        self.record_har_path = shot.get("record_har_path")
+
         # Process selectors
         self.selectors = list(shot.get("selectors") or [])
         self.selectors_all = list(shot.get("selectors_all") or [])
