@@ -119,6 +119,8 @@ def common_shot_options(fn):
                 help="Automatically trigger lazy-loaded images by scrolling and converting data-src attributes")(fn)
     click.option("--skip-cloudflare-check", is_flag=True,
                 help="Skip Cloudflare challenge detection and waiting")(fn)
+    click.option("--no-resize-viewport", is_flag=True,
+                help="Don't resize viewport to full page height when taking full page screenshot")(fn)
 
     # Wait options
     click.option("--skip-wait-for-load", is_flag=True, help="Skip waiting for window load event")(fn)
@@ -200,7 +202,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
          padding, javascript, retina, scale_factor, omit_background, quality,
          interactive, devtools, log_requests, save_html,
          verbose, debug, silent, log_console, skip, fail, ad_block, popup_block,
-         wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
+         wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
          auth_username, auth_password):
     """
@@ -252,7 +254,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         "wait": wait, "wait_for": wait_for, "timeout": timeout,
         "skip_cloudflare_check": skip_cloudflare_check,
         "skip_wait_for_load": skip_wait_for_load,
-        "trigger_lazy_load": trigger_lazy_load, "verbose": verbose,
+        "trigger_lazy_load": trigger_lazy_load, "resize_viewport": not no_resize_viewport, "verbose": verbose,
         "log_console": log_console,
         "log_requests": log_requests,
         # Browser options

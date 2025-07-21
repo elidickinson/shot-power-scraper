@@ -148,6 +148,11 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     if Config.verbose and converted_count > 0:
         click.echo(f"Converted {converted_count} lazy load attributes", err=True)
 
+    await page.scroll_down(1000)
+    await page.sleep(0.1)
+    await page.scroll_up(1000)
+    await page.sleep(0.1)
+
     # Try CDP-based viewport scaling to trigger image loading in headless mode. I had strange problems
     # triggering loading=lazy images when in headless. Both scrolling and rewriting img attributes
     # didn't seem to work. Something peculiar to --headless (or --headless=new perhaps)
@@ -158,18 +163,13 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     await page.send(uc.cdp.emulation.set_device_metrics_override(
         width=viewport_width,
         height=10000,  # Very tall viewport
-        device_scale_factor=1,
+        device_scale_factor=0.5,  # scaled down
         mobile=False
     ))
     await page  # give it a breather to actually do the emulation
-    # await page.scroll_down(1000)
-    # await page.sleep(0.5)
-    # await page.scroll_up(1000)
-    # await page.sleep(0.5)
     # Wait for all images to load with timeout
     max_wait = 5  # seconds (TODO: don't hardcode this)
     start_wait = time.time()
-
     while time.time() - start_wait < max_wait:
         all_loaded = await page.evaluate("""
             Array.from(document.querySelectorAll('img[src]')).every(img => img.complete)

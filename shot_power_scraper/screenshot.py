@@ -14,28 +14,63 @@ from shot_power_scraper.utils import filename_for_url, url_or_file_path
 from shot_power_scraper.shot_config import ShotConfig
 
 
-async def _save_screenshot_with_temp_file(page_or_element, format, quality=None, full_page=False):
+async def _save_screenshot_with_temp_file(page_or_element, format, quality=None, full_page=False, resize_viewport=True):
     """Save screenshot to temporary file and return bytes"""
     suffix = '.jpg' if format == "jpeg" else '.png'
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-        await _save_screenshot(page_or_element, tmp.name, format, quality, full_page)
+        await _save_screenshot(page_or_element, tmp.name, format, quality, full_page, resize_viewport)
         with open(tmp.name, 'rb') as f:
             bytes_data = f.read()
         os.unlink(tmp.name)
         return bytes_data
 
 
-async def _save_screenshot(page_or_element, output, format, quality=None, full_page=False):
+async def _save_screenshot(page_or_element, output, format, quality=None, full_page=False, resize_viewport=True):
     """Save screenshot to file"""
     # nodriver doesn't support `quality` param
     if format == "jpeg" and quality and not getattr(_save_screenshot, '_quality_warning_shown', False):
         click.echo("Warning: JPEG quality parameter is not supported by nodriver and will be ignored", err=True)
         _save_screenshot._quality_warning_shown = True
 
-    # omit the full_page param when it's not true becaues on a page (tab) the default is false
-    # and for an element it doesn't have full_page at all.
     if full_page:
-        await page_or_element.save_screenshot(output, format=format, full_page=True)
+        await page_or_element
+        if resize_viewport:
+            # resize viewport to the size of the whole page. This *seems like* it makes for a more consistent full page screenshot.
+            # especially if the page has a sticky footer
+            layout_width = document_height = await page_or_element.evaluate("document.documentElement.scrollWidth")
+            layout_height = document_height = await page_or_element.evaluate("document.documentElement.scrollHeight")
+            if Config.verbose:
+                click.echo(f"Resizing viewport for screenshot to {layout_width}x{layout_height}", err=True)
+            await page_or_element.send(uc.cdp.emulation.set_device_metrics_override(
+                width=layout_width,
+                height=layout_height,
+                device_scale_factor=1,
+                mobile=False
+            ))
+            await page_or_element
+
+        data = await page_or_element.send(
+            uc.cdp.page.capture_screenshot(
+                format_=format, capture_beyond_viewport=full_page
+            )
+        )
+
+        if resize_viewport:
+            await page_or_element.send(uc.cdp.emulation.clear_device_metrics_override())
+            await page_or_element
+        if not data:
+            raise ProtocolException(
+                "could not take screenshot. most possible cause is the page has not finished loading yet."
+            )
+
+        import pathlib
+        path = pathlib.Path(output)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        import base64
+        data_bytes = base64.b64decode(data)
+        if not path:
+            raise RuntimeError("invalid filename or path: '%s'" % filename)
+        path.write_bytes(data_bytes)
     else:
         await page_or_element.save_screenshot(output, format=format)
 
@@ -206,11 +241,11 @@ async def take_shot(
         element = await page.select(selector_to_shoot)
         if element:
             if return_bytes:
-                return await _save_screenshot_with_temp_file(element, format, shot_config.quality, full_page)
+                return await _save_screenshot_with_temp_file(element, format, shot_config.quality, full_page, shot_config.resize_viewport)
             else:
                 if Config.verbose:
                     click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
-                await _save_screenshot(element, shot_config.output, format, shot_config.quality)
+                await _save_screenshot(element, shot_config.output, format, shot_config.quality, full_page, shot_config.resize_viewport)
                 message = "Screenshot of '{}' on '{}' written to '{}'".format(
                     ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), url, shot_config.output
                 )
@@ -222,33 +257,33 @@ async def take_shot(
         else:
             # Whole page
             if return_bytes:
-                return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page)
+                return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page, shot_config.resize_viewport)
             else:
                 if Config.verbose:
                     click.echo(f"Taking screenshot (full_page={full_page})", err=True)
-                await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page)
+                await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page, shot_config.resize_viewport)
                 message = f"Screenshot of '{url}' written to '{shot_config.output}'"
 
     # Save HTML if requested
     if shot_config.save_html and not return_bytes:
-            # Get the HTML content
-            html_content = await page.get_content()
+        # Get the HTML content
+        html_content = await page.get_content()
 
-            # Determine HTML filename from screenshot output
-            if shot_config.output and shot_config.output != "-":
-                # Get the base name without extension
-                output_path = pathlib.Path(shot_config.output)
-                html_filename = output_path.with_suffix('.html')
+        # Determine HTML filename from screenshot output
+        if shot_config.output and shot_config.output != "-":
+            # Get the base name without extension
+            output_path = pathlib.Path(shot_config.output)
+            html_filename = output_path.with_suffix('.html')
 
-                # Write HTML content to file
-                with open(html_filename, 'w', encoding='utf-8') as f:
-                    f.write(html_content)
+            # Write HTML content to file
+            with open(html_filename, 'w', encoding='utf-8') as f:
+                f.write(html_content)
 
-                if not Config.silent:
-                    click.echo(f"HTML content saved to '{html_filename}'", err=True)
-            else:
-                if not Config.silent:
-                    click.echo("Cannot save HTML when output is stdout", err=True)
+            if not Config.silent:
+                click.echo(f"HTML content saved to '{html_filename}'", err=True)
+        else:
+            if not Config.silent:
+                click.echo("Cannot save HTML when output is stdout", err=True)
 
 
 

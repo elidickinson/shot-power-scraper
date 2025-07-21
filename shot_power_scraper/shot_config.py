@@ -91,6 +91,7 @@ class ShotConfig:
         self.width = shot.get("width", 1280)
         self.height = shot.get("height", 720)
         self.trigger_lazy_load = shot.get("trigger_lazy_load", False)
+        self.resize_viewport = shot.get("resize_viewport", True)
 
         # PDF specific options
         self.pdf_landscape = shot.get("pdf_landscape", False)

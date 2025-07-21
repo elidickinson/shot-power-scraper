@@ -1,0 +1,17 @@
+
+  - fix the way `timeout` works. It should be a timeout for the whole screenshot (or pdf, etc) generation process. So like start the clock when you make the request and then the timeout for each step after that is however much time remains (or a lower number if that is too much time).
+  - Fix test `tests/test_shot_scraper.py::test_javascript_input_github` - not sure why it can't load from github
+  - `pdf` with --ad-block needs testing
+  - Should throw an error on cloudflare errors 1XXX
+  - shot with selector doesn't seem to work. `shot-power-scraper shot -s 'a' https://eli.pizza/`
+  - PDF needs backgrounds? `shot-power-scraper pdf eli.pizza`
+  - JPEG quality parameter not supported by nodriver - need to implement quality control for JPEG screenshots
+  - PDF doesn't work with local html file `shot-power-scraper pdf examples/local.html -o examples/local.pdf`
+  - `accessibility` command is not implemented
+  - `--omit-background` not implemented
+  - `--landscape` removed
+  - todo check `--js-selector` timing out
+  - check example title-tagline-from-promise
+  - if resize_viewport enabled, should just do it once at the start (after CF check)
+  - don't need temp files for most screenshots
+  - add support for quality and jpg/webp
