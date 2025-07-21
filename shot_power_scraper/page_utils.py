@@ -161,7 +161,11 @@ async def trigger_lazy_load(page, timeout_ms=5000):
         device_scale_factor=1,
         mobile=False
     ))
-
+    await page  # give it a breather to actually do the emulation
+    # await page.scroll_down(1000)
+    # await page.sleep(0.5)
+    # await page.scroll_up(1000)
+    # await page.sleep(0.5)
     # Wait for all images to load with timeout
     max_wait = 5  # seconds (TODO: don't hardcode this)
     start_wait = time.time()
@@ -172,14 +176,14 @@ async def trigger_lazy_load(page, timeout_ms=5000):
         """)
         if all_loaded:
             if Config.verbose:
-                click.echo(f"All images loaded after {time.time() - start_wait:.1f}s", err=True)
+                click.echo(f"All images loaded after {time.time() - start_wait:.2f}s", err=True)
             break
 
-        await asyncio.sleep(0.1)
+        await page.sleep(0.1)
 
     # Clear the override to restore normal viewport
     await page.send(uc.cdp.emulation.clear_device_metrics_override())
-
+    await page
     if Config.verbose:
         click.echo(f"Lazy load complete", err=True)
 
@@ -240,7 +244,7 @@ async def navigate_to_page(
     if Config.verbose:
         click.echo(f"Loading page: {url}", err=True)
     await page.get(url)
-
+    await page
     # Wait for window load event unless skipped
     if not shot_config.skip_wait_for_load:
         if Config.verbose:
@@ -257,6 +261,8 @@ async def navigate_to_page(
                 }}
             }});
         """)
+        if Config.verbose:
+            click.echo(f"Done waiting for window load", err=True)
 
     # Check HTTP response status
     response_status, response_url = await response_handler.wait_for_response(timeout=5)
@@ -271,6 +277,7 @@ async def navigate_to_page(
                 raise SystemExit  # TODO: this probably breaks `multi`
             elif Config.fail:
                 raise click.ClickException(f"{response_status} error for {url}")
+                # FIXME: this is duplicated below
 
     # Automatic Cloudflare detection and waiting
     if not shot_config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
@@ -282,6 +289,7 @@ async def navigate_to_page(
                 click.echo("Warning: Cloudflare challenge may still be active", err=True)
 
     # Check if page failed to load
+    # FIXME: not sure this is needed or useful
     has_error, error_msg = await detect_navigation_error(page, url)
     if has_error:
         full_msg = f"Page failed to load: {error_msg}"
@@ -339,10 +347,11 @@ async def navigate_to_page(
         ))
 
         # Wait a moment for lazy loading to trigger
-        await asyncio.sleep(0.5)
+        await page.sleep(0.5)
 
         # Clear the override to restore normal viewport
         await page.send(uc.cdp.emulation.clear_device_metrics_override())
+        await page.sleep()
 
     if shot_config.return_js_result:
         return page, response_handler, js_result

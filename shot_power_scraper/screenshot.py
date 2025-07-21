@@ -231,7 +231,6 @@ async def take_shot(
 
     # Save HTML if requested
     if shot_config.save_html and not return_bytes:
-        try:
             # Get the HTML content
             html_content = await page.get_content()
 
@@ -251,9 +250,7 @@ async def take_shot(
                 if not Config.silent:
                     click.echo("Cannot save HTML when output is stdout", err=True)
 
-        except Exception as e:
-            if not Config.silent:
-                click.echo(f"Failed to save HTML: {e}", err=True)
+
 
     if not Config.silent:
         click.echo(message, err=True)
@@ -285,8 +282,8 @@ async def generate_pdf(page, options):
         # Emulate screen media for CSS
         await page.send(uc.cdp.emulation.set_emulated_media(media="screen"))
 
-        # Default CSS for better page break handling
-        default_css = """
+        # Insert some CSS to add page breaks etc
+        basic_pdf_css = """
             /* Avoid breaking inside paragraphs and list items */
             p, li, blockquote, h1, h2, h3, h4, h5, h6 {
                 break-inside: avoid;
@@ -308,7 +305,7 @@ async def generate_pdf(page, options):
         # Combine default CSS with custom CSS if provided
         css_to_inject = default_css
         if options.get("pdf_css"):
-            css_to_inject = default_css + "\n" + options.get("pdf_css")
+            css_to_inject = basic_pdf_css + "\n" + options.get("pdf_css")
 
         # Inject the CSS
         await page.evaluate(f"""
