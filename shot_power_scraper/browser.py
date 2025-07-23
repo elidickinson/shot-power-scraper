@@ -98,28 +98,21 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block):
     """Setup blocking extensions based on requested flags"""
     base_extensions_path = pathlib.Path(__file__).parent.parent / 'extensions'
 
-    # Choose the appropriate pre-built extension
-    if ad_block and popup_block:
-        extension_name = 'shot-scraper-combo-blocker'
-        filter_description = "ad and popup blocking"
-    elif ad_block:
-        extension_name = 'shot-scraper-ad-blocker'
-        filter_description = "ad blocking"
-    elif popup_block:
-        extension_name = 'shot-scraper-popup-blocker'
-        filter_description = "popup blocking"
-    else:
-        return  # No blocking requested
+    # Load appropriate extensions
+    loaded_extensions = []
 
-    extension_path = (base_extensions_path / extension_name).resolve()
-    extensions.append(str(extension_path))
+    if ad_block:
+        ad_extension_path = (base_extensions_path / 'shot-scraper-ad-blocker').resolve()
+        extensions.append(str(ad_extension_path))
+        loaded_extensions.append("ad blocking")
+
+    if popup_block:
+        popup_extension_path = (base_extensions_path / 'shot-scraper-popup-blocker').resolve()
+        extensions.append(str(popup_extension_path))
+        loaded_extensions.append("popup blocking")
 
     if Config.verbose:
-        click.echo(f"Blocking enabled: {filter_description}", err=True)
-
-
-
-
+        click.echo(f"Blocking extensions enabled: {' + '.join(loaded_extensions)}", err=True)
 
 
 async def cleanup_browser(browser_obj):

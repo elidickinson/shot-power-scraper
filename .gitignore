@@ -17,3 +17,4 @@ examples/
 /extensions/shot-scraper-ad-blocker/
 /extensions/shot-scraper-popup-blocker/
 /extensions/shot-scraper-combo-blocker/
+extensions/blocker-shared/downloads/*
