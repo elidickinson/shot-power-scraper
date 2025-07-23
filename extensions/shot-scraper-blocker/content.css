@@ -1,5 +1,0 @@
-/* CSS for cosmetic filtering - minimal base styles */
-[data-shot-scraper-blocked="cosmetic"] {
-    display: none !important;
-    visibility: hidden !important;
-}

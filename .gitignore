@@ -12,3 +12,9 @@ examples/
 *.jpg
 *.pdf
 /extensions/shot-scraper-blocker/downloads
+
+# Keep downloads directory ignored
+extensions/blocker-shared/downloads/*
+
+# Chrome-generated extension metadata (runtime cache files)
+extensions/*/_metadata/

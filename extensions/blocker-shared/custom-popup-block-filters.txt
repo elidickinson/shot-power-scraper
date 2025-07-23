@@ -1,0 +1,21 @@
+! Custom Popup Block Filters
+! Add your custom popup/cookie notice blocking rules here
+! This file is processed during build alongside downloaded filter lists
+!
+! Examples:
+! Block cookie consent domains:
+! ||cookielaw.org^
+! ||onetrust.com^
+!
+! Hide cookie banners with CSS selectors:
+! ##div[id*="cookie"]
+! ##div[class*="consent"]
+! ##div[class*="gdpr"]
+!
+! Block newsletter popups:
+! example.com##div[class*="newsletter-popup"]
+! example.com##div[class*="email-signup"]
+!
+! For rule syntax, see: https://adblockplus.org/filter-cheatsheet
+! wnyc
+##div.CampaignType--popup

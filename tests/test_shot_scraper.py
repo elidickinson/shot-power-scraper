@@ -301,10 +301,10 @@ def test_pdf_basic():
 
 def test_config_save_load(mocker, tmp_path):
     """Test config persistence works"""
-    from shot_power_scraper.utils import save_config, load_config
+    from shot_power_scraper.shot_config import save_config, load_config
     
     # Mock the config directory to use a temporary path
-    mocker.patch("shot_power_scraper.utils.get_config_dir", return_value=tmp_path)
+    mocker.patch("shot_power_scraper.shot_config.get_config_dir", return_value=tmp_path)
     
     # Test save and load
     config = {"ad_block": True, "user_agent": "test"}

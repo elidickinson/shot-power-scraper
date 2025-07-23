@@ -1,13 +1,11 @@
 """Core screenshot functionality for shot-scraper"""
 import os
-import time
 import json
 import secrets
 import textwrap
 import tempfile
 import pathlib
 import base64
-import asyncio
 import click
 import nodriver as uc
 from shot_power_scraper.browser import Config
@@ -16,25 +14,65 @@ from shot_power_scraper.utils import filename_for_url, url_or_file_path
 from shot_power_scraper.shot_config import ShotConfig
 
 
-
-async def _save_screenshot_with_temp_file(page, format, quality, full_page):
+async def _save_screenshot_with_temp_file(page_or_element, format, quality=None, full_page=False, resize_viewport=True):
     """Save screenshot to temporary file and return bytes"""
     suffix = '.jpg' if format == "jpeg" else '.png'
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-        await _save_screenshot(page, tmp.name, format, quality, full_page)
+        await _save_screenshot(page_or_element, tmp.name, format, quality, full_page, resize_viewport)
         with open(tmp.name, 'rb') as f:
             bytes_data = f.read()
         os.unlink(tmp.name)
         return bytes_data
 
 
-async def _save_screenshot(page, output, format, quality, full_page):
+async def _save_screenshot(page_or_element, output, format, quality=None, full_page=False, resize_viewport=True):
     """Save screenshot to file"""
-    # Note: nodriver doesn't support quality parameter for JPEG screenshots
+    # nodriver doesn't support `quality` param
     if format == "jpeg" and quality and not getattr(_save_screenshot, '_quality_warning_shown', False):
         click.echo("Warning: JPEG quality parameter is not supported by nodriver and will be ignored", err=True)
         _save_screenshot._quality_warning_shown = True
-    await page.save_screenshot(output, format=format, full_page=full_page)
+
+    if full_page:
+        await page_or_element
+        if resize_viewport:
+            # resize viewport to the size of the whole page. This *seems like* it makes for a more consistent full page screenshot.
+            # especially if the page has a sticky footer
+            layout_width = document_height = await page_or_element.evaluate("document.documentElement.scrollWidth")
+            layout_height = document_height = await page_or_element.evaluate("document.documentElement.scrollHeight")
+            if Config.verbose:
+                click.echo(f"Resizing viewport for screenshot to {layout_width}x{layout_height}", err=True)
+            await page_or_element.send(uc.cdp.emulation.set_device_metrics_override(
+                width=layout_width,
+                height=layout_height,
+                device_scale_factor=1,
+                mobile=False
+            ))
+            await page_or_element
+
+        data = await page_or_element.send(
+            uc.cdp.page.capture_screenshot(
+                format_=format, capture_beyond_viewport=full_page
+            )
+        )
+
+        if resize_viewport:
+            await page_or_element.send(uc.cdp.emulation.clear_device_metrics_override())
+            await page_or_element
+        if not data:
+            raise ProtocolException(
+                "could not take screenshot. most possible cause is the page has not finished loading yet."
+            )
+
+        import pathlib
+        path = pathlib.Path(output)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        import base64
+        data_bytes = base64.b64decode(data)
+        if not path:
+            raise RuntimeError("invalid filename or path: '%s'" % filename)
+        path.write_bytes(data_bytes)
+    else:
+        await page_or_element.save_screenshot(output, format=format)
 
 
 def _check_and_absolutize(filepath):
@@ -47,17 +85,6 @@ def _check_and_absolutize(filepath):
     except OSError:
         # On Windows, instantiating a Path object on `http://` or `https://` will raise an exception
         return False
-
-
-def get_viewport(width, height):
-    """Get viewport configuration"""
-    if width or height:
-        return {
-            "width": width or 1280,
-            "height": height or 720,
-        }
-    else:
-        return {}
 
 
 def js_selector_javascript(js_selectors, js_selectors_all):
@@ -86,9 +113,7 @@ def js_selector_javascript(js_selectors, js_selectors_all):
         Array.from(
           document.getElementsByTagName('*')
         ).filter(el => {}).forEach(el => el.classList.add("{}"));
-        """.format(
-                    js_selector_all, klass
-                )
+        """.format(js_selector_all, klass)
             )
         )
     js_selector_javascript = "() => {" + "\n".join(js_blocks) + "}"
@@ -175,28 +200,20 @@ async def take_shot(
         shot_config.output = filename_for_url(url, ext="png", file_exists=os.path.exists)
 
     if not use_existing_page:
-        from shot_power_scraper.page_utils import setup_page
+        from shot_power_scraper.page_utils import navigate_to_page
 
-        page, response_handler = await setup_page(
+        page, response_handler = await navigate_to_page(
             context_or_page,
             shot_config,
         )
     else:
         page = context_or_page
-        # Set up console logging for existing page
-        console_logger = None
-        if shot_config.log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=Config.silent)
-            await console_logger.setup(page)
 
-    viewport = get_viewport(shot_config.width, shot_config.height)
-    if viewport:
-        # nodriver doesn't have set_viewport_size, we'll use window size instead
-        await page.set_window_size(viewport["width"], viewport["height"])
+    # Set window size using shot_config dimensions
+    await page.set_window_size(shot_config.width, shot_config.height)
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
-    # are now handled by setup_page() for new pages
+    # are now handled by navigate_to_page() for new pages
 
     # Determine format based on quality parameter
     format = "jpeg" if shot_config.quality else "png"
@@ -211,6 +228,7 @@ async def take_shot(
         ) = js_selector_javascript(shot_config.js_selectors, shot_config.js_selectors_all)
         shot_config.selectors.extend(extra_selectors)
         shot_config.selectors_all.extend(extra_selectors_all)
+        print(js_selector_js)
         await evaluate_js(page, js_selector_js)
 
     if shot_config.has_selectors():
@@ -219,63 +237,55 @@ async def take_shot(
             shot_config.selectors, shot_config.selectors_all, shot_config.padding
         )
         await evaluate_js(page, selector_js)
-        try:
-            # nodriver element screenshot with selector
-            element = await page.select(selector_to_shoot)
-            if element:
-                if return_bytes:
-                    return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page)
-                else:
-                    if Config.verbose:
-                        click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
-                    await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page)
-                    message = "Screenshot of '{}' on '{}' written to '{}'".format(
-                        ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), url, shot_config.output
-                    )
+        # nodriver element screenshot with selector
+        element = await page.select(selector_to_shoot)
+        if element:
+            if return_bytes:
+                return await _save_screenshot_with_temp_file(element, format, shot_config.quality, full_page, shot_config.resize_viewport)
             else:
-                raise click.ClickException(f"Could not find element matching selector: {selector_to_shoot}")
-        except Exception as e:
-            raise click.ClickException(
-                f"Timed out while waiting for element to become available.\n\n{e}"
-            )
+                if Config.verbose:
+                    click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
+                await _save_screenshot(element, shot_config.output, format, shot_config.quality, full_page, shot_config.resize_viewport)
+                message = "Screenshot of '{}' on '{}' written to '{}'".format(
+                    ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), url, shot_config.output
+                )
+        else:
+            raise click.ClickException(f"Could not find element matching selector: {selector_to_shoot}")
     else:
         if shot_config.skip_shot:
             message = "Skipping screenshot of '{}'".format(url)
         else:
             # Whole page
             if return_bytes:
-                return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page)
+                return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page, shot_config.resize_viewport)
             else:
                 if Config.verbose:
                     click.echo(f"Taking screenshot (full_page={full_page})", err=True)
-                await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page)
+                await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page, shot_config.resize_viewport)
                 message = f"Screenshot of '{url}' written to '{shot_config.output}'"
 
     # Save HTML if requested
     if shot_config.save_html and not return_bytes:
-        try:
-            # Get the HTML content
-            html_content = await page.get_content()
+        # Get the HTML content
+        html_content = await page.get_content()
 
-            # Determine HTML filename from screenshot output
-            if shot_config.output and shot_config.output != "-":
-                # Get the base name without extension
-                output_path = pathlib.Path(shot_config.output)
-                html_filename = output_path.with_suffix('.html')
+        # Determine HTML filename from screenshot output
+        if shot_config.output and shot_config.output != "-":
+            # Get the base name without extension
+            output_path = pathlib.Path(shot_config.output)
+            html_filename = output_path.with_suffix('.html')
 
-                # Write HTML content to file
-                with open(html_filename, 'w', encoding='utf-8') as f:
-                    f.write(html_content)
+            # Write HTML content to file
+            with open(html_filename, 'w', encoding='utf-8') as f:
+                f.write(html_content)
 
-                if not Config.silent:
-                    click.echo(f"HTML content saved to '{html_filename}'", err=True)
-            else:
-                if not Config.silent:
-                    click.echo("Cannot save HTML when output is stdout", err=True)
-
-        except Exception as e:
             if not Config.silent:
-                click.echo(f"Failed to save HTML: {e}", err=True)
+                click.echo(f"HTML content saved to '{html_filename}'", err=True)
+        else:
+            if not Config.silent:
+                click.echo("Cannot save HTML when output is stdout", err=True)
+
+
 
     if not Config.silent:
         click.echo(message, err=True)
@@ -307,8 +317,8 @@ async def generate_pdf(page, options):
         # Emulate screen media for CSS
         await page.send(uc.cdp.emulation.set_emulated_media(media="screen"))
 
-        # Default CSS for better page break handling
-        default_css = """
+        # Insert some CSS to add page breaks etc
+        basic_pdf_css = """
             /* Avoid breaking inside paragraphs and list items */
             p, li, blockquote, h1, h2, h3, h4, h5, h6 {
                 break-inside: avoid;
@@ -330,7 +340,7 @@ async def generate_pdf(page, options):
         # Combine default CSS with custom CSS if provided
         css_to_inject = default_css
         if options.get("pdf_css"):
-            css_to_inject = default_css + "\n" + options.get("pdf_css")
+            css_to_inject = basic_pdf_css + "\n" + options.get("pdf_css")
 
         # Inject the CSS
         await page.evaluate(f"""
@@ -404,28 +414,20 @@ async def take_pdf(
         shot_config.output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
 
     if not use_existing_page:
-        from shot_power_scraper.page_utils import setup_page
+        from shot_power_scraper.page_utils import navigate_to_page
 
-        page, response_handler = await setup_page(
+        page, response_handler = await navigate_to_page(
             context_or_page,
             shot_config,
         )
     else:
         page = context_or_page
-        # Set up console logging for existing page
-        console_logger = None
-        if shot_config.log_console:
-            from shot_power_scraper.console_logger import ConsoleLogger
-            console_logger = ConsoleLogger(silent=Config.silent)
-            await console_logger.setup(page)
 
-    viewport = get_viewport(shot_config.width, shot_config.height)
-    if viewport:
-        # nodriver doesn't have set_viewport_size, we'll use window size instead
-        await page.set_window_size(viewport["width"], viewport["height"])
+    # Set window size using shot_config dimensions
+    await page.set_window_size(shot_config.width, shot_config.height)
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
-    # are now handled by setup_page() for new pages
+    # are now handled by navigate_to_page() for new pages
 
     # Generate PDF
     pdf_options = {

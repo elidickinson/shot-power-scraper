@@ -81,7 +81,7 @@ from shot_power_scraper.browser import create_browser_context, Config
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.shot_config import ShotConfig
 from shot_power_scraper.cli import browser_args_option
-from shot_power_scraper.page_utils import evaluate_js, detect_navigation_error, setup_page
+from shot_power_scraper.page_utils import evaluate_js, detect_navigation_error, navigate_to_page
 
 # Global browser instance for reuse
 browser_instance = None
@@ -340,7 +340,7 @@ async def html(request: HtmlRequest):
         # Get browser instance
         browser = await get_browser()
 
-        # Use setup_page for consistent page setup including Cloudflare detection
+        # Use navigate_to_page for consistent page setup including Cloudflare detection
         shot_config = ShotConfig({
             "url": request.url,
             "timeout": request.timeout // 1000,  # Convert to seconds
@@ -349,7 +349,7 @@ async def html(request: HtmlRequest):
             "silent": True
         })
         
-        page, response_handler = await setup_page(
+        page, response_handler = await navigate_to_page(
             browser,
             shot_config,
         )

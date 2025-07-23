@@ -7,7 +7,6 @@ import nodriver as uc
 import pathlib
 import tempfile
 import shutil
-from shot_power_scraper.utils import get_default_user_agent
 
 
 class Config:
@@ -20,35 +19,16 @@ class Config:
 
 
 
-async def create_browser_context(
-    auth=None,
-    interactive=False,
-    devtools=False,
-    scale_factor=None,
-    browser="chromium",
-    browser_args=None,
-    user_agent=None,
-    timeout=None,
-    reduced_motion=False,
-    bypass_csp=False,
-    auth_username=None,
-    auth_password=None,
-    record_har_path=None,
-    extensions=None,
-):
+async def create_browser_context(shot_config, extensions=None):
     """Create and configure a browser instance with nodriver"""
     # Convert browser_args tuple to list and add user agent if needed
-    browser_args_list = list(browser_args) if browser_args else []
-
-    # Use stored default user agent if no explicit user agent is provided
-    if not user_agent:
-        user_agent = get_default_user_agent()
+    browser_args_list = list(shot_config.browser_args) if shot_config.browser_args else []
 
     # Add user agent to browser args if specified or found in config
-    if user_agent:
-        browser_args_list.append(f"--user-agent={user_agent}")
+    if shot_config.user_agent:
+        browser_args_list.append(f"--user-agent={shot_config.user_agent}")
 
-    # Add extensions if provided
+    # Add extensions via Chrome flags if provided
     if extensions:
         if isinstance(extensions, str):
             extensions = [extensions]
@@ -58,29 +38,13 @@ async def create_browser_context(
             ext_path = pathlib.Path(ext_path).absolute()
             if Config.verbose:
                 click.echo(f"Loading extension: {ext_path}", err=True)
-            # Check if extension path exists and has manifest
-            manifest_path = ext_path / "manifest.json"
-            if not ext_path.exists():
-                click.warn(f"Warning: Extension path does not exist: {ext_path}", err=True)
-                continue
-            if not manifest_path.exists():
-                click.warn(f"Warning: Extension manifest not found: {manifest_path}", err=True)
-                continue
-            if Config.verbose:
-                click.echo(f"Extension manifest found: {manifest_path}", err=True)
             extension_paths.append(str(ext_path))
 
-        # Use Chrome's --load-extension argument with proper flags
+        # Use Chrome's --load-extension argument
         if extension_paths:
-            # Add the load extension argument
             extension_arg = f"--load-extension={','.join(extension_paths)}"
             browser_args_list.append(extension_arg)
-
-            # Only allow our extensions (disable built-in ones)
-            for ext_path in extension_paths:
-                browser_args_list.append(f"--disable-extensions-except-{ext_path}")
-
-            # Enable extension loading from command line
+            # Enable extension loading
             browser_args_list.append("--disable-features=DisableLoadExtensionCommandLineSwitch")
 
     # Create temporary user data directory to avoid nodriver cleanup messages
@@ -88,10 +52,10 @@ async def create_browser_context(
 
     # Create browser config
     config = uc.Config(user_data_dir=temp_user_data_dir)
-    config.headless = not interactive
+    config.headless = not shot_config.interactive
 
     # Add --hide-scrollbars when in headless mode
-    if not interactive:
+    if not shot_config.interactive:
         browser_args_list.append("--hide-scrollbars")
 
     # Add browser args (including extension args)
@@ -114,8 +78,8 @@ async def create_browser_context(
         await asyncio.sleep(2.5)
 
     # Handle auth state if provided
-    if auth:
-        storage_state = json.load(auth)
+    if shot_config.auth:
+        storage_state = json.load(shot_config.auth)
         # nodriver doesn't have direct storage_state support,
         # but we can set cookies manually
         if "cookies" in storage_state:
@@ -132,85 +96,23 @@ async def create_browser_context(
 
 async def setup_blocking_extensions(extensions, ad_block, popup_block):
     """Setup blocking extensions based on requested flags"""
-    import tempfile
-    import shutil
+    base_extensions_path = pathlib.Path(__file__).parent.parent / 'extensions'
 
-    base_extension_path = os.path.join(os.path.dirname(__file__), '..', 'extensions', 'shot-scraper-blocker')
+    # Load appropriate extensions
+    loaded_extensions = []
 
-    if not os.path.exists(base_extension_path):
-        if not Config.silent:
-            click.echo(f"Warning: Base extension not found at {base_extension_path}", err=True)
-        return
-
-    # Create a temporary extension directory
-    temp_ext_dir = tempfile.mkdtemp(prefix="shot_scraper_ext_")
-
-    # Copy base extension files
-    shutil.copytree(base_extension_path, temp_ext_dir, dirs_exist_ok=True)
-
-    # Create custom rules.json based on selected filters
-    rules_path = os.path.join(temp_ext_dir, "rules.json")
-    create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path)
-
-    extensions.append(temp_ext_dir)
-
-    if Config.verbose:
-        enabled_filters = []
-        if ad_block:
-            enabled_filters.append("ad blocking")
-        if popup_block:
-            enabled_filters.append("popup blocking")
-        click.echo(f"Blocking enabled: {', '.join(enabled_filters)}", err=True)
-
-
-def create_filtered_rules(rules_path, ad_block, popup_block, base_extension_path):
-    """Create a rules.json file with only the selected filter categories"""
-    import os
-
-    # Load rules from category files
-    combined_rules = []
-    rule_id = 1
-
-    # Ad blocking rules
     if ad_block:
-        ad_rules_file = os.path.join(base_extension_path, "ad-block-rules.json")
-        if os.path.exists(ad_rules_file):
-            with open(ad_rules_file, 'r') as f:
-                rules = json.load(f)
-            for rule in rules:
-                rule["id"] = rule_id
-                rule_id += 1
-            combined_rules.extend(rules)
-            if Config.verbose:
-                click.echo(f"Added {len(rules)} ad-block rules", err=True)
+        ad_extension_path = (base_extensions_path / 'shot-scraper-ad-blocker').resolve()
+        extensions.append(str(ad_extension_path))
+        loaded_extensions.append("ad blocking")
 
-    # Popup blocking rules
     if popup_block:
-        popup_rules_file = os.path.join(base_extension_path, "popup-block-rules.json")
-        if os.path.exists(popup_rules_file):
-            with open(popup_rules_file, 'r') as f:
-                rules = json.load(f)
-            for rule in rules:
-                rule["id"] = rule_id
-                rule_id += 1
-            combined_rules.extend(rules)
-            if Config.verbose:
-                click.echo(f"Added {len(rules)} popup-block rules", err=True)
-
-    # Limit to Chrome's 30,000 rule limit
-    if len(combined_rules) > 30000:
-        combined_rules = combined_rules[:30000]
-        if Config.verbose:
-            click.echo(f"Limited rules to 30,000 (Chrome's limit)", err=True)
-
-    # Write combined rules
-    with open(rules_path, 'w') as f:
-        json.dump(combined_rules, f, indent=2)
+        popup_extension_path = (base_extensions_path / 'shot-scraper-popup-blocker').resolve()
+        extensions.append(str(popup_extension_path))
+        loaded_extensions.append("popup blocking")
 
     if Config.verbose:
-        click.echo(f"Created {len(combined_rules)} total blocking rules", err=True)
-
-
+        click.echo(f"Blocking extensions enabled: {' + '.join(loaded_extensions)}", err=True)
 
 
 async def cleanup_browser(browser_obj):
