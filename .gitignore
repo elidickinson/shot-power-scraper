@@ -12,3 +12,8 @@ examples/
 *.jpg
 *.pdf
 /extensions/shot-scraper-blocker/downloads
+
+# Generated static extensions (build artifacts)
+/extensions/shot-scraper-ad-blocker/
+/extensions/shot-scraper-popup-blocker/
+/extensions/shot-scraper-combo-blocker/
