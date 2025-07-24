@@ -49,9 +49,10 @@ async def _save_screenshot(page_or_element, output, format, quality=None, full_p
             ))
             await page_or_element
 
+        clip_whole_page = uc.cdp.page.Viewport.from_json({'width': layout_width, 'height': layout_height, 'x': 0, 'y': 0, 'scale': 1})
         data = await page_or_element.send(
             uc.cdp.page.capture_screenshot(
-                format_=format, capture_beyond_viewport=full_page
+                format_=format, capture_beyond_viewport=full_page, clip=clip_whole_page
             )
         )
 
