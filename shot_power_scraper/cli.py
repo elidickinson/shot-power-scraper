@@ -13,7 +13,7 @@ import asyncio
 from shot_power_scraper.utils import filename_for_url, load_github_script, url_or_file_path
 from shot_power_scraper.browser import Config, create_browser_context, cleanup_browser, setup_blocking_extensions
 from shot_power_scraper.screenshot import take_shot, take_pdf
-from shot_power_scraper.shot_config import ShotConfig, set_default_user_agent
+from shot_power_scraper.shot_config import ShotConfig, set_config_value
 
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
@@ -58,13 +58,21 @@ def run_browser_command(command_func, shot_config, **kwargs):
     return run_nodriver_async(browser_execution())
 
 
-def setup_common_config(verbose, debug, silent, skip, fail):
+def setup_common_config(verbose, debug, silent, skip, fail, enable_gpu=False):
     """Setup common configuration used by all commands"""
     Config.verbose = verbose
     Config.silent = silent
     Config.debug = debug
     Config.skip = skip
     Config.fail = fail
+    
+    # Use command line flag if provided, otherwise check config file
+    if enable_gpu:
+        Config.enable_gpu = True
+    else:
+        from shot_power_scraper.shot_config import load_config
+        config_file_settings = load_config()
+        Config.enable_gpu = config_file_settings.get("enable_gpu", False)
 
     if skip and fail:
         raise click.ClickException("--skip and --fail cannot be used together")
@@ -131,6 +139,7 @@ def common_shot_options(fn):
     # Browser options
     click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")(fn)
     click.option("--user-agent", help="User-Agent header to use")(fn)
+    click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration (GPU is disabled by default)")(fn)
     click.option("browser_args", "--browser-arg", multiple=True,
                 help="Additional arguments to pass to the browser")(fn)
     click.option("--browser", "-b", default="chromium", type=click.Choice(BROWSERS, case_sensitive=False),
@@ -162,6 +171,7 @@ def simple_browser_options(fn):
     """Simplified browser options for auth and config commands"""
     click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")(fn)
     click.option("--user-agent", help="User-Agent header to use")(fn)
+    click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration (GPU is disabled by default)")(fn)
     click.option("browser_args", "--browser-arg", multiple=True,
                 help="Additional arguments to pass to the browser")(fn)
     click.option("--browser", "-b", default="chromium", type=click.Choice(BROWSERS, case_sensitive=False),
@@ -206,7 +216,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
          verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
          wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
-         auth_username, auth_password):
+         auth_username, auth_password, enable_gpu):
     """
     Take a single screenshot of a page or portion of a page.
 
@@ -237,7 +247,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 
         shot-scraper https://www.example.com/ --height 600 -o partial.png
     """
-    setup_common_config(verbose, debug, silent, skip, fail)
+    setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
     if output is None:
         ext = "jpg" if quality else None
@@ -325,7 +335,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
          verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
          wait, wait_for, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
-         auth_username, auth_password):
+         auth_username, auth_password, enable_gpu):
     """
     Take multiple screenshots or PDFs, defined by a YAML file
 
@@ -347,7 +357,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
     PDF files are automatically detected by .pdf extension.
     All PDF options from the pdf command are supported in YAML format.
     """
-    setup_common_config(verbose, debug, silent, skip, fail)
+    setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
     if (har or har_zip) and not har_file:
         har_file = filename_for_url(
@@ -461,7 +471,7 @@ def accessibility(url, output, javascript,
                  verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
                  wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
                  auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
-                 auth_username, auth_password):
+                 auth_username, auth_password, enable_gpu):
     """
     (NOT IMPLEMENTED) Dump the Chromium accessibility tree for the specifed page
 
@@ -485,7 +495,7 @@ def har(url, zip_, output, javascript,
        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
        wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
-       auth_username, auth_password):
+       auth_username, auth_password, enable_gpu):
     """
     NOT IMPLEMENTED - Record a HAR file for the specified page
 
@@ -515,7 +525,7 @@ def javascript(url, javascript, input, output, raw,
               verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
               wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
               auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
-              auth_username, auth_password):
+              auth_username, auth_password, enable_gpu):
     """
     Execute JavaScript against the page and return the result as JSON
 
@@ -541,7 +551,7 @@ def javascript(url, javascript, input, output, raw,
 
     If a JavaScript error occurs an exit code of 1 will be returned.
     """
-    setup_common_config(verbose, debug, silent, skip, fail)
+    setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
     if not javascript:
         if input.startswith("gh:"):
@@ -601,7 +611,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
        wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
-       auth_username, auth_password):
+       auth_username, auth_password, enable_gpu):
     """
     Create a PDF of the specified page
 
@@ -623,7 +633,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 
         shot-power-scraper pdf https://www.example.com/ -o - > example.pdf
     """
-    setup_common_config(verbose, debug, silent, skip, fail)
+    setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
     url = url_or_file_path(url, _check_and_absolutize)
 
@@ -673,7 +683,7 @@ def html(url, output, javascript, selector,
         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
         wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
         auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
-        auth_username, auth_password):
+        auth_username, auth_password, enable_gpu):
     """
     Output the final HTML of the specified page
 
@@ -685,7 +695,7 @@ def html(url, output, javascript, selector,
 
         shot-scraper html https://datasette.io/ -o index.html
     """
-    setup_common_config(verbose, debug, silent, skip, fail)
+    setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
     if output is None:
         output = filename_for_url(url, ext="html", file_exists=os.path.exists)
@@ -767,7 +777,7 @@ def install(browser, browser_args):
             raise click.ClickException("Could not detect user agent")
 
         modified_user_agent = user_agent.replace("HeadlessChrome", "Chrome")
-        set_default_user_agent(modified_user_agent)
+        set_config_value('user_agent', modified_user_agent)
 
         from shot_power_scraper.shot_config import get_config_file
         click.echo(f"Original user agent: {user_agent}")
@@ -800,6 +810,11 @@ def install(browser, browser_args):
     help="Set default user agent string"
 )
 @click.option(
+    "--enable-gpu",
+    type=bool,
+    help="Set default GPU enable setting (true/false)"
+)
+@click.option(
     "--clear",
     is_flag=True,
     help="Clear all configuration settings (delete config file)"
@@ -809,7 +824,7 @@ def install(browser, browser_args):
     is_flag=True,
     help="Show current configuration"
 )
-def config_cmd(ad_block, popup_block, paywall_block, user_agent, clear, show):
+def config_cmd(ad_block, popup_block, paywall_block, user_agent, enable_gpu, clear, show):
     """
     Configure default settings for shot-power-scraper
 
@@ -817,10 +832,11 @@ def config_cmd(ad_block, popup_block, paywall_block, user_agent, clear, show):
 
         shot-power-scraper config --ad-block true --popup-block false --paywall-block true
         shot-power-scraper config --user-agent "Mozilla/5.0 ..."
+        shot-power-scraper config --enable-gpu true
         shot-power-scraper config --clear
         shot-power-scraper config --show
     """
-    from shot_power_scraper.shot_config import load_config, set_default_ad_block, set_default_popup_block, set_default_paywall_block, set_default_user_agent, get_config_file
+    from shot_power_scraper.shot_config import load_config, set_config_value, get_config_file
     import os
 
     if clear:
@@ -839,27 +855,32 @@ def config_cmd(ad_block, popup_block, paywall_block, user_agent, clear, show):
         click.echo(f"popup_block: {config.get('popup_block', False)}")
         click.echo(f"paywall_block: {config.get('paywall_block', False)}")
         click.echo(f"user_agent: {config.get('user_agent', 'None')}")
+        click.echo(f"enable_gpu: {config.get('enable_gpu', False)}")
         return
 
     if ad_block is not None:
-        set_default_ad_block(ad_block)
+        set_config_value('ad_block', ad_block)
         click.echo(f"Set default ad_block to: {ad_block}")
 
     if popup_block is not None:
-        set_default_popup_block(popup_block)
+        set_config_value('popup_block', popup_block)
         click.echo(f"Set default popup_block to: {popup_block}")
 
     if paywall_block is not None:
-        set_default_paywall_block(paywall_block)
+        set_config_value('paywall_block', paywall_block)
         click.echo(f"Set default paywall_block to: {paywall_block}")
 
     if user_agent is not None:
-        set_default_user_agent(user_agent)
+        set_config_value('user_agent', user_agent)
         click.echo(f"Set default user_agent to: {user_agent}")
 
-    if ad_block is None and popup_block is None and paywall_block is None and user_agent is None and not show and not clear:
+    if enable_gpu is not None:
+        set_config_value('enable_gpu', enable_gpu)
+        click.echo(f"Set default enable_gpu to: {enable_gpu}")
+
+    if ad_block is None and popup_block is None and paywall_block is None and user_agent is None and enable_gpu is None and not show and not clear:
         click.echo("No configuration changes specified. Use --show to view current settings.")
-        click.echo("Use --ad-block true/false, --popup-block true/false, --paywall-block true/false, --user-agent 'string', or --clear to modify settings.")
+        click.echo("Use --ad-block true/false, --popup-block true/false, --paywall-block true/false, --user-agent 'string', --enable-gpu true/false, or --clear to modify settings.")
 
 
 @cli.command()

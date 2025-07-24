@@ -16,6 +16,7 @@ class Config:
     debug = False
     skip = False
     fail = False
+    enable_gpu = False
 
 
 
@@ -27,6 +28,10 @@ async def create_browser_context(shot_config, extensions=None):
     # Add user agent to browser args if specified or found in config
     if shot_config.user_agent:
         browser_args_list.append(f"--user-agent={shot_config.user_agent}")
+
+    # Add --disable-gpu by default unless --enable-gpu is specified
+    if not Config.enable_gpu:
+        browser_args_list.append("--disable-gpu")
 
     # Add extensions via Chrome flags if provided
     if extensions:

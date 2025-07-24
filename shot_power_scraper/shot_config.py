@@ -42,31 +42,10 @@ def get_default_user_agent():
     return config.get('user_agent')
 
 
-def set_default_user_agent(user_agent):
-    """Set the default user agent in config"""
+def set_config_value(key, value):
+    """Set a configuration value"""
     config = load_config()
-    config['user_agent'] = user_agent
-    save_config(config)
-
-
-def set_default_ad_block(ad_block):
-    """Set the default ad block setting in config"""
-    config = load_config()
-    config['ad_block'] = ad_block
-    save_config(config)
-
-
-def set_default_popup_block(popup_block):
-    """Set the default popup block setting in config"""
-    config = load_config()
-    config['popup_block'] = popup_block
-    save_config(config)
-
-
-def set_default_paywall_block(paywall_block):
-    """Set the default paywall block setting in config"""
-    config = load_config()
-    config['paywall_block'] = paywall_block
+    config[key] = value
     save_config(config)
 
 
