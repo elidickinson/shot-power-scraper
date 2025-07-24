@@ -1,0 +1,26 @@
+{
+  "Capital.fr": {
+    "domain": "capital.fr",
+    "allow_cookies": 1,
+    "cs_code": "[{\"cond\":\"div#articleWall-wrapper\", \"rm_elem\":1, \"elems\": [{\"cond\":\"div#articleWall-paid\", \"rm_attrib\":\"class|hidden\"}, {\"cond\":\"div#articleWall\", \"rm_attrib\":\"class\"}]}]",
+    "upd_version": "4.1.6.4"
+  },
+  "Der Freitag": {
+    "domain": "freitag.de",
+    "allow_cookies": 1,
+    "ld_json": "section.qa-paywall|div.bo-article-text",
+    "upd_version": "4.1.5.4"
+  },
+  "Loeb Classical Library": {
+    "domain": "loebclassics.com",
+    "remove_cookies_select_drop": ["hupLclFreeReadsCookie"],
+    "upd_version": "4.1.6.2"
+  },
+  "Mittelbayerische Zeitung": {
+    "domain": "mittelbayerische.de",
+    "allow_cookies": 1,
+    "block_regex": "\\.piano\\.io",
+    "ld_archive_is": "div.paywall-layer|div#article-body",
+    "upd_version": "4.1.6.2"
+  }
+}

@@ -17,18 +17,17 @@ function isValidElementHidingSelector(selector) {
         selector.includes(':has-text(') ||
         selector.includes(':matches-css(') ||
         selector.includes(':xpath(') ||
-        selector.includes('>>>') ||
-        selector.includes('^')) {
+        selector.includes('>>>')) {
         return false;
     }
     
     // Skip overly complex selectors that might cause performance issues
-    if (selector.length > 200) {
+    if (selector.length > 1000) {
         return false;
     }
     
     // Basic CSS selector validation (simple heuristic)
-    const invalidChars = /[<>{}]/;
+    const invalidChars = /[<{}]/;
     if (invalidChars.test(selector)) {
         return false;
     }

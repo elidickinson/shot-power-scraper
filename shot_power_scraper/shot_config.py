@@ -63,6 +63,13 @@ def set_default_popup_block(popup_block):
     save_config(config)
 
 
+def set_default_paywall_block(paywall_block):
+    """Set the default paywall block setting in config"""
+    config = load_config()
+    config['paywall_block'] = paywall_block
+    save_config(config)
+
+
 class ShotConfig:
     """Configuration for screenshot and PDF operations"""
     def __init__(self, shot):
@@ -85,6 +92,7 @@ class ShotConfig:
         self.full_page = not shot.get("height")
         self.ad_block = shot.get("ad_block", config_file_settings.get("ad_block", False))
         self.popup_block = shot.get("popup_block", config_file_settings.get("popup_block", False))
+        self.paywall_block = shot.get("paywall_block", config_file_settings.get("paywall_block", False))
         self.user_agent = shot.get("user_agent", config_file_settings.get("user_agent"))
         self.skip_shot = shot.get("skip_shot", False)
         self.save_html = shot.get("save_html", False)

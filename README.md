@@ -46,11 +46,11 @@ For stealth features to work when running in headless mode (the default) you mus
 
 ### Ad and Popup Blocking
 
-This fork has a simple custom ad blocking extension. If called with --ad-block it blocks most ads and with --popup-block it blocks most modal dialogs, popups and cookie consent banners.
+This fork includes Chrome extensions for blocking ads and popups during screenshot capture. Use `--ad-block` to block advertisements and `--popup-block` to block modal dialogs, popups and cookie consent banners.
 
-    shot-power-scraper --ad-block https://example.com
+    shot-power-scraper --ad-block --popup-block https://example.com
 
-This can be enabled by default using the `config` command.
+This can be enabled by default using the `config` command. For detailed information about the extensions, custom filter rules, and architecture, see [EXTENSIONS.md](EXTENSIONS.md).
 
 ## ⚠️ Important: Differences from Original shot-scraper
 
