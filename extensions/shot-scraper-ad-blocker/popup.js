@@ -1,3 +1,7 @@
+// Set extension name in title
+const manifest = chrome.runtime.getManifest();
+document.getElementById('title').textContent = manifest.name;
+
 // Get blocked count from background script
 chrome.runtime.sendMessage({ action: "getBlockedCount" }, (response) => {
   if (response) {

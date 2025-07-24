@@ -3,53 +3,21 @@
   "name": "Shot Scraper Ad Blocker",
   "version": "1.0",
   "description": "Ad blocker for shot-scraper",
-  "permissions": [
-    "declarativeNetRequest",
-    "declarativeNetRequestFeedback",
-    "activeTab"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
-  "background": {
-    "service_worker": "background.js"
-  },
+  "permissions": ["declarativeNetRequest", "declarativeNetRequestFeedback", "activeTab", "webNavigation"],
+  "host_permissions": ["<all_urls>"],
+  "background": {"service_worker": "background.js"},
   "declarative_net_request": {
-    "rule_resources": [
-      {
-        "id": "default_rules",
-        "enabled": true,
-        "path": "rules.json"
-      }
-    ]
+    "rule_resources": [{"id": "default_rules", "enabled": true, "path": "network-rules.json"}]
   },
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "cosmetic-ad-block-rules.json",
-        "cosmetic-popup-block-rules.json"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
-    }
-  ],
-  "action": {
-    "default_title": "Shot Scraper Ad Blocker",
-    "default_popup": "popup.html"
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content.js"
-      ],
-      "css": [
-        "content.css"
-      ],
-      "run_at": "document_start"
-    }
-  ]
+  "web_accessible_resources": [{
+    "resources": ["cosmetic-rules.json"],
+    "matches": ["<all_urls>"]
+  }],
+  "action": {"default_title": "Shot Scraper Ad Blocker", "default_popup": "popup.html"},
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content.js"],
+    "css": ["content.css"],
+    "run_at": "document_start"
+  }]
 }

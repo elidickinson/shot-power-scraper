@@ -43,8 +43,8 @@ def run_browser_command(command_func, shot_config, **kwargs):
         browser_obj = None
         try:
             extensions = []
-            if shot_config.ad_block or shot_config.popup_block:
-                await setup_blocking_extensions(extensions, shot_config.ad_block, shot_config.popup_block)
+            if shot_config.ad_block or shot_config.popup_block or shot_config.paywall_block:
+                await setup_blocking_extensions(extensions, shot_config.ad_block, shot_config.popup_block, shot_config.paywall_block)
 
             # Create browser with shot_config parameters
             browser_obj = await create_browser_context(shot_config, extensions)
@@ -152,6 +152,8 @@ def common_shot_options(fn):
                 help="Enable/disable popup blocking (overrides config file setting)")(fn)
     click.option("--ad-block/--no-ad-block", default=None,
                 help="Enable ad blocking using built-in filter lists")(fn)
+    click.option("--paywall-block/--no-paywall-block", default=None,
+                help="Enable paywall bypass using Bypass Paywalls Clean extension")(fn)
 
     return fn
 
@@ -201,7 +203,7 @@ def cli():
 def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_selectors_all,
          padding, javascript, retina, scale_factor, omit_background, quality,
          interactive, devtools, log_requests, save_html,
-         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block,
+         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
          wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
          auth_username, auth_password):
@@ -250,7 +252,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         "javascript": javascript, "width": width, "height": height, "quality": quality,
         "padding": padding, "omit_background": omit_background, "scale_factor": scale_factor,
         "save_html": save_html,
-        "ad_block": ad_block, "popup_block": popup_block,
+        "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block,
         "wait": wait, "wait_for": wait_for, "timeout": timeout,
         "skip_cloudflare_check": skip_cloudflare_check,
         "skip_wait_for_load": skip_wait_for_load,
@@ -320,7 +322,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 @common_shot_options
 def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outputs,
          leave_server, har, har_zip, har_file,
-         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block,
+         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
          wait, wait_for, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
          auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
          auth_username, auth_password):
@@ -368,8 +370,8 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 
     async def run_multi():
         extensions = []
-        if ad_block or popup_block:
-            await setup_blocking_extensions(extensions, ad_block, popup_block)
+        if ad_block or popup_block or paywall_block:
+            await setup_blocking_extensions(extensions, ad_block, popup_block, paywall_block)
 
         # Create browser config for multi command
         browser_shot_config = ShotConfig({
@@ -456,7 +458,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 @click.option("-j", "--javascript", help="Execute this JS prior to taking the snapshot")
 @common_shot_options
 def accessibility(url, output, javascript,
-                 verbose, debug, silent, log_console, skip, fail, ad_block, popup_block,
+                 verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
                  wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
                  auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
                  auth_username, auth_password):
@@ -480,7 +482,7 @@ def accessibility(url, output, javascript,
 @click.option("-j", "--javascript", help="Execute this JavaScript on the page")
 @common_shot_options
 def har(url, zip_, output, javascript,
-       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block,
+       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
        wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
        auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
        auth_username, auth_password):
@@ -510,7 +512,7 @@ def har(url, zip_, output, javascript,
 )
 @common_shot_options
 def javascript(url, javascript, input, output, raw,
-              verbose, debug, silent, log_console, skip, fail, ad_block, popup_block,
+              verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
               wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
               auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
               auth_username, auth_password):
@@ -557,7 +559,7 @@ def javascript(url, javascript, input, output, raw,
             "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
             "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
             "log_console": log_console,
-            "ad_block": ad_block, "popup_block": popup_block,
+            "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block,
             "user_agent": user_agent,
             "return_js_result": True
         })
@@ -569,7 +571,7 @@ def javascript(url, javascript, input, output, raw,
         return result
 
     shot_config = ShotConfig({
-        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent,
+        "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block, "user_agent": user_agent,
         "auth": auth, "browser": browser, "browser_args": browser_args,
         "reduced_motion": reduced_motion, "bypass_csp": bypass_csp,
         "auth_username": auth_username, "auth_password": auth_password, "timeout": timeout
@@ -596,7 +598,7 @@ def javascript(url, javascript, input, output, raw,
 @click.option("--pdf-css", help="Inject custom CSS for PDF generation")
 @common_shot_options
 def pdf(url, output, javascript, media_screen, landscape, scale, print_background, pdf_css,
-       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block,
+       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
        wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
        auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
        auth_username, auth_password):
@@ -634,7 +636,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
         "pdf_print_background": print_background, "pdf_media_screen": media_screen,
         "pdf_css": pdf_css, "wait": wait, "wait_for": wait_for, "timeout": timeout,
         "trigger_lazy_load": trigger_lazy_load,
-        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent,
+        "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block, "user_agent": user_agent,
         "auth": auth, "browser": browser, "browser_args": browser_args,
         "reduced_motion": reduced_motion, "bypass_csp": bypass_csp,
         "auth_username": auth_username, "auth_password": auth_password
@@ -668,7 +670,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 )
 @common_shot_options
 def html(url, output, javascript, selector,
-        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block,
+        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
         wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
         auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
         auth_username, auth_password):
@@ -694,7 +696,7 @@ def html(url, output, javascript, selector,
         "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
         "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
         "log_console": log_console,
-        "ad_block": ad_block, "popup_block": popup_block, "user_agent": user_agent,
+        "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block, "user_agent": user_agent,
         "auth": auth, "browser": browser, "browser_args": browser_args,
         "bypass_csp": bypass_csp, "auth_username": auth_username,
         "auth_password": auth_password
@@ -789,6 +791,11 @@ def install(browser, browser_args):
     help="Set default popup blocking (true/false)"
 )
 @click.option(
+    "--paywall-block",
+    type=bool,
+    help="Set default paywall blocking (true/false)"
+)
+@click.option(
     "--user-agent",
     help="Set default user agent string"
 )
@@ -802,18 +809,18 @@ def install(browser, browser_args):
     is_flag=True,
     help="Show current configuration"
 )
-def config_cmd(ad_block, popup_block, user_agent, clear, show):
+def config_cmd(ad_block, popup_block, paywall_block, user_agent, clear, show):
     """
     Configure default settings for shot-power-scraper
 
     Usage:
 
-        shot-power-scraper config --ad-block true --popup-block false
+        shot-power-scraper config --ad-block true --popup-block false --paywall-block true
         shot-power-scraper config --user-agent "Mozilla/5.0 ..."
         shot-power-scraper config --clear
         shot-power-scraper config --show
     """
-    from shot_power_scraper.shot_config import load_config, set_default_ad_block, set_default_popup_block, set_default_user_agent, get_config_file
+    from shot_power_scraper.shot_config import load_config, set_default_ad_block, set_default_popup_block, set_default_paywall_block, set_default_user_agent, get_config_file
     import os
 
     if clear:
@@ -830,6 +837,7 @@ def config_cmd(ad_block, popup_block, user_agent, clear, show):
         click.echo(f"Configuration file: {get_config_file()}")
         click.echo(f"ad_block: {config.get('ad_block', False)}")
         click.echo(f"popup_block: {config.get('popup_block', False)}")
+        click.echo(f"paywall_block: {config.get('paywall_block', False)}")
         click.echo(f"user_agent: {config.get('user_agent', 'None')}")
         return
 
@@ -841,13 +849,17 @@ def config_cmd(ad_block, popup_block, user_agent, clear, show):
         set_default_popup_block(popup_block)
         click.echo(f"Set default popup_block to: {popup_block}")
 
+    if paywall_block is not None:
+        set_default_paywall_block(paywall_block)
+        click.echo(f"Set default paywall_block to: {paywall_block}")
+
     if user_agent is not None:
         set_default_user_agent(user_agent)
         click.echo(f"Set default user_agent to: {user_agent}")
 
-    if ad_block is None and popup_block is None and user_agent is None and not show and not clear:
+    if ad_block is None and popup_block is None and paywall_block is None and user_agent is None and not show and not clear:
         click.echo("No configuration changes specified. Use --show to view current settings.")
-        click.echo("Use --ad-block true/false, --popup-block true/false, --user-agent 'string', or --clear to modify settings.")
+        click.echo("Use --ad-block true/false, --popup-block true/false, --paywall-block true/false, --user-agent 'string', or --clear to modify settings.")
 
 
 @cli.command()

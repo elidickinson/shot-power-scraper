@@ -34,17 +34,22 @@ async def create_browser_context(shot_config, extensions=None):
             extensions = [extensions]
 
         extension_paths = []
+        
         for ext_path in extensions:
             ext_path = pathlib.Path(ext_path).absolute()
             if Config.verbose:
                 click.echo(f"Loading extension: {ext_path}", err=True)
+            
+            
             extension_paths.append(str(ext_path))
 
-        # Use Chrome's --load-extension argument
+        # Use Chrome's --load-extension argument for all extensions
         if extension_paths:
             extension_arg = f"--load-extension={','.join(extension_paths)}"
             browser_args_list.append(extension_arg)
-            # Enable extension loading
+        
+        # Enable extension loading
+        if extension_paths:
             browser_args_list.append("--disable-features=DisableLoadExtensionCommandLineSwitch")
 
     # Create temporary user data directory to avoid nodriver cleanup messages
@@ -94,7 +99,7 @@ async def create_browser_context(shot_config, extensions=None):
     return browser_obj
 
 
-async def setup_blocking_extensions(extensions, ad_block, popup_block):
+async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_block):
     """Setup blocking extensions based on requested flags"""
     base_extensions_path = pathlib.Path(__file__).parent.parent / 'extensions'
 
@@ -110,6 +115,11 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block):
         popup_extension_path = (base_extensions_path / 'shot-scraper-popup-blocker').resolve()
         extensions.append(str(popup_extension_path))
         loaded_extensions.append("popup blocking")
+
+    if paywall_block:
+        paywall_extension_path = (base_extensions_path / 'bypass-paywalls-chrome-clean-master').resolve()
+        extensions.append(str(paywall_extension_path))
+        loaded_extensions.append("paywall bypass")
 
     if Config.verbose:
         click.echo(f"Blocking extensions enabled: {' + '.join(loaded_extensions)}", err=True)

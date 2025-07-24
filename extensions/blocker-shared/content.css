@@ -1,5 +1,4 @@
-/* CSS for cosmetic filtering - minimal base styles */
+/* Extra CSS for cosmetic filtering in case there's a conflict with another !important rule */
 [data-shot-scraper-blocked="cosmetic"] {
     display: none !important;
-    visibility: hidden !important;
 }
