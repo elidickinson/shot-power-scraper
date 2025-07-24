@@ -323,7 +323,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outputs,
          leave_server, har, har_zip, har_file,
          verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
-         wait, wait_for, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
+         wait, wait_for, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
          auth_username, auth_password):
     """
@@ -459,7 +459,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 @common_shot_options
 def accessibility(url, output, javascript,
                  verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
-                 wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
+                 wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
                  auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
                  auth_username, auth_password):
     """
@@ -483,7 +483,7 @@ def accessibility(url, output, javascript,
 @common_shot_options
 def har(url, zip_, output, javascript,
        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
-       wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
+       wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
        auth_username, auth_password):
     """
@@ -513,7 +513,7 @@ def har(url, zip_, output, javascript,
 @common_shot_options
 def javascript(url, javascript, input, output, raw,
               verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
-              wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
+              wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
               auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
               auth_username, auth_password):
     """
@@ -599,7 +599,7 @@ def javascript(url, javascript, input, output, raw,
 @common_shot_options
 def pdf(url, output, javascript, media_screen, landscape, scale, print_background, pdf_css,
        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
-       wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
+       wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
        auth_username, auth_password):
     """
@@ -671,7 +671,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 @common_shot_options
 def html(url, output, javascript, selector,
         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
-        wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load,
+        wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
         auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
         auth_username, auth_password):
     """
