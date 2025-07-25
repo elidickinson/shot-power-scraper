@@ -14,6 +14,7 @@ class ResponseHandler:
         self.response_url: Optional[str] = None
         self.main_request_id: Optional[str] = None
         self._response_received = asyncio.Event()
+        self._load_failed = asyncio.Event()
 
     async def on_response_received(self, event: uc.cdp.network.ResponseReceived):
         """Handler for ResponseReceived events"""
@@ -27,10 +28,35 @@ class ResponseHandler:
             if Config.verbose:
                 click.echo(f"Response received: {event.response.status} {event.response.url}", err=True)
 
+    async def on_loading_failed(self, event: uc.cdp.network.LoadingFailed):
+        """Handler for LoadingFailed events"""
+        if (hasattr(event, 'type_') and event.type_ == uc.cdp.network.ResourceType.DOCUMENT) or \
+           (not hasattr(event, 'type_') and not self._load_failed.is_set()):
+            self._load_failed.set()
+
     async def wait_for_response(self, timeout: float = 30) -> Tuple[Optional[int], Optional[str]]:
         """Wait for the main response and return status and URL"""
-        await asyncio.wait_for(self._response_received.wait(), timeout=timeout)
-        return self.response_status, self.response_url
+        # Wait for either a successful response or a loading failure
+        done, pending = await asyncio.wait(
+            [
+                asyncio.create_task(self._response_received.wait()),
+                asyncio.create_task(self._load_failed.wait())
+            ],
+            timeout=timeout,
+            return_when=asyncio.FIRST_COMPLETED
+        )
+        
+        # Cancel any pending tasks
+        for task in pending:
+            task.cancel()
+        
+        # Check if we got a response or an error
+        if self._response_received.is_set():
+            return self.response_status, self.response_url
+        elif self._load_failed.is_set():
+            raise ConnectionError("Network loading failed")
+        else:
+            raise asyncio.TimeoutError("Timeout waiting for response")
 
     def reset(self):
         """Reset the handler for a new request"""
@@ -38,3 +64,4 @@ class ResponseHandler:
         self.response_url = None
         self.main_request_id = None
         self._response_received.clear()
+        self._load_failed.clear()

@@ -132,15 +132,15 @@ def generate_user_agent_metadata(user_agent_string):
 async def create_tab_context(browser_obj, shot_config):
     """
     Create and configure a new tab context with one-time setup.
-    
+
     Handles tab creation, window sizing, user agent configuration,
     script injection, console logging, and network response handling.
-    
+
     Returns: configured tab at about:blank ready for navigation
     """
     from shot_power_scraper.console_logger import ConsoleLogger
     from shot_power_scraper.response_handler import ResponseHandler
-    
+
     if Config.verbose:
         click.echo(f"Setting up tab context", err=True)
 
@@ -177,38 +177,51 @@ async def create_tab_context(browser_obj, shot_config):
     response_handler = ResponseHandler()
     await page.send(uc.cdp.network.enable())
     page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
+    page.add_handler(uc.cdp.network.LoadingFailed, response_handler.on_loading_failed)
     page._response_handler = response_handler
-    
+
     if Config.verbose:
         click.echo(f"Tab context setup complete", err=True)
-    
+
     return page
 
 
 async def navigate_to_url(page, shot_config):
     """
     Navigate a configured tab to a target URL and handle post-navigation logic.
-    
+
     Expects a tab that has already been configured with create_tab_context().
     Handles navigation, load waiting, error checking, Cloudflare bypass,
     JavaScript execution, and post-navigation processing.
-    
+
     Returns: response_handler (page._response_handler should already be set)
     """
     from shot_power_scraper.utils import url_or_file_path
-    
+
     # Convert URL to proper format
     url = url_or_file_path(shot_config.url)
-    
+
     # Get the response handler that was set up during tab context creation
     response_handler = page._response_handler
+    response_handler.reset()
 
     # Navigate to the actual URL
     if Config.verbose:
         click.echo(f"Loading page: {url}", err=True)
-    await page.get(url)
-    await page
     
+    # Start navigation - network failure events will fire immediately for DNS/connection issues
+    try:
+        await asyncio.wait_for(page.get(url), timeout=10)
+        await page
+    except asyncio.TimeoutError:
+        msg = "Could not connect to" if response_handler._load_failed.is_set() else "Timeout loading"
+        error_msg = f"{msg} {url}"
+        
+        if Config.skip:
+            click.echo(f"{error_msg}, skipping", err=True)
+            raise SystemExit
+        raise click.ClickException(error_msg)
+
     # Wait for window load event unless skipped
     if not shot_config.skip_wait_for_load:
         if Config.verbose:
@@ -229,7 +242,15 @@ async def navigate_to_url(page, shot_config):
             click.echo(f"Done waiting for window load", err=True)
 
     # Check HTTP response status
-    response_status, response_url = await response_handler.wait_for_response(timeout=5)
+    try:
+        response_status, response_url = await response_handler.wait_for_response(timeout=5)
+    except (ConnectionError, asyncio.TimeoutError):
+        error_msg = f"Could not connect to {url}"
+        if Config.skip:
+            click.echo(f"{error_msg}, skipping", err=True)
+            raise SystemExit
+        raise click.ClickException(error_msg)
+
     if response_status is not None:
         if str(response_status)[0] in ("4", "5"):
             if Config.skip:
@@ -500,5 +521,3 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     await page
     if Config.verbose:
         click.echo(f"Lazy load complete", err=True)
-
-
