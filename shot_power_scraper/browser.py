@@ -64,6 +64,7 @@ async def create_browser_context(shot_config, extensions=None):
     # Create browser config
     config = uc.Config(user_data_dir=temp_user_data_dir)
     config.headless = not shot_config.interactive
+    # config.lang = "en-US"  # Set single language to match legitimate browsers
 
     # Add --hide-scrollbars when in headless mode
     if not shot_config.interactive:
