@@ -176,11 +176,11 @@ async def wait_for_cloudflare_bypass(page, max_wait_seconds=8):
                     if Config.verbose:
                         click.echo(f"Cloudflare challenge bypassed in {elapsed_seconds:.1f}s", err=True)
                     return True
-            await asyncio.sleep(0.3)  # Check more frequently
+            await page.sleep(0.3)  # Check more frequently
         except Exception as e:
             if Config.verbose:
                 click.echo(f"Cloudflare bypass check failed: {e}", err=True)
-            await asyncio.sleep(0.3)
+            await page.sleep(0.3)
 
     if Config.verbose:
         click.echo(f"Cloudflare bypass timeout after {max_wait_seconds}s", err=True)
@@ -202,7 +202,7 @@ async def wait_for_condition(page, wait_for_expression, timeout_seconds=30):
                 elapsed = int((time.time() - start_time) * 1000)
                 click.echo(f"Wait condition met after {elapsed}ms", err=True)
             return True
-        await asyncio.sleep(0.1)
+        await page.sleep(0.1)
 
     raise click.ClickException(f"Timeout waiting for condition: {wait_for_expression}")
 
