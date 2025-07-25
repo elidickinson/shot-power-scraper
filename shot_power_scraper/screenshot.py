@@ -14,66 +14,95 @@ from shot_power_scraper.utils import filename_for_url, url_or_file_path
 from shot_power_scraper.shot_config import ShotConfig
 
 
-async def _save_screenshot_with_temp_file(page_or_element, format, quality=None, full_page=False, resize_viewport=True):
+async def _save_screenshot_with_temp_file(page_or_element, shot_config):
     """Save screenshot to temporary file and return bytes"""
-    suffix = '.jpg' if format == "jpeg" else '.png'
+    suffix = '.jpg' if shot_config.format == "jpeg" else '.png'
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-        await _save_screenshot(page_or_element, tmp.name, format, quality, full_page, resize_viewport)
+        await _save_screenshot(page_or_element, tmp.name, shot_config)
         with open(tmp.name, 'rb') as f:
             bytes_data = f.read()
         os.unlink(tmp.name)
         return bytes_data
 
 
-async def _save_screenshot(page_or_element, output, format, quality=None, full_page=False, resize_viewport=True):
+async def _save_screenshot(page_or_element, output, shot_config):
     """Save screenshot to file"""
-    # nodriver doesn't support `quality` param
-    if format == "jpeg" and quality and not getattr(_save_screenshot, '_quality_warning_shown', False):
-        click.echo("Warning: JPEG quality parameter is not supported by nodriver and will be ignored", err=True)
-        _save_screenshot._quality_warning_shown = True
+    # Check if this is an element (has get_position method) or a page
+    is_element = hasattr(page_or_element, 'get_position')
 
-    if full_page:
-        await page_or_element
-        if resize_viewport:
-            # resize viewport to the size of the whole page. This *seems like* it makes for a more consistent full page screenshot.
-            # especially if the page has a sticky footer
-            layout_width = document_height = await page_or_element.evaluate("document.documentElement.scrollWidth")
-            layout_height = document_height = await page_or_element.evaluate("document.documentElement.scrollHeight")
+    page = page_or_element
+    if is_element:
+        # Element screenshot - get position and create clip
+        page = page_or_element.tab
+        element = page_or_element
+        await page  # gotta give the browser a chance to lay out the elements
+        pos = await element.get_position()
+        clip = pos.to_viewport(1)  # scale=1
+        capture_beyond_viewport = True  # Elements might be outside viewport
+    elif shot_config.effective_full_page:
+        # Full page screenshot
+        await page  # give a moment for everything to settle on the page
+        layout_width = shot_config.width  # user specified width, or default
+        layout_height = await page.evaluate("document.documentElement.scrollHeight")
+        if shot_config.resize_viewport:
             if Config.verbose:
                 click.echo(f"Resizing viewport for screenshot to {layout_width}x{layout_height}", err=True)
-            await page_or_element.send(uc.cdp.emulation.set_device_metrics_override(
+            await page.send(uc.cdp.emulation.set_device_metrics_override(
                 width=layout_width,
                 height=layout_height,
                 device_scale_factor=1,
                 mobile=False
             ))
-            await page_or_element
+            await page
 
-        clip_whole_page = uc.cdp.page.Viewport.from_json({'width': layout_width, 'height': layout_height, 'x': 0, 'y': 0, 'scale': 1})
-        data = await page_or_element.send(
-            uc.cdp.page.capture_screenshot(
-                format_=format, capture_beyond_viewport=full_page, clip=clip_whole_page
-            )
+        clip = uc.cdp.page.Viewport.from_json({'width': layout_width, 'height': layout_height, 'x': 0, 'y': 0, 'scale': 1})
+        capture_beyond_viewport = True
+    else:
+        # Regular page screenshot - set viewport to requested dimensions
+        await page
+        if Config.verbose:
+            click.echo(f"Setting viewport for screenshot to {shot_config.width}x{shot_config.height}", err=True)
+        await page.send(uc.cdp.emulation.set_device_metrics_override(
+            width=shot_config.width,
+            height=shot_config.height,
+            device_scale_factor=1,
+            mobile=False
+        ))
+        await page
+        
+        clip = None
+        capture_beyond_viewport = False
+
+    # Build capture_screenshot parameters
+    screenshot_params = {
+        'format_': shot_config.format,
+        'capture_beyond_viewport': capture_beyond_viewport,
+        'clip': clip,
+        'quality': shot_config.quality
+    }
+
+    data = await page.send(
+        uc.cdp.page.capture_screenshot(**screenshot_params)
+    )
+
+    # Clean up viewport override if we set one
+    if not is_element:
+        await page.send(uc.cdp.emulation.clear_device_metrics_override())
+        await page
+
+    if not data:
+        raise ProtocolException(
+            "No data returned from capture_screenshot. Maybe page is still loading?"
         )
 
-        if resize_viewport:
-            await page_or_element.send(uc.cdp.emulation.clear_device_metrics_override())
-            await page_or_element
-        if not data:
-            raise ProtocolException(
-                "could not take screenshot. most possible cause is the page has not finished loading yet."
-            )
-
-        import pathlib
-        path = pathlib.Path(output)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        import base64
-        data_bytes = base64.b64decode(data)
-        if not path:
-            raise RuntimeError("invalid filename or path: '%s'" % filename)
-        path.write_bytes(data_bytes)
-    else:
-        await page_or_element.save_screenshot(output, format=format)
+    import pathlib
+    path = pathlib.Path(output)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    import base64
+    data_bytes = base64.b64decode(data)
+    if not path:
+        raise RuntimeError("invalid filename or path: '%s'" % output)
+    path.write_bytes(data_bytes)
 
 
 def _check_and_absolutize(filepath):
@@ -210,15 +239,10 @@ async def take_shot(
     else:
         page = context_or_page
 
-    # Set window size using shot_config dimensions
-    await page.set_window_size(shot_config.width, shot_config.height)
-
     # Note: wait, javascript, wait_for, and trigger_lazy_load
     # are now handled by navigate_to_page() for new pages
+    # Window size is also set in navigate_to_page() before navigation
 
-    # Determine format based on quality parameter
-    format = "jpeg" if shot_config.quality else "png"
-    full_page = shot_config.full_page if not shot_config.has_selectors() else True
 
     if shot_config.js_selectors or shot_config.js_selectors_all:
         # Evaluate JavaScript adding classes we can select on
@@ -242,11 +266,11 @@ async def take_shot(
         element = await page.select(selector_to_shoot)
         if element:
             if return_bytes:
-                return await _save_screenshot_with_temp_file(element, format, shot_config.quality, full_page, shot_config.resize_viewport)
+                return await _save_screenshot_with_temp_file(element, shot_config)
             else:
                 if Config.verbose:
                     click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
-                await _save_screenshot(element, shot_config.output, format, shot_config.quality, full_page, shot_config.resize_viewport)
+                await _save_screenshot(element, shot_config.output, shot_config)
                 message = "Screenshot of '{}' on '{}' written to '{}'".format(
                     ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), url, shot_config.output
                 )
@@ -258,11 +282,11 @@ async def take_shot(
         else:
             # Whole page
             if return_bytes:
-                return await _save_screenshot_with_temp_file(page, format, shot_config.quality, full_page, shot_config.resize_viewport)
+                return await _save_screenshot_with_temp_file(page, shot_config)
             else:
                 if Config.verbose:
-                    click.echo(f"Taking screenshot (full_page={full_page})", err=True)
-                await _save_screenshot(page, shot_config.output, format, shot_config.quality, full_page, shot_config.resize_viewport)
+                    click.echo(f"Taking screenshot (full_page={shot_config.effective_full_page})", err=True)
+                await _save_screenshot(page, shot_config.output, shot_config)
                 message = f"Screenshot of '{url}' written to '{shot_config.output}'"
 
     # Save HTML if requested
@@ -339,7 +363,7 @@ async def generate_pdf(page, options):
         """
 
         # Combine default CSS with custom CSS if provided
-        css_to_inject = default_css
+        css_to_inject = basic_pdf_css
         if options.get("pdf_css"):
             css_to_inject = basic_pdf_css + "\n" + options.get("pdf_css")
 
@@ -424,11 +448,9 @@ async def take_pdf(
     else:
         page = context_or_page
 
-    # Set window size using shot_config dimensions
-    await page.set_window_size(shot_config.width, shot_config.height)
-
     # Note: wait, javascript, wait_for, and trigger_lazy_load
     # are now handled by navigate_to_page() for new pages
+    # Window size is also set in navigate_to_page() before navigation
 
     # Generate PDF
     pdf_options = {

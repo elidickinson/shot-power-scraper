@@ -124,3 +124,13 @@ class ShotConfig:
     def has_selectors(self):
         """Check if any selectors are defined"""
         return bool(self.selectors or self.js_selectors or self.selectors_all or self.js_selectors_all)
+
+    @property
+    def format(self):
+        """Image format based on quality setting"""
+        return "jpeg" if self.quality else "png"
+
+    @property
+    def effective_full_page(self):
+        """Whether to take full page screenshot, accounting for selectors"""
+        return self.full_page if not self.has_selectors() else True

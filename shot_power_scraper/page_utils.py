@@ -351,6 +351,9 @@ async def navigate_to_page(
     # Get a blank page first
     page = await browser_obj.get("about:blank")
 
+    # Set window size BEFORE navigation so page loads at correct size
+    await page.set_window_size(shot_config.width, shot_config.height)
+
     # Set user agent override with Client Hints metadata if configured
     if hasattr(browser_obj, '_user_agent') and browser_obj._user_agent:
         metadata = generate_user_agent_metadata(browser_obj._user_agent)

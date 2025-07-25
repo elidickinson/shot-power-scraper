@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # exit when any command fails
-set -e
+set -ex
 
 mkdir -p examples
 # Without the -o option should produce www-example-com.png
