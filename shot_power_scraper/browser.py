@@ -90,12 +90,6 @@ async def create_browser_context(shot_config, extensions=None):
         if Config.verbose:
             click.echo(f"Will set user agent with Client Hints metadata: {shot_config.user_agent}", err=True)
 
-    # Give extensions time to load if any were specified
-    if extensions:
-        if Config.verbose:
-            click.echo("Waiting for extensions to load...", err=True)
-        await asyncio.sleep(2.5)
-
     # Handle auth state if provided
     if shot_config.auth:
         storage_state = json.load(shot_config.auth)
