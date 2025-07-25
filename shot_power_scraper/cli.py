@@ -91,11 +91,6 @@ def console_log(msg):
     click.echo(msg, err=True)
 
 
-def _check_and_absolutize(filepath):
-    path = pathlib.Path(filepath)
-    if path.exists():
-        return path.absolute()
-    return False
 
 
 def scale_factor_options(fn):
@@ -244,9 +239,11 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
     """
     setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
+    url = url_or_file_path(url)
+
     if output is None:
         ext = "jpg" if quality else None
-        output = filename_for_url(url, ext=ext, file_exists=os.path.exists)
+        output = filename_for_url(url, ext=ext)
 
     interactive = interactive or devtools
     resize_viewport = not no_resize_viewport
@@ -338,7 +335,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 
     if (har or har_zip) and not har_file:
         har_file = filename_for_url(
-            "trace", ext="har.zip" if har_zip else "har", file_exists=os.path.exists
+            "trace", ext="har.zip" if har_zip else "har"
         )
 
     shots = yaml.safe_load(config)
@@ -604,10 +601,10 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
     """
     setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
-    url = url_or_file_path(url, _check_and_absolutize)
+    url = url_or_file_path(url)
 
     if output is None:
-        output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
+        output = filename_for_url(url, ext="pdf")
 
     pdf_landscape = landscape
     pdf_scale = scale or 1.0
@@ -664,7 +661,7 @@ def html(url, output, javascript, selector,
     setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
     if output is None:
-        output = filename_for_url(url, ext="html", file_exists=os.path.exists)
+        output = filename_for_url(url, ext="html")
 
     shot_config = ShotConfig(locals())
 

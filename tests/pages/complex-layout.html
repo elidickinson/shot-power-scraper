@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complex Layout Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; line-height: 1.6; }
+        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+        .nav { background: #34495e; padding: 10px; }
+        .nav a { color: white; text-decoration: none; margin: 0 15px; }
+        .container { display: flex; max-width: 1200px; margin: 0 auto; }
+        .sidebar { width: 300px; background: #ecf0f1; padding: 20px; }
+        .main { flex: 1; padding: 20px; }
+        .card { background: white; border: 1px solid #bdc3c7; border-radius: 5px; padding: 15px; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .highlight { background: #f39c12; color: white; padding: 10px; border-radius: 5px; }
+        .code-block { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; font-family: monospace; overflow-x: auto; }
+        .footer { background: #95a5a6; color: white; text-align: center; padding: 20px; margin-top: 40px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #bdc3c7; padding: 10px; text-align: left; }
+        th { background: #3498db; color: white; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+        .grid-item { background: #e74c3c; color: white; padding: 20px; text-align: center; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header" id="main-header">
+        <h1>🧪 Complex Layout Test Page</h1>
+        <p>Testing selectors, PDF generation, and visual scaling</p>
+    </div>
+    
+    <nav class="nav">
+        <a href="#section1">Section 1</a>
+        <a href="#section2">Section 2</a>
+        <a href="#section3">Section 3</a>
+        <a href="#tables">Tables</a>
+    </nav>
+    
+    <div class="container">
+        <aside class="sidebar" id="test-sidebar">
+            <h3>📋 Sidebar Navigation</h3>
+            <div class="card">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#important">Important Section</a></li>
+                    <li><a href="#code">Code Examples</a></li>
+                    <li><a href="#grid">Grid Layout</a></li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>📊 Statistics</h4>
+                <p>Users: 1,234</p>
+                <p>Views: 56,789</p>
+                <p>Rating: ⭐⭐⭐⭐⭐</p>
+            </div>
+        </aside>
+        
+        <main class="main">
+            <section id="section1">
+                <h2>📝 Section 1: Text Content</h2>
+                <div class="card">
+                    <p>This is a complex layout designed to test various screenshot and PDF features:</p>
+                    <ul>
+                        <li><strong>Selector testing</strong> - Different elements can be targeted</li>
+                        <li><strong>PDF generation</strong> - Complex layouts in document format</li>
+                        <li><strong>Scaling</strong> - How content looks at different resolutions</li>
+                        <li><strong>Multi-column layouts</strong> - Sidebar and main content</li>
+                    </ul>
+                </div>
+                
+                <div class="highlight" id="important">
+                    ⚠️ This is an important highlighted section that should stand out in screenshots.
+                </div>
+            </section>
+            
+            <section id="section2">
+                <h2>💻 Section 2: Code and Technical Content</h2>
+                <div class="card">
+                    <h3>Code Example</h3>
+                    <div class="code-block" id="code">
+function takeScreenshot(url, options) {
+    return browser.newPage()
+        .then(page => page.goto(url))
+        .then(page => page.screenshot(options));
+}
+                    </div>
+                </div>
+            </section>
+            
+            <section id="tables">
+                <h2>📊 Section 3: Tables and Data</h2>
+                <div class="card">
+                    <table id="data-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Screenshot Capture</td>
+                                <td>✅ Complete</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>PDF Generation</td>
+                                <td>✅ Complete</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>Ad Blocking</td>
+                                <td>🔄 Testing</td>
+                                <td>Medium</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <section id="grid">
+                <h2>🎯 Section 4: Grid Layout</h2>
+                <div class="card">
+                    <div class="grid">
+                        <div class="grid-item">Item 1</div>
+                        <div class="grid-item">Item 2</div>
+                        <div class="grid-item">Item 3</div>
+                        <div class="grid-item">Item 4</div>
+                        <div class="grid-item">Item 5</div>
+                        <div class="grid-item">Item 6</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p>Footer content - useful for testing full-page captures vs specific heights</p>
+    </footer>
+</body>
+</html>

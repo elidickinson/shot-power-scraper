@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lazy Loading Test Page</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+        .spacer { height: 800px; background: #f0f0f0; margin: 10px 0; }
+        .lazy-image { 
+            width: 200px; 
+            height: 150px; 
+            background: #ddd; 
+            border: 2px solid #333;
+            display: block;
+            margin: 20px 0;
+        }
+        .loaded { background: #4ecdc4; }
+    </style>
+</head>
+<body>
+    <h1>Lazy Loading Test</h1>
+    <p>This page tests lazy loading functionality.</p>
+    
+    <div class="spacer">Spacer to push content below fold</div>
+    
+    <img class="lazy-image" data-src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzRlY2RjNCIvPgogIDx0ZXh0IHg9IjEwMCIgeT0iNzUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5MYXp5IEltYWdlPC90ZXh0Pgo8L3N2Zz4=" loading="lazy" alt="Lazy loaded image">
+    
+    <div class="spacer">More content below</div>
+    
+    <script>
+        // Simulate lazy loading behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            const lazyImages = document.querySelectorAll('img[data-src]');
+            
+            function loadImage(img) {
+                img.src = img.dataset.src;
+                img.classList.add('loaded');
+                delete img.dataset.src;
+            }
+            
+            // Simple intersection observer simulation
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        loadImage(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            lazyImages.forEach(function(img) {
+                observer.observe(img);
+            });
+        });
+    </script>
+</body>
+</html>

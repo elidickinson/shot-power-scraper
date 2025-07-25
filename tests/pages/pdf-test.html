@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF Generation Test Page</title>
+    <style>
+        @media screen {
+            body { background: #f0f0f0; }
+            .screen-only { display: block; color: blue; }
+            .print-only { display: none; }
+        }
+        
+        @media print {
+            body { background: white; }
+            .screen-only { display: none; }
+            .print-only { display: block; color: red; }
+            .page-break { page-break-before: always; }
+        }
+        
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .header { 
+            background: #333; 
+            color: white; 
+            padding: 20px; 
+            margin-bottom: 20px;
+        }
+        
+        .content { 
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .fixed-element {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: orange;
+            padding: 10px;
+            color: white;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="fixed-element">Fixed Element</div>
+    
+    <div class="header">
+        <h1>PDF Test Document</h1>
+        <p>This page tests PDF generation features.</p>
+    </div>
+    
+    <div class="content">
+        <h2>Page 1 Content</h2>
+        <p class="screen-only">This text appears only on screen.</p>
+        <p class="print-only">This text appears only in print/PDF.</p>
+        <p>This paragraph appears in both screen and print modes. It contains enough text to demonstrate how the PDF generation handles text flow and formatting across different media types.</p>
+    </div>
+    
+    <div class="content page-break">
+        <h2>Page 2 Content</h2>
+        <p>This content should appear on a new page in PDF due to the page-break CSS rule.</p>
+        <ul>
+            <li>List item 1</li>
+            <li>List item 2</li>
+            <li>List item 3</li>
+        </ul>
+    </div>
+    
+    <div class="content">
+        <h2>Background and Styling Test</h2>
+        <p>This section tests whether background colors and styles are preserved in PDF generation when the --print-background option is used.</p>
+        <div style="background: #ffffcc; padding: 15px; border-radius: 5px; margin: 10px 0;">
+            <strong>Highlighted content with background color</strong>
+        </div>
+    </div>
+</body>
+</html>

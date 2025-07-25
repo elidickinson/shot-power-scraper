@@ -269,3 +269,203 @@ def test_config_save_load(mocker, tmp_path):
     save_config(config)
     loaded = load_config()
     assert loaded == config
+
+
+# Integration tests for regression protection
+@browser_required
+def test_screenshot_dimensions_regression():
+    """Regression test: verify --width and --height parameters work correctly"""
+    import os
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        # Create simple test page
+        test_page = "test.html"
+        with open(test_page, "w") as f:
+            f.write("""
+            <!DOCTYPE html>
+            <html>
+            <head><title>Dimension Test</title></head>
+            <body style="margin:0; background: linear-gradient(45deg, red, blue); min-height: 100vh;">
+                <div style="width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center;">
+                    <h1 style="color: white;">Test Content</h1>
+                </div>
+            </body>
+            </html>
+            """)
+
+        # Test custom dimensions
+        result = runner.invoke(cli, [
+            "shot", test_page,
+            "--width", "800",
+            "--height", "600",
+            "-o", "custom_size.png"
+        ])
+        assert result.exit_code == 0, str(result.exception)
+        assert os.path.exists("custom_size.png")
+
+        # Verify file was created with reasonable size (regression test)
+        file_size = os.path.getsize("custom_size.png")
+        assert file_size > 1000, f"Screenshot file seems too small: {file_size} bytes"
+        assert file_size < 1000000, f"Screenshot file seems too large: {file_size} bytes"
+
+
+@browser_required
+def test_selector_screenshot_regression():
+    """Regression test: verify selector screenshots work with proper timing"""
+    import os
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        # Create test page with selectors
+        test_page = "selector_test.html"
+        with open(test_page, "w") as f:
+            f.write("""
+            <!DOCTYPE html>
+            <html>
+            <head><title>Selector Test</title></head>
+            <body style="margin: 0; padding: 20px; background: #f0f0f0;">
+                <div style="background: white; padding: 20px; margin-bottom: 20px;">
+                    <h1>Other Content</h1>
+                    <p>This should not be in the screenshot</p>
+                </div>
+                <div id="target" style="background: #ff6b6b; color: white; padding: 20px; width: 300px; height: 200px;">
+                    <h2>Target Element</h2>
+                    <p>This should be captured</p>
+                </div>
+                <div style="background: white; padding: 20px; margin-top: 20px;">
+                    <p>More content below</p>
+                </div>
+            </body>
+            </html>
+            """)
+
+        # Test selector screenshot
+        result = runner.invoke(cli, [
+            "shot", test_page,
+            "-s", "#target",
+            "-o", "selector.png"
+        ])
+        assert result.exit_code == 0, str(result.exception)
+        assert os.path.exists("selector.png")
+
+        # Test multiple selectors with padding
+        result = runner.invoke(cli, [
+            "shot", test_page,
+            "-s", "#target",
+            "--padding", "10",
+            "-o", "selector_padded.png"
+        ])
+        assert result.exit_code == 0, str(result.exception)
+        assert os.path.exists("selector_padded.png")
+
+        # Verify selector with padding creates different sized file
+        size1 = os.path.getsize("selector.png")
+        size2 = os.path.getsize("selector_padded.png")
+        assert size2 > size1, "Padded selector should create larger image"
+
+
+@browser_required
+def test_pdf_generation_basic():
+    """Basic PDF generation test"""
+    import os
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        # Create minimal HTML file for PDF generation
+        test_page = "pdf_test.html"
+        with open(test_page, "w") as f:
+            f.write("""<!DOCTYPE html>
+<html>
+<head><title>PDF Test</title></head>
+<body>
+<h1>Test PDF</h1>
+<p>Simple content.</p>
+</body>
+</html>""")
+
+        result = runner.invoke(cli, [
+            "pdf", test_page,
+            "-o", "test.pdf",
+        ])
+        assert result.exit_code == 0, f"PDF generation failed: {result.output}\nException: {result.exception}"
+        assert os.path.exists("test.pdf")
+
+        # Basic validation - PDF should be reasonable size
+        pdf_size = os.path.getsize("test.pdf")
+        assert pdf_size > 500, f"PDF seems too small: {pdf_size} bytes"
+        assert pdf_size < 2000000, f"PDF seems too large: {pdf_size} bytes"
+
+
+@browser_required
+def test_multi_shot_architecture():
+    """Test multi-shot YAML works with new architecture"""
+    import os
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        # Create test HTML files
+        with open("page1.html", "w") as f:
+            f.write("<html><body><h1>Shot 1</h1></body></html>")
+
+        with open("page2.html", "w") as f:
+            f.write("<html><body><h1>Shot 2</h1></body></html>")
+
+        # Create simple YAML config
+        yaml_content = """
+        - url: page1.html
+          output: shot1.png
+          width: 400
+          height: 300
+        - url: page2.html
+          output: shot2.png
+          width: 600
+          height: 400
+        """
+
+        with open("multi_test.yaml", "w") as f:
+            f.write(yaml_content)
+
+        result = runner.invoke(cli, ["multi", "multi_test.yaml"])
+        assert result.exit_code == 0, str(result.exception)
+
+        # Verify both shots were created
+        assert os.path.exists("shot1.png")
+        assert os.path.exists("shot2.png")
+
+
+@browser_required
+def test_javascript_execution():
+    """Test JavaScript execution works correctly"""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        test_page = "js_test.html"
+        with open(test_page, "w") as f:
+            f.write("""
+            <!DOCTYPE html>
+            <html>
+            <head><title>JS Test</title></head>
+            <body>
+                <div id="target">Original Text</div>
+                <script>
+                    window.testValue = 42;
+                </script>
+            </body>
+            </html>
+            """)
+
+        # Test reading a value
+        result = runner.invoke(cli, [
+            "javascript", test_page, "window.testValue"
+        ])
+        assert result.exit_code == 0, str(result.exception)
+        assert "42" in result.output
+
+        # Test DOM manipulation
+        result = runner.invoke(cli, [
+            "javascript", test_page,
+            "document.getElementById('target').innerText = 'Modified'; document.getElementById('target').innerText"
+        ])
+        assert result.exit_code == 0, str(result.exception)
+        assert "Modified" in result.output

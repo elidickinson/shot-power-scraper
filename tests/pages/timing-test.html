@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timing and Wait Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .immediate { background: #e8f5e8; padding: 20px; margin: 10px 0; }
+        .delayed { background: #fff3cd; padding: 20px; margin: 10px 0; }
+        .slow { background: #f8d7da; padding: 20px; margin: 10px 0; }
+        .status { font-weight: bold; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>Timing Test Page</h1>
+    
+    <div class="immediate">
+        <h2>✅ Immediate Content</h2>
+        <p>This content appears immediately when the page loads.</p>
+    </div>
+    
+    <div class="status" id="status">⏳ Loading delayed content...</div>
+    
+    <div id="delayed-1sec" class="delayed" style="display: none;">
+        <h2>⏱️ 1 Second Delay</h2>
+        <p>This content appears after 1 second.</p>
+    </div>
+    
+    <div id="delayed-3sec" class="slow" style="display: none;">
+        <h2>🐌 3 Second Delay</h2>
+        <p>This content appears after 3 seconds. Testing longer waits.</p>
+    </div>
+    
+    <div id="final-status" style="display: none; background: #d4edda; padding: 20px; margin: 10px 0;">
+        <h2>✨ All Content Loaded</h2>
+        <p>Page is fully loaded. This should be visible with proper wait settings.</p>
+    </div>
+
+    <script>
+        // Update status immediately
+        document.getElementById('status').textContent = '⏳ Content loading in stages...';
+        
+        // Show 1-second content
+        setTimeout(() => {
+            document.getElementById('delayed-1sec').style.display = 'block';
+            document.getElementById('status').textContent = '⏳ Still loading more content...';
+        }, 1000);
+        
+        // Show 3-second content
+        setTimeout(() => {
+            document.getElementById('delayed-3sec').style.display = 'block';
+            document.getElementById('status').style.display = 'none';
+            document.getElementById('final-status').style.display = 'block';
+        }, 3000);
+    </script>
+</body>
+</html>

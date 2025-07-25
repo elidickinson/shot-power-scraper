@@ -6,6 +6,7 @@ import textwrap
 import tempfile
 import pathlib
 import base64
+import urllib.parse
 import click
 import nodriver as uc
 from shot_power_scraper.browser import Config
@@ -105,16 +106,6 @@ async def _save_screenshot(page_or_element, output, shot_config):
     path.write_bytes(data_bytes)
 
 
-def _check_and_absolutize(filepath):
-    """Check if a file exists and return its absolute path"""
-    try:
-        path = pathlib.Path(filepath)
-        if path.exists():
-            return path.absolute()
-        return False
-    except OSError:
-        # On Windows, instantiating a Path object on `http://` or `https://` will raise an exception
-        return False
 
 
 def js_selector_javascript(js_selectors, js_selectors_all):
@@ -224,10 +215,10 @@ async def take_shot(
     if not shot_config.url:
         raise click.ClickException("url is required")
 
-    url = url_or_file_path(shot_config.url, file_exists=_check_and_absolutize)
+    url = url_or_file_path(shot_config.url)
 
     if not shot_config.output and not return_bytes:
-        shot_config.output = filename_for_url(url, ext="png", file_exists=os.path.exists)
+        shot_config.output = filename_for_url(url, ext="png")
 
     if not skip_navigation:
         from shot_power_scraper.page_utils import navigate_to_url
@@ -269,8 +260,9 @@ async def take_shot(
                 if Config.verbose:
                     click.echo(f"Taking element screenshot: {selector_to_shoot}", err=True)
                 await _save_screenshot(element, shot_config.output, shot_config)
+                display_url = pathlib.Path(urllib.parse.urlparse(url).path).name if url.startswith('file://') else url
                 message = "Screenshot of '{}' on '{}' written to '{}'".format(
-                    ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), url, shot_config.output
+                    ", ".join(list(shot_config.selectors) + list(shot_config.selectors_all)), display_url, shot_config.output
                 )
         else:
             raise click.ClickException(f"Could not find element matching selector: {selector_to_shoot}")
@@ -285,7 +277,8 @@ async def take_shot(
                 if Config.verbose:
                     click.echo(f"Taking screenshot (full_page={shot_config.effective_full_page})", err=True)
                 await _save_screenshot(page, shot_config.output, shot_config)
-                message = f"Screenshot of '{url}' written to '{shot_config.output}'"
+                display_url = pathlib.Path(urllib.parse.urlparse(url).path).name if url.startswith('file://') else url
+                message = f"Screenshot of '{display_url}' written to '{shot_config.output}'"
 
     # Save HTML if requested
     if shot_config.save_html and not return_bytes:
@@ -431,10 +424,10 @@ async def take_pdf(
     if not shot_config.url:
         raise click.ClickException("url is required")
 
-    url = url_or_file_path(shot_config.url, file_exists=_check_and_absolutize)
+    url = url_or_file_path(shot_config.url)
 
     if not shot_config.output and not return_bytes:
-        shot_config.output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
+        shot_config.output = filename_for_url(url, ext="pdf")
 
     if not skip_navigation:
         from shot_power_scraper.page_utils import navigate_to_url
@@ -468,11 +461,13 @@ async def take_pdf(
         if shot_config.output == "-":
             import sys
             sys.stdout.buffer.write(pdf_data)
-            message = f"PDF of '{url}' written to stdout"
+            display_url = pathlib.Path(urllib.parse.urlparse(url).path).name if url.startswith('file://') else url
+            message = f"PDF of '{display_url}' written to stdout"
         else:
             with open(shot_config.output, "wb") as f:
                 f.write(pdf_data)
-            message = f"PDF of '{url}' written to '{shot_config.output}'"
+            display_url = pathlib.Path(urllib.parse.urlparse(url).path).name if url.startswith('file://') else url
+            message = f"PDF of '{display_url}' written to '{shot_config.output}'"
 
     if not Config.silent:
         click.echo(message, err=True)

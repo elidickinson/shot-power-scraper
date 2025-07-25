@@ -196,20 +196,9 @@ async def navigate_to_url(page, shot_config):
     Returns: response_handler (page._response_handler should already be set)
     """
     from shot_power_scraper.utils import url_or_file_path
-    import pathlib
     
-    def _check_and_absolutize(filepath):
-        """Check if a file exists and return its absolute path"""
-        try:
-            path = pathlib.Path(filepath)
-            if path.exists():
-                return path.absolute()
-            return False
-        except OSError:
-            return False
-
     # Convert URL to proper format
-    url = url_or_file_path(shot_config.url, file_exists=_check_and_absolutize)
+    url = url_or_file_path(shot_config.url)
     
     # Get the response handler that was set up during tab context creation
     response_handler = page._response_handler

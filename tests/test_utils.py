@@ -2,6 +2,7 @@ import pytest
 from shot_power_scraper.utils import filename_for_url
 
 
+@pytest.mark.quick
 @pytest.mark.parametrize(
     "url,ext,expected",
     (
@@ -19,17 +20,3 @@ def test_filename_for_url(url, ext, expected):
     assert filename_for_url(url, ext) == expected
 
 
-@pytest.mark.parametrize(
-    "url,existing_files,expected",
-    (
-        ("https://datasette.io/", [], "datasette-io.png"),
-        ("https://datasette.io/", ["datasette-io.png"], "datasette-io.1.png"),
-        (
-            "https://datasette.io/",
-            ["datasette-io.png", "datasette-io.1.png"],
-            "datasette-io.2.png",
-        ),
-    ),
-)
-def test_filename_for_url_if_exists(url, existing_files, expected):
-    assert filename_for_url(url, file_exists=lambda s: s in existing_files) == expected

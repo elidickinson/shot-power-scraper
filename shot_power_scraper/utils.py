@@ -4,34 +4,45 @@ import urllib.error
 import re
 import json
 import pathlib
+import os
 
 disallowed_re = re.compile("[^a-zA-Z0-9_-]")
 
 
-def file_exists_never(filename):
-    return False
-
-
-def filename_for_url(url, ext=None, file_exists=file_exists_never):
+def filename_for_url(url, ext=None):
     ext = ext or "png"
     bits = urllib.parse.urlparse(url)
-    filename = (bits.netloc + bits.path).replace(".", "-").replace("/", "-").rstrip("-")
-    # Remove any characters outside of the allowed range
-    base_filename = disallowed_re.sub("", filename).lstrip("-")
+    
+    # Special handling for file:// URLs - use basename
+    if bits.scheme == 'file':
+        path = pathlib.Path(bits.path)
+        base_filename = path.stem  # filename without extension
+    else:
+        # Original logic for HTTP URLs
+        filename = (bits.netloc + bits.path).replace(".", "-").replace("/", "-").rstrip("-")
+        # Remove any characters outside of the allowed range
+        base_filename = disallowed_re.sub("", filename).lstrip("-")
+    
     filename = base_filename + "." + ext
     suffix = 0
-    while file_exists(filename):
+    while os.path.exists(filename):
         suffix += 1
         filename = f"{base_filename}.{suffix}.{ext}"
     return filename
 
 
-def url_or_file_path(url, file_exists=file_exists_never):
-    # If url exists as a file, convert that to file:/
-    file_path = file_exists(url)
-    if file_path:
-        return f"file:{file_path}"
-    if not (url.startswith("http://") or url.startswith("https://")):
+def url_or_file_path(url):
+    # Check if url exists as a file and convert to file:// URL
+    try:
+        path = pathlib.Path(url)
+        if path.exists():
+            return f"file://{path.absolute()}"
+    except OSError:
+        # On Windows, instantiating a Path object on `http://` or `https://` will raise an exception
+        pass
+    
+    # Add http:// prefix if no scheme provided
+    if not (url.startswith("http://") or url.startswith("https://") or url.startswith("file://")):
         return f"http://{url}"
     return url
 

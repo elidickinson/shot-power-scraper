@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Test Page</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+        }
+        .container { 
+            width: 800px; 
+            height: 600px; 
+            background: white; 
+            border: 2px solid #333;
+            padding: 20px;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        .selector-test { 
+            background: #ff6b6b; 
+            color: white; 
+            padding: 10px; 
+            margin: 10px 0;
+            width: 200px;
+            height: 50px;
+        }
+        .hidden-element {
+            position: absolute;
+            top: 1000px;
+            left: 0;
+            background: #4ecdc4;
+            padding: 10px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Page for Screenshot Testing</h1>
+        <p>This page has predictable dimensions for testing width/height parameters.</p>
+        <div class="selector-test" id="target-element">
+            Target Element for Selector Tests
+        </div>
+        <div class="selector-test">Second Element</div>
+        <p>Page content continues here...</p>
+    </div>
+    <div class="hidden-element">
+        Element below fold for scroll testing
+    </div>
+</body>
+</html>

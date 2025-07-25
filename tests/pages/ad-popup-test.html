@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ad and Popup Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        
+        /* Cookie/popup blocking patterns (popup blocker only) */
+        #stickyCookieBar, .cookiebar-bar, #cookieNotice, .cookieOverlay {
+            background: #ff9800; color: white; padding: 15px; margin: 10px 0;
+            text-align: center; border: 2px solid #f57c00;
+        }
+        
+        /* Ad blocking patterns (ad blocker only) */
+        .ad-zone, .ad-space, .ad-unit {
+            background: #f44336; color: white; padding: 15px; margin: 10px 0;
+            text-align: center; border: 2px solid #d32f2f;
+        }
+        
+        #stickyCookieBar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; }
+        .cookieOverlay { position: fixed; top: 100px; right: 20px; width: 300px; }
+        .cookieOverlay div { background: white; color: black; padding: 20px; border-radius: 10px; }
+        
+        .main-content { background: #f5f5f5; padding: 20px; margin: 20px 0; min-height: 200px; }
+    </style>
+</head>
+<body>
+    <!-- Popup blocking tests (orange - blocked by --popup-block only) -->
+    <div id="stickyCookieBar" class="cookiebar-bar">
+        🍪 Cookie Bar - Accept cookies <button>Accept</button>
+    </div>
+    
+    <div id="cookieNotice" class="cookieOverlay">
+        <div>🔒 Cookie Notice Modal - Accept policy <button>OK</button></div>
+    </div>
+    
+    <h1>Welcome to Our Test Site</h1>
+    
+    <!-- Ad blocking tests (red - blocked by --ad-block only) -->
+    <div class="ad-zone ad-space ad-unit">
+        📢 ADVERTISEMENT - Buy Now!
+        <img src="https://googleads.g.doubleclick.net/pagead/ads?client=test" alt="Blocked ad" onerror="this.innerHTML='❌ Network blocked'">
+    </div>
+    
+    <script>
+        // Network ad blocking test
+        const script = document.createElement('script');
+        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+        script.onerror = () => {
+            const status = document.createElement('div');
+            status.innerHTML = '✅ Network script blocked';
+            status.style.cssText = 'background: #4caf50; color: white; padding: 10px; margin: 10px 0; text-align: center;';
+            document.body.appendChild(status);
+        };
+        document.head.appendChild(script);
+    </script>
+    
+    <div class="main-content">
+        <h2>Main Article Content</h2>
+        <p>This content should always be visible.</p>
+        <p><strong>Orange elements</strong> = blocked by --popup-block only</p>
+        <p><strong>Red elements</strong> = blocked by --ad-block only</p>
+        <p>Use different combinations to test each blocker independently.</p>
+    </div>
+</body>
+</html>
