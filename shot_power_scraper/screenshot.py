@@ -214,10 +214,10 @@ def selector_javascript(selectors, selectors_all, padding=0):
 
 
 async def take_shot(
-    context_or_page,
+    page,
     shot_config,
     return_bytes=False,
-    use_existing_page=False,
+    skip_navigation=False,
 ):
     """Take a screenshot based on the provided configuration"""
 
@@ -229,19 +229,17 @@ async def take_shot(
     if not shot_config.output and not return_bytes:
         shot_config.output = filename_for_url(url, ext="png", file_exists=os.path.exists)
 
-    if not use_existing_page:
-        from shot_power_scraper.page_utils import navigate_to_page
+    if not skip_navigation:
+        from shot_power_scraper.page_utils import navigate_to_url
 
-        page, response_handler = await navigate_to_page(
-            context_or_page,
+        response_handler = await navigate_to_url(
+            page,
             shot_config,
         )
-    else:
-        page = context_or_page
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
-    # are now handled by navigate_to_page() for new pages
-    # Window size is also set in navigate_to_page() before navigation
+    # are now handled by navigate_to_url() for new pages
+    # Window size is also set in create_tab_context() before navigation
 
 
     if shot_config.js_selectors or shot_config.js_selectors_all:
@@ -423,10 +421,10 @@ async def generate_pdf(page, options):
 
 
 async def take_pdf(
-    context_or_page,
+    page,
     shot_config,
     return_bytes=False,
-    use_existing_page=False,
+    skip_navigation=False,
 ):
     """Generate a PDF based on the provided configuration"""
 
@@ -438,19 +436,17 @@ async def take_pdf(
     if not shot_config.output and not return_bytes:
         shot_config.output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
 
-    if not use_existing_page:
-        from shot_power_scraper.page_utils import navigate_to_page
+    if not skip_navigation:
+        from shot_power_scraper.page_utils import navigate_to_url
 
-        page, response_handler = await navigate_to_page(
-            context_or_page,
+        response_handler = await navigate_to_url(
+            page,
             shot_config,
         )
-    else:
-        page = context_or_page
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
-    # are now handled by navigate_to_page() for new pages
-    # Window size is also set in navigate_to_page() before navigation
+    # are now handled by navigate_to_url() for new pages
+    # Window size is also set in create_tab_context() before navigation
 
     # Generate PDF
     pdf_options = {

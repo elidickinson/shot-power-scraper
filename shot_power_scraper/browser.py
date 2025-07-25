@@ -82,7 +82,7 @@ async def create_browser_context(shot_config, extensions=None):
     browser_obj = await uc.start(config=config)
 
     if browser_obj is None:
-        raise click.ClickException("Failed to initialize browser")
+        raise click.ClickException("Failed to initialize browser; browser_obj is empty")
 
     # Store user agent config on browser object for later use
     if shot_config.user_agent:

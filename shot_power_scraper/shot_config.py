@@ -96,7 +96,6 @@ class ShotConfig:
         self.auth = shot.get("auth")
         self.interactive = shot.get("interactive", False)
         self.devtools = shot.get("devtools", False)
-        self.scale_factor = shot.get("scale_factor")
         self.browser = shot.get("browser", "chromium")
         self.browser_args = shot.get("browser_args")
         self.reduced_motion = shot.get("reduced_motion", False)
@@ -104,6 +103,16 @@ class ShotConfig:
         self.auth_username = shot.get("auth_username")
         self.auth_password = shot.get("auth_password")
         self.record_har_path = shot.get("record_har_path")
+        # Handle scale factor and retina options
+        retina = shot.get("retina", False)
+        scale_factor = shot.get("scale_factor")
+        if retina and scale_factor:
+            raise ValueError("--retina and --scale-factor cannot be used together")
+        if scale_factor is not None and scale_factor <= 0.0:
+            raise ValueError("--scale-factor must be positive")
+        if retina:
+            scale_factor = 2
+        self.scale_factor = scale_factor
 
         # Process selectors
         self.selectors = list(shot.get("selectors") or [])

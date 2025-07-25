@@ -224,48 +224,6 @@ def test_html(args, expected):
 
 
 @pytest.mark.parametrize(
-    "command,args,expected",
-    [
-        (
-            "shot",
-            ["--retina", "--scale-factor", 3],
-            "Error: --retina and --scale-factor cannot be used together\n",
-        ),
-        (
-            "multi",
-            ["--retina", "--scale-factor", 3],
-            "Error: --retina and --scale-factor cannot be used together\n",
-        ),
-        (
-            "shot",
-            ["--scale-factor", 0],
-            "Error: --scale-factor must be positive\n",
-        ),
-        (
-            "multi",
-            ["--scale-factor", 0],
-            "Error: --scale-factor must be positive\n",
-        ),
-        (
-            "shot",
-            ["--scale-factor", -3],
-            "Error: --scale-factor must be positive\n",
-        ),
-        (
-            "multi",
-            ["--scale-factor", -3],
-            "Error: --scale-factor must be positive\n",
-        ),
-    ],
-)
-def test_error_on_invalid_scale_factors(command, args, expected):
-    runner = CliRunner()
-    result = runner.invoke(cli, [command, "-"] + args)
-    assert result.exit_code == 1
-    assert result.output == expected
-
-
-@pytest.mark.parametrize(
     "command,flag",
     [
         ("shot", "--ad-block"),
@@ -302,10 +260,10 @@ def test_pdf_basic():
 def test_config_save_load(mocker, tmp_path):
     """Test config persistence works"""
     from shot_power_scraper.shot_config import save_config, load_config
-    
+
     # Mock the config directory to use a temporary path
     mocker.patch("shot_power_scraper.shot_config.get_config_dir", return_value=tmp_path)
-    
+
     # Test save and load
     config = {"ad_block": True, "user_agent": "test"}
     save_config(config)

@@ -129,6 +129,208 @@ def generate_user_agent_metadata(user_agent_string):
     return metadata
 
 
+async def create_tab_context(browser_obj, shot_config):
+    """
+    Create and configure a new tab context with one-time setup.
+    
+    Handles tab creation, window sizing, user agent configuration,
+    script injection, console logging, and network response handling.
+    
+    Returns: configured tab at about:blank ready for navigation
+    """
+    from shot_power_scraper.console_logger import ConsoleLogger
+    from shot_power_scraper.response_handler import ResponseHandler
+    
+    if Config.verbose:
+        click.echo(f"Setting up tab context", err=True)
+
+    # Create blank page and set window size
+    page = await browser_obj.get("about:blank")
+    await page.set_window_size(shot_config.width, shot_config.height)
+
+    # Configure user agent with Client Hints metadata
+    if hasattr(browser_obj, '_user_agent') and browser_obj._user_agent:
+        metadata = generate_user_agent_metadata(browser_obj._user_agent)
+        await page.send(uc.cdp.emulation.set_user_agent_override(
+            user_agent=browser_obj._user_agent,
+            user_agent_metadata=metadata
+        ))
+        if Config.verbose:
+            click.echo(f"Applied user agent with Client Hints: {browser_obj._user_agent}", err=True)
+
+    # Enable page domain and inject navigator.languages override
+    await page.send(uc.cdp.page.enable())
+    await page.send(uc.cdp.page.add_script_to_evaluate_on_new_document("""
+        Object.defineProperty(navigator, 'languages', {
+            get: () => ['en-US']
+        });
+    """))
+
+    # Set up console logging if requested
+    if shot_config.log_console:
+        console_logger = ConsoleLogger(silent=Config.silent)
+        await console_logger.setup(page)
+        if Config.verbose:
+            click.echo("Console logging enabled", err=True)
+
+    # Set up HTTP response monitoring
+    response_handler = ResponseHandler()
+    await page.send(uc.cdp.network.enable())
+    page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
+    page._response_handler = response_handler
+    
+    if Config.verbose:
+        click.echo(f"Tab context setup complete", err=True)
+    
+    return page
+
+
+async def navigate_to_url(page, shot_config):
+    """
+    Navigate a configured tab to a target URL and handle post-navigation logic.
+    
+    Expects a tab that has already been configured with create_tab_context().
+    Handles navigation, load waiting, error checking, Cloudflare bypass,
+    JavaScript execution, and post-navigation processing.
+    
+    Returns: response_handler (page._response_handler should already be set)
+    """
+    from shot_power_scraper.utils import url_or_file_path
+    import pathlib
+    
+    def _check_and_absolutize(filepath):
+        """Check if a file exists and return its absolute path"""
+        try:
+            path = pathlib.Path(filepath)
+            if path.exists():
+                return path.absolute()
+            return False
+        except OSError:
+            return False
+
+    # Convert URL to proper format
+    url = url_or_file_path(shot_config.url, file_exists=_check_and_absolutize)
+    
+    # Get the response handler that was set up during tab context creation
+    response_handler = page._response_handler
+
+    # Navigate to the actual URL
+    if Config.verbose:
+        click.echo(f"Loading page: {url}", err=True)
+    await page.get(url)
+    await page
+    
+    # Wait for window load event unless skipped
+    if not shot_config.skip_wait_for_load:
+        if Config.verbose:
+            click.echo(f"Waiting for window load event...", err=True)
+
+        timeout = shot_config.timeout
+        await page.evaluate(f"""
+            new Promise((resolve) => {{
+                if (document.readyState === 'complete') {{
+                    resolve();
+                }} else {{
+                    window.addEventListener('load', resolve);
+                    setTimeout(resolve, {timeout * 1000});
+                }}
+            }});
+        """)
+        if Config.verbose:
+            click.echo(f"Done waiting for window load", err=True)
+
+    # Check HTTP response status
+    response_status, response_url = await response_handler.wait_for_response(timeout=5)
+    if response_status is not None:
+        if str(response_status)[0] in ("4", "5"):
+            if Config.skip:
+                click.echo(
+                    f"{response_status} error for {url}, skipping",
+                    err=True,
+                )
+                # Exit with a 0 status code
+                raise SystemExit  # TODO: this probably breaks `multi`
+            elif Config.fail:
+                raise click.ClickException(f"{response_status} error for {url}")
+
+    # Automatic Cloudflare detection and waiting
+    if not shot_config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
+        if not Config.silent:
+            click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
+        success = await wait_for_cloudflare_bypass(page)
+        if not success:
+            if not Config.silent:
+                click.echo("Warning: Cloudflare challenge may still be active", err=True)
+
+    # Check if page failed to load
+    has_error, error_msg = await detect_navigation_error(page, url)
+    if has_error:
+        full_msg = f"Page failed to load: {error_msg}"
+        if Config.skip:
+            click.echo(f"{full_msg}, skipping", err=True)
+            raise SystemExit
+        elif Config.fail:
+            raise click.ClickException(full_msg)
+        elif not Config.silent:
+            click.echo(f"Warning: {full_msg}", err=True)
+
+    # Wait if specified
+    wait_ms = shot_config.wait
+    if wait_ms:
+        if Config.verbose:
+            click.echo(f"Waiting {wait_ms}ms before processing...", err=True)
+        await asyncio.sleep(wait_ms / 1000)
+
+    # Execute JavaScript if provided
+    js_result = None
+    javascript = shot_config.javascript
+    if javascript:
+        if Config.verbose:
+            click.echo(f"Executing JavaScript: {javascript[:50]}{'...' if len(javascript) > 50 else ''}", err=True)
+        js_result = await evaluate_js(page, javascript)
+
+    # Wait for condition if specified
+    wait_for = shot_config.wait_for
+    if wait_for:
+        timeout_seconds = shot_config.timeout
+        await wait_for_condition(page, wait_for, timeout_seconds)
+
+    # Trigger lazy load if requested
+    if shot_config.trigger_lazy_load:
+        await trigger_lazy_load(page)
+
+    # Apply viewport expansion to fix intersection observers when blocking is enabled
+    elif shot_config.popup_block or shot_config.ad_block:
+        if Config.verbose:
+            click.echo("Applying viewport expansion to fix intersection observers...", err=True)
+
+        # Get viewport width and document height
+        viewport_width = await page.evaluate("window.innerWidth")
+        document_height = await page.evaluate("document.documentElement.scrollHeight")
+
+        # Use document height, minimum 10000px
+        viewport_height = max(document_height, 10000)
+
+        await page.send(uc.cdp.emulation.set_device_metrics_override(
+            width=viewport_width,
+            height=viewport_height,
+            device_scale_factor=1,
+            mobile=False
+        ))
+
+        # Wait a moment for lazy loading to trigger
+        await page.sleep(0.5)
+
+        # Clear the override to restore normal viewport
+        await page.send(uc.cdp.emulation.clear_device_metrics_override())
+        await page.sleep()
+
+    if shot_config.return_js_result:
+        return response_handler, js_result
+    else:
+        return response_handler
+
+
 async def evaluate_js(page, javascript):
     """Safely evaluate JavaScript on a page"""
     try:
@@ -311,195 +513,3 @@ async def trigger_lazy_load(page, timeout_ms=5000):
         click.echo(f"Lazy load complete", err=True)
 
 
-async def navigate_to_page(
-    browser_obj,
-    shot_config,
-):
-    """
-    Navigate to a page and handle common operations:
-    - Page navigation
-    - Console logging setup
-    - Response handling
-    - Cloudflare detection and bypass
-    - Navigation error detection
-    - Wait and JavaScript execution
-    - Lazy load triggering
-
-    Returns: (page, response_handler) tuple
-    """
-    from shot_power_scraper.console_logger import ConsoleLogger
-    from shot_power_scraper.response_handler import ResponseHandler
-    from shot_power_scraper.utils import url_or_file_path
-    import pathlib
-
-    def _check_and_absolutize(filepath):
-        """Check if a file exists and return its absolute path"""
-        try:
-            path = pathlib.Path(filepath)
-            if path.exists():
-                return path.absolute()
-            return False
-        except OSError:
-            return False
-
-    # Convert URL to proper format
-    url = url_or_file_path(shot_config.url, file_exists=_check_and_absolutize)
-
-    if Config.verbose:
-        click.echo(f"Creating new page for: {url}", err=True)
-
-    # Get a blank page first
-    page = await browser_obj.get("about:blank")
-
-    # Set window size BEFORE navigation so page loads at correct size
-    await page.set_window_size(shot_config.width, shot_config.height)
-
-    # Set user agent override with Client Hints metadata if configured
-    if hasattr(browser_obj, '_user_agent') and browser_obj._user_agent:
-        metadata = generate_user_agent_metadata(browser_obj._user_agent)
-        await page.send(uc.cdp.emulation.set_user_agent_override(
-            user_agent=browser_obj._user_agent,
-            # accept_language="en-US",
-            user_agent_metadata=metadata
-        ))
-        if Config.verbose:
-            click.echo(f"Applied user agent with Client Hints: {browser_obj._user_agent}", err=True)
-
-    # Override navigator.languages to match legitimate browsers
-    await page.send(uc.cdp.page.enable())
-    await page.send(uc.cdp.page.add_script_to_evaluate_on_new_document("""
-        Object.defineProperty(navigator, 'languages', {
-            get: () => ['en-US']
-        });
-    """))
-
-    # Set up console logging BEFORE navigating
-    console_logger = None
-    if shot_config.log_console:
-        console_logger = ConsoleLogger(silent=Config.silent)
-        await console_logger.setup(page)
-        if Config.verbose:
-            click.echo("Console logging enabled", err=True)
-
-    # Set up response handler for HTTP status checking
-    response_handler = ResponseHandler()
-    await page.send(uc.cdp.network.enable())
-    page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
-
-    # Navigate to the actual URL
-    if Config.verbose:
-        click.echo(f"Loading page: {url}", err=True)
-    await page.get(url)
-    await page
-    # Wait for window load event unless skipped
-    if not shot_config.skip_wait_for_load:
-        if Config.verbose:
-            click.echo(f"Waiting for window load event...", err=True)
-
-        timeout = shot_config.timeout
-        await page.evaluate(f"""
-            new Promise((resolve) => {{
-                if (document.readyState === 'complete') {{
-                    resolve();
-                }} else {{
-                    window.addEventListener('load', resolve);
-                    setTimeout(resolve, {timeout * 1000});
-                }}
-            }});
-        """)
-        if Config.verbose:
-            click.echo(f"Done waiting for window load", err=True)
-
-    # Check HTTP response status
-    response_status, response_url = await response_handler.wait_for_response(timeout=5)
-    if response_status is not None:
-        if str(response_status)[0] in ("4", "5"):
-            if Config.skip:
-                click.echo(
-                    f"{response_status} error for {url}, skipping",
-                    err=True,
-                )
-                # Exit with a 0 status code
-                raise SystemExit  # TODO: this probably breaks `multi`
-            elif Config.fail:
-                raise click.ClickException(f"{response_status} error for {url}")
-                # FIXME: this is duplicated below
-
-    # Automatic Cloudflare detection and waiting
-    if not shot_config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
-        if not Config.silent:
-            click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
-        success = await wait_for_cloudflare_bypass(page)
-        if not success:
-            if not Config.silent:
-                click.echo("Warning: Cloudflare challenge may still be active", err=True)
-
-    # Check if page failed to load
-    # FIXME: not sure this is needed or useful
-    has_error, error_msg = await detect_navigation_error(page, url)
-    if has_error:
-        full_msg = f"Page failed to load: {error_msg}"
-        if Config.skip:
-            click.echo(f"{full_msg}, skipping", err=True)
-            raise SystemExit
-        elif Config.fail:
-            raise click.ClickException(full_msg)
-        elif not Config.silent:
-            click.echo(f"Warning: {full_msg}", err=True)
-
-
-    # Wait if specified
-    wait_ms = shot_config.wait
-    if wait_ms:
-        if Config.verbose:
-            click.echo(f"Waiting {wait_ms}ms before processing...", err=True)
-        await asyncio.sleep(wait_ms / 1000)
-
-    # Execute JavaScript if provided
-    js_result = None
-    javascript = shot_config.javascript
-    if javascript:
-        if Config.verbose:
-            click.echo(f"Executing JavaScript: {javascript[:50]}{'...' if len(javascript) > 50 else ''}", err=True)
-        js_result = await evaluate_js(page, javascript)
-
-    # Wait for condition if specified
-    wait_for = shot_config.wait_for
-    if wait_for:
-        timeout_seconds = shot_config.timeout
-        await wait_for_condition(page, wait_for, timeout_seconds)
-
-    # Trigger lazy load if requested
-    if shot_config.trigger_lazy_load:
-        await trigger_lazy_load(page)
-
-    # Apply viewport expansion to fix intersection observers when blocking is enabled
-    elif shot_config.popup_block or shot_config.ad_block:
-        if Config.verbose:
-            click.echo("Applying viewport expansion to fix intersection observers...", err=True)
-
-        # Get viewport width and document height
-        viewport_width = await page.evaluate("window.innerWidth")
-        document_height = await page.evaluate("document.documentElement.scrollHeight")
-
-        # Use document height, minimum 10000px
-        viewport_height = max(document_height, 10000)
-
-        await page.send(uc.cdp.emulation.set_device_metrics_override(
-            width=viewport_width,
-            height=viewport_height,
-            device_scale_factor=1,
-            mobile=False
-        ))
-
-        # Wait a moment for lazy loading to trigger
-        await page.sleep(0.5)
-
-        # Clear the override to restore normal viewport
-        await page.send(uc.cdp.emulation.clear_device_metrics_override())
-        await page.sleep()
-
-    if shot_config.return_js_result:
-        return page, response_handler, js_result
-    else:
-        return page, response_handler

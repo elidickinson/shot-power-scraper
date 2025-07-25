@@ -38,7 +38,7 @@ def run_nodriver_async(coro):
 
 
 def run_browser_command(command_func, shot_config, **kwargs):
-    """ Execute command async with browser lifecycle management """
+    """ Create a browser, set up a tab, execute command async, and tear it down """
     async def browser_execution():
         browser_obj = None
         try:
@@ -49,8 +49,12 @@ def run_browser_command(command_func, shot_config, **kwargs):
             # Create browser with shot_config parameters
             browser_obj = await create_browser_context(shot_config, extensions)
 
-            # Execute the command
-            result = await command_func(browser_obj, **kwargs)
+            # Set up tab context with one-time configuration
+            from shot_power_scraper.page_utils import create_tab_context
+            page = await create_tab_context(browser_obj, shot_config)
+
+            # Execute the command with configured page
+            result = await command_func(page, **kwargs)
             return result
         finally:
             await cleanup_browser(browser_obj)
@@ -65,7 +69,7 @@ def setup_common_config(verbose, debug, silent, skip, fail, enable_gpu=False):
     Config.debug = debug
     Config.skip = skip
     Config.fail = fail
-    
+
     # Use command line flag if provided, otherwise check config file
     if enable_gpu:
         Config.enable_gpu = True
@@ -101,15 +105,6 @@ def scale_factor_options(fn):
     return fn
 
 
-def normalize_scale_factor(retina, scale_factor):
-    """Normalize scale factor from retina flag or explicit value"""
-    if retina and scale_factor:
-        raise click.ClickException("--retina and --scale-factor cannot be used together")
-    if scale_factor is not None and scale_factor <= 0.0:
-        raise click.ClickException("--scale-factor must be positive")
-    if retina:
-        scale_factor = 2
-    return scale_factor
 
 
 # Consolidated option decorators
@@ -253,50 +248,32 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         ext = "jpg" if quality else None
         output = filename_for_url(url, ext=ext, file_exists=os.path.exists)
 
-    scale_factor = normalize_scale_factor(retina, scale_factor)
     interactive = interactive or devtools
+    resize_viewport = not no_resize_viewport
 
-    shot_config = ShotConfig({
-        "url": url, "selectors": selectors, "selectors_all": selectors_all,
-        "js_selectors": js_selectors, "js_selectors_all": js_selectors_all,
-        "javascript": javascript, "width": width, "height": height, "quality": quality,
-        "padding": padding, "omit_background": omit_background, "scale_factor": scale_factor,
-        "save_html": save_html,
-        "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block,
-        "wait": wait, "wait_for": wait_for, "timeout": timeout,
-        "skip_cloudflare_check": skip_cloudflare_check,
-        "skip_wait_for_load": skip_wait_for_load,
-        "trigger_lazy_load": trigger_lazy_load, "resize_viewport": not no_resize_viewport, "verbose": verbose,
-        "log_console": log_console,
-        "log_requests": log_requests,
-        # Browser options
-        "auth": auth, "interactive": interactive, "devtools": devtools,
-        "browser": browser, "browser_args": browser_args, "user_agent": user_agent,
-        "reduced_motion": reduced_motion, "bypass_csp": bypass_csp,
-        "auth_username": auth_username, "auth_password": auth_password
-    })
+    try:
+        shot_config = ShotConfig(locals())
+    except ValueError as e:
+        raise click.ClickException(str(e))
 
-    async def shot_execution(browser_obj):
-        context = browser_obj
-        use_existing_page = False
+    async def shot_execution(page):
+        skip_navigation = False
         if interactive:
-            from shot_power_scraper.page_utils import navigate_to_page
-            page, response_handler = await navigate_to_page(browser_obj, shot_config)
-            await page.set_window_size(shot_config.width, shot_config.height)
+            from shot_power_scraper.page_utils import navigate_to_url
+            response_handler = await navigate_to_url(page, shot_config)
             click.echo("Hit <enter> to take the shot and close the browser window:", err=True)
             input()
-            context = page
-            use_existing_page = True
+            skip_navigation = True
 
         if output == "-":
             shot_bytes = await take_shot(
-                context, shot_config, return_bytes=True, use_existing_page=use_existing_page,
+                page, shot_config, return_bytes=True, skip_navigation=skip_navigation,
             )
             sys.stdout.buffer.write(shot_bytes)
         else:
             shot_config.output = str(output)
             await take_shot(
-                context, shot_config, use_existing_page=use_existing_page,
+                page, shot_config, skip_navigation=skip_navigation,
             )
 
     run_browser_command(shot_execution, shot_config)
@@ -364,7 +341,6 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
             "trace", ext="har.zip" if har_zip else "har", file_exists=os.path.exists
         )
 
-    scale_factor = normalize_scale_factor(retina, scale_factor)
     shots = yaml.safe_load(config)
 
     if har_file:
@@ -384,13 +360,11 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
             await setup_blocking_extensions(extensions, ad_block, popup_block, paywall_block)
 
         # Create browser config for multi command
-        browser_shot_config = ShotConfig({
-            "auth": auth, "scale_factor": scale_factor, "browser": browser,
-            "browser_args": browser_args, "user_agent": user_agent,
-            "timeout": timeout, "reduced_motion": reduced_motion,
-            "auth_username": auth_username, "auth_password": auth_password,
-            "record_har_path": har_file
-        })
+        record_har_path = har_file
+        try:
+            browser_shot_config = ShotConfig(locals())
+        except ValueError as e:
+            raise click.ClickException(str(e))
 
         browser_obj = await create_browser_context(browser_shot_config, extensions)
 
@@ -431,13 +405,18 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
                             "log_console": log_console,
                         })
                         shot_config = ShotConfig(shot)
+
+                        # Create a new tab context for each shot
+                        from shot_power_scraper.page_utils import create_tab_context
+                        page = await create_tab_context(browser_obj, shot_config)
+
                         if shot_config.output and shot_config.output.lower().endswith('.pdf'):
                             await take_pdf(
-                                browser_obj, shot_config,
+                                page, shot_config,
                             )
                         else:
                             await take_shot(
-                                browser_obj, shot_config,
+                                page, shot_config,
                             )
                     except Exception as e:
                         if Config.fail or fail_on_error:
@@ -514,9 +493,7 @@ def har(url, zip_, output, javascript,
     help=("Read input JavaScript from this file or use gh:username/script "
           "to load from github.com/username/shot-scraper-scripts/script.js"),
 )
-@click.option(
-    "-o", "--output", type=click.File("w"), default="-", help="Save output JSON to this file",
-)
+@click.option("-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True), default="-", help="Save output JSON to this file")
 @click.option(
     "-r", "--raw", is_flag=True, help="Output JSON strings as raw text",
 )
@@ -562,39 +539,31 @@ def javascript(url, javascript, input, output, raw,
             with open(input, "r") as f:
                 javascript = f.read()
 
-    async def execute_js(browser_obj, **kwargs):
-        shot_config = ShotConfig({
-            "url": url,
-            "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
-            "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
-            "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
-            "log_console": log_console,
-            "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block,
-            "user_agent": user_agent,
-            "return_js_result": True
-        })
+    return_js_result = True
+    shot_config = ShotConfig(locals())
 
-        from shot_power_scraper.page_utils import navigate_to_page
-        page, response_handler, result = await navigate_to_page(
-            browser_obj, shot_config,
+    async def execute_js(page, **kwargs):
+        from shot_power_scraper.page_utils import navigate_to_url
+        response_handler, result = await navigate_to_url(
+            page, shot_config,
         )
         return result
 
-    shot_config = ShotConfig({
-        "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block, "user_agent": user_agent,
-        "auth": auth, "browser": browser, "browser_args": browser_args,
-        "reduced_motion": reduced_motion, "bypass_csp": bypass_csp,
-        "auth_username": auth_username, "auth_password": auth_password, "timeout": timeout
-    })
-
     result = run_browser_command(execute_js, shot_config)
 
-    if raw:
-        output.write(str(result))
-        return
-    output.write(json.dumps(result, indent=4, default=str))
-    output.write("\n")
-
+    if output == "-":
+        if raw:
+            sys.stdout.write(str(result))
+        else:
+            sys.stdout.write(json.dumps(result, default=str))
+            sys.stdout.write("\n")
+    else:
+        with open(output, "w") as f:
+            if raw:
+                f.write(str(result))
+            else:
+                f.write(json.dumps(result, indent=4, default=str))
+                f.write("\n")
 
 
 @cli.command()
@@ -640,21 +609,18 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
     if output is None:
         output = filename_for_url(url, ext="pdf", file_exists=os.path.exists)
 
-    shot_config = ShotConfig({
-        "url": url, "output": output, "javascript": javascript,
-        "pdf_landscape": landscape, "pdf_scale": scale or 1.0,
-        "pdf_print_background": print_background, "pdf_media_screen": media_screen,
-        "pdf_css": pdf_css, "wait": wait, "wait_for": wait_for, "timeout": timeout,
-        "trigger_lazy_load": trigger_lazy_load,
-        "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block, "user_agent": user_agent,
-        "auth": auth, "browser": browser, "browser_args": browser_args,
-        "reduced_motion": reduced_motion, "bypass_csp": bypass_csp,
-        "auth_username": auth_username, "auth_password": auth_password
-    })
+    pdf_landscape = landscape
+    pdf_scale = scale or 1.0
+    pdf_print_background = print_background
+    pdf_media_screen = media_screen
+    try:
+        shot_config = ShotConfig(locals())
+    except ValueError as e:
+        raise click.ClickException(str(e))
 
-    async def execute_pdf(browser_obj, **kwargs):
+    async def execute_pdf(page, **kwargs):
         pdf_data = await take_pdf(
-            browser_obj, shot_config, return_bytes=True
+            page, shot_config, return_bytes=True
         )
         return pdf_data
 
@@ -700,22 +666,12 @@ def html(url, output, javascript, selector,
     if output is None:
         output = filename_for_url(url, ext="html", file_exists=os.path.exists)
 
-    shot_config = ShotConfig({
-        "url": url,
-        "javascript": javascript, "skip_cloudflare_check": skip_cloudflare_check,
-        "skip_wait_for_load": skip_wait_for_load, "timeout": timeout,
-        "wait": wait, "wait_for": wait_for, "trigger_lazy_load": trigger_lazy_load,
-        "log_console": log_console,
-        "ad_block": ad_block, "popup_block": popup_block, "paywall_block": paywall_block, "user_agent": user_agent,
-        "auth": auth, "browser": browser, "browser_args": browser_args,
-        "bypass_csp": bypass_csp, "auth_username": auth_username,
-        "auth_password": auth_password
-    })
+    shot_config = ShotConfig(locals())
 
-    async def execute_html(browser_obj, **kwargs):
-        from shot_power_scraper.page_utils import navigate_to_page
-        page, response_handler = await navigate_to_page(
-            browser_obj, shot_config,
+    async def execute_html(page, **kwargs):
+        from shot_power_scraper.page_utils import navigate_to_url
+        response_handler = await navigate_to_url(
+            page, shot_config,
         )
 
         if selector:
@@ -913,10 +869,8 @@ def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced
         }
         return context_state
 
-    shot_config = ShotConfig({
-        "user_agent": user_agent, "interactive": True, "devtools": devtools,
-        "browser": browser, "browser_args": browser_args
-    })
+    interactive = True
+    shot_config = ShotConfig(locals())
 
     context_state = run_browser_command(execute_auth, shot_config)
 

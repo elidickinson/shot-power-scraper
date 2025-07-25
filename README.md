@@ -114,7 +114,7 @@ This section outlines the major code path and functions called when executing `s
 4. **Browser Context** (`browser.py:create_browser_context()`) - Initialize nodriver browser using `shot_config` parameters
 5. **Screenshot Execution** (`cli.py:execute_shot()`) - Handle interactive mode and viewport
 6. **Core Screenshot** (`screenshot.py:take_shot()`) - Main screenshot logic with `shot_config`
-7. **Page Setup** (`page_utils.py:navigate_to_page()`) - Navigate, wait, handle errors using `shot_config`
+7. **Page Setup** (`page_utils.py:create_tab_context()` + `navigate_to_url()`) - Create tab context, navigate, wait, handle errors using `shot_config`
 8. **Screenshot Capture** (`screenshot.py:_save_screenshot()`) - Take and save image
 9. **Browser Cleanup** (`browser.py:cleanup_browser()`) - Stop browser and cleanup
 10. **Async Wrapper** (`cli.py:run_nodriver_async()`) - Setup nodriver event loop
