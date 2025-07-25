@@ -1,9 +1,132 @@
 """Page interaction utilities for shot-scraper"""
 import time
 import asyncio
+import platform
+import re
 import click
 from shot_power_scraper.browser import Config
 import nodriver as uc
+
+
+def generate_user_agent_metadata(user_agent_string):
+    """Generate realistic UserAgentMetadata for Client Hints based on user agent string"""
+    
+    # Parse Chrome version from user agent
+    chrome_match = re.search(r'Chrome/(\d+)\.(\d+)\.(\d+)\.(\d+)', user_agent_string)
+    if not chrome_match:
+        return None
+    
+    major_version = chrome_match.group(1)
+    minor_version = chrome_match.group(2)
+    build_version = chrome_match.group(3)
+    patch_version = chrome_match.group(4)
+    full_version = f"{major_version}.{minor_version}.{build_version}.{patch_version}"
+    
+    # Detect platform from user agent
+    is_mobile = 'Mobile' in user_agent_string or 'Android' in user_agent_string
+    
+    if 'Windows NT' in user_agent_string:
+        # Windows platform
+        platform_name = "Windows"
+        
+        # Extract Windows version
+        windows_match = re.search(r'Windows NT (\d+)\.(\d+)', user_agent_string)
+        if windows_match:
+            nt_major = windows_match.group(1)
+            nt_minor = windows_match.group(2)
+            platform_version = f"{nt_major}.{nt_minor}.0"
+        else:
+            platform_version = "10.0.0"
+        
+        # Detect architecture
+        architecture = "x86" if "WOW64" in user_agent_string or "Win64" in user_agent_string else "x86"
+        if "x64" in user_agent_string or "Win64" in user_agent_string:
+            architecture = "x86"
+        
+        bitness = "64"
+        wow64 = "WOW64" in user_agent_string
+        model = ""
+        
+    elif 'Mac OS X' in user_agent_string or 'macOS' in user_agent_string:
+        # macOS platform
+        platform_name = "macOS"
+        
+        # Extract macOS version
+        mac_match = re.search(r'Mac OS X (\d+)[_.](\d+)[_.]?(\d+)?', user_agent_string)
+        if mac_match:
+            mac_major = mac_match.group(1)
+            mac_minor = mac_match.group(2)
+            mac_patch = mac_match.group(3) or "0"
+            platform_version = f"{mac_major}.{mac_minor}.{mac_patch}"
+        else:
+            platform_version = "13.0.0"
+        
+        # Mac architecture detection
+        architecture = "arm" if "arm64" in user_agent_string else "x86"
+        bitness = "64"
+        wow64 = False
+        model = ""
+        
+    elif 'Android' in user_agent_string:
+        # Android platform
+        platform_name = "Android"
+        
+        # Extract Android version
+        android_match = re.search(r'Android (\d+)(?:\.(\d+))?(?:\.(\d+))?', user_agent_string)
+        if android_match:
+            android_major = android_match.group(1)
+            android_minor = android_match.group(2) or "0"
+            android_patch = android_match.group(3) or "0"
+            platform_version = f"{android_major}.{android_minor}.{android_patch}"
+        else:
+            platform_version = "10.0.0"
+        
+        architecture = "arm"
+        bitness = "64"
+        wow64 = False
+        
+        # Extract device model if available
+        model_match = re.search(r';\s*([^)]+)\s*\)', user_agent_string)
+        model = model_match.group(1).strip() if model_match else ""
+        
+    else:
+        # Default to Linux
+        platform_name = "Linux"
+        platform_version = "0.0.0"
+        architecture = "x86"
+        bitness = "64"
+        wow64 = False
+        model = ""
+    
+    # Generate brands list (matches what real Chrome reports)
+    brands = [
+        uc.cdp.emulation.UserAgentBrandVersion(brand="Google Chrome", version=major_version),
+        uc.cdp.emulation.UserAgentBrandVersion(brand="Chromium", version=major_version),
+        uc.cdp.emulation.UserAgentBrandVersion(brand="Not=A?Brand", version="99")
+    ]
+    
+    # Full version list for Sec-CH-UA-Full-Version-List
+    full_version_list = [
+        uc.cdp.emulation.UserAgentBrandVersion(brand="Google Chrome", version=full_version),
+        uc.cdp.emulation.UserAgentBrandVersion(brand="Chromium", version=full_version),
+        uc.cdp.emulation.UserAgentBrandVersion(brand="Not=A?Brand", version="99.0.0.0")
+    ]
+    
+    # Create UserAgentMetadata
+    metadata = uc.cdp.emulation.UserAgentMetadata(
+        platform=platform_name,
+        platform_version=platform_version,
+        architecture=architecture,
+        model=model,
+        mobile=is_mobile,
+        brands=brands,
+        full_version_list=full_version_list,
+        full_version=full_version,
+        bitness=bitness,
+        wow64=wow64 if platform_name == "Windows" else None
+    )
+    
+    return metadata
 
 
 async def evaluate_js(page, javascript):
@@ -228,6 +351,16 @@ async def navigate_to_page(
     # Get a blank page first
     page = await browser_obj.get("about:blank")
 
+    # Set user agent override with Client Hints metadata if configured
+    if hasattr(browser_obj, '_user_agent') and browser_obj._user_agent:
+        metadata = generate_user_agent_metadata(browser_obj._user_agent)
+        await page.send(uc.cdp.emulation.set_user_agent_override(
+            user_agent=browser_obj._user_agent,
+            user_agent_metadata=metadata
+        ))
+        if Config.verbose:
+            click.echo(f"Applied user agent with Client Hints: {browser_obj._user_agent}", err=True)
+
     # Set up console logging BEFORE navigating
     console_logger = None
     if shot_config.log_console:
@@ -238,6 +371,7 @@ async def navigate_to_page(
 
     # Set up response handler for HTTP status checking
     response_handler = ResponseHandler()
+    await page.send(uc.cdp.network.enable())
     page.add_handler(uc.cdp.network.ResponseReceived, response_handler.on_response_received)
 
     # Navigate to the actual URL

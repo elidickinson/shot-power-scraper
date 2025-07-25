@@ -768,7 +768,6 @@ def install(browser, browser_args):
     click.echo()
     click.echo("Setting up default user agent for stealth mode...")
 
-
     async def set_user_agent_wrapper(browser_obj):
         page = await browser_obj.get("about:blank")
         user_agent = await page.evaluate("navigator.userAgent")
@@ -776,6 +775,7 @@ def install(browser, browser_args):
         if not user_agent:
             raise click.ClickException("Could not detect user agent")
 
+        # Remove HeadlessChrome to avoid detection
         modified_user_agent = user_agent.replace("HeadlessChrome", "Chrome")
         set_config_value('user_agent', modified_user_agent)
 
@@ -783,6 +783,7 @@ def install(browser, browser_args):
         click.echo(f"Original user agent: {user_agent}")
         click.echo(f"Modified user agent: {modified_user_agent}")
         click.echo(f"Saved default user agent to: {get_config_file()}")
+        click.echo("✓ Client Hints metadata will be generated from real user agent at runtime")
 
     shot_config = ShotConfig({"interactive": False, "browser_args": browser_args or []})
     run_browser_command(set_user_agent_wrapper, shot_config)

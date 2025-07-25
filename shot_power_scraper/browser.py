@@ -20,14 +20,15 @@ class Config:
 
 
 
+
+
+
 async def create_browser_context(shot_config, extensions=None):
     """Create and configure a browser instance with nodriver"""
-    # Convert browser_args tuple to list and add user agent if needed
+    # Convert browser_args tuple to list
     browser_args_list = list(shot_config.browser_args) if shot_config.browser_args else []
 
-    # Add user agent to browser args if specified or found in config
-    if shot_config.user_agent:
-        browser_args_list.append(f"--user-agent={shot_config.user_agent}")
+    # Note: User agent is now set via CDP with Client Hints metadata, not browser args
 
     # Add --disable-gpu by default unless --enable-gpu is specified
     if not Config.enable_gpu:
@@ -39,20 +40,20 @@ async def create_browser_context(shot_config, extensions=None):
             extensions = [extensions]
 
         extension_paths = []
-        
+
         for ext_path in extensions:
             ext_path = pathlib.Path(ext_path).absolute()
             if Config.verbose:
                 click.echo(f"Loading extension: {ext_path}", err=True)
-            
-            
+
+
             extension_paths.append(str(ext_path))
 
         # Use Chrome's --load-extension argument for all extensions
         if extension_paths:
             extension_arg = f"--load-extension={','.join(extension_paths)}"
             browser_args_list.append(extension_arg)
-        
+
         # Enable extension loading
         if extension_paths:
             browser_args_list.append("--disable-features=DisableLoadExtensionCommandLineSwitch")
@@ -74,12 +75,19 @@ async def create_browser_context(shot_config, extensions=None):
 
     # Show browser args in verbose mode
     if Config.verbose and browser_args_list:
-        click.echo(f"Browser args: {browser_args_list}", err=True)
+        # click.echo(f"Browser args: {browser_args_list}", err=True)
+        click.echo(f"Browser config: {config}", err=True)
 
     browser_obj = await uc.start(config=config)
 
     if browser_obj is None:
         raise click.ClickException("Failed to initialize browser")
+
+    # Store user agent config on browser object for later use
+    if shot_config.user_agent:
+        browser_obj._user_agent = shot_config.user_agent
+        if Config.verbose:
+            click.echo(f"Will set user agent with Client Hints metadata: {shot_config.user_agent}", err=True)
 
     # Give extensions time to load if any were specified
     if extensions:
