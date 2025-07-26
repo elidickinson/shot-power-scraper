@@ -91,15 +91,11 @@ def console_log(msg):
     click.echo(msg, err=True)
 
 
-
-
 def scale_factor_options(fn):
     """Scale factor options for backwards compatibility"""
     click.option("--retina", is_flag=True, help="Use device scale factor of 2. Cannot be used together with '--scale-factor'.")(fn)
     click.option("--scale-factor", type=float, help="Device scale factor. Cannot be used together with '--retina'.")(fn)
     return fn
-
-
 
 
 # Consolidated option decorators
@@ -257,7 +253,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
         skip_navigation = False
         if interactive:
             from shot_power_scraper.page_utils import navigate_to_url
-            response_handler = await navigate_to_url(page, shot_config)
+            await navigate_to_url(page, shot_config)
             click.echo("Hit <enter> to take the shot and close the browser window:", err=True)
             input()
             skip_navigation = True
@@ -541,9 +537,7 @@ def javascript(url, javascript, input, output, raw,
 
     async def execute_js(page, **kwargs):
         from shot_power_scraper.page_utils import navigate_to_url
-        response_handler, result = await navigate_to_url(
-            page, shot_config,
-        )
+        result = await navigate_to_url(page, shot_config)
         return result
 
     result = run_browser_command(execute_js, shot_config)
@@ -667,9 +661,7 @@ def html(url, output, javascript, selector,
 
     async def execute_html(page, **kwargs):
         from shot_power_scraper.page_utils import navigate_to_url
-        response_handler = await navigate_to_url(
-            page, shot_config,
-        )
+        await navigate_to_url(page, shot_config)
 
         if selector:
             element = await page.select(selector)

@@ -1,7 +1,5 @@
 """Browser management for shot-scraper"""
-import asyncio
 import json
-import os
 import click
 import nodriver as uc
 import pathlib

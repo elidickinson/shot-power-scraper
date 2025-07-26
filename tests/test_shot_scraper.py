@@ -5,8 +5,7 @@ import textwrap
 from click.testing import CliRunner
 import pytest
 from shot_power_scraper.cli import cli
-import zipfile
-import json
+
 
 
 # Mark for tests that require a working browser (skip only in CI)

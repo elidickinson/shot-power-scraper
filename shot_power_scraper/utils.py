@@ -2,7 +2,6 @@ import urllib.parse
 import urllib.request
 import urllib.error
 import re
-import json
 import pathlib
 import os
 
@@ -12,7 +11,7 @@ disallowed_re = re.compile("[^a-zA-Z0-9_-]")
 def filename_for_url(url, ext=None):
     ext = ext or "png"
     bits = urllib.parse.urlparse(url)
-    
+
     # Special handling for file:// URLs - use basename
     if bits.scheme == 'file':
         path = pathlib.Path(bits.path)
@@ -22,7 +21,7 @@ def filename_for_url(url, ext=None):
         filename = (bits.netloc + bits.path).replace(".", "-").replace("/", "-").rstrip("-")
         # Remove any characters outside of the allowed range
         base_filename = disallowed_re.sub("", filename).lstrip("-")
-    
+
     filename = base_filename + "." + ext
     suffix = 0
     while os.path.exists(filename):
@@ -40,7 +39,7 @@ def url_or_file_path(url):
     except OSError:
         # On Windows, instantiating a Path object on `http://` or `https://` will raise an exception
         pass
-    
+
     # Add http:// prefix if no scheme provided
     if not (url.startswith("http://") or url.startswith("https://") or url.startswith("file://")):
         return f"http://{url}"
@@ -87,7 +86,3 @@ def load_github_script(github_path: str) -> str:
                 )
     except urllib.error.URLError as e:
         raise ValueError(f"Error fetching from GitHub: {e}")
-
-
-
-

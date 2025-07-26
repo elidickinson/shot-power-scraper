@@ -12,7 +12,6 @@ import nodriver as uc
 from shot_power_scraper.browser import Config
 from shot_power_scraper.page_utils import evaluate_js
 from shot_power_scraper.utils import filename_for_url, url_or_file_path
-from shot_power_scraper.shot_config import ShotConfig
 
 
 async def _save_screenshot_with_temp_file(page_or_element, shot_config):
@@ -70,7 +69,7 @@ async def _save_screenshot(page_or_element, output, shot_config):
             mobile=False
         ))
         await page
-        
+
         clip = None
         capture_beyond_viewport = False
 
@@ -92,7 +91,7 @@ async def _save_screenshot(page_or_element, output, shot_config):
         await page
 
     if not data:
-        raise ProtocolException(
+        raise RuntimeError(
             "No data returned from capture_screenshot. Maybe page is still loading?"
         )
 
@@ -223,10 +222,7 @@ async def take_shot(
     if not skip_navigation:
         from shot_power_scraper.page_utils import navigate_to_url
 
-        response_handler = await navigate_to_url(
-            page,
-            shot_config,
-        )
+        await navigate_to_url(page, shot_config)
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
     # are now handled by navigate_to_url() for new pages
@@ -431,11 +427,7 @@ async def take_pdf(
 
     if not skip_navigation:
         from shot_power_scraper.page_utils import navigate_to_url
-
-        response_handler = await navigate_to_url(
-            page,
-            shot_config,
-        )
+        await navigate_to_url(page, shot_config)
 
     # Note: wait, javascript, wait_for, and trigger_lazy_load
     # are now handled by navigate_to_url() for new pages

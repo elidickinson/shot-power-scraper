@@ -35,15 +35,15 @@ TOLERANCE=100  # Allow up to 100 different pixels (adjust as needed)
 # Compare all generated images
 for current in "$EXAMPLES_DIR"/*.png "$EXAMPLES_DIR"/*.jpg; do
     [[ -f "$current" ]] || continue  # Skip if no files match
-    
+
     filename=$(basename "$current")
     reference="$REFERENCES_DIR/$filename"
     diff_image="$DIFFS_DIR/${filename%.*}_diff.png"
-    
+
     if [[ -f "$reference" ]]; then
         # Compare images - capture both stdout and stderr
         diff_output=$(compare -metric AE "$reference" "$current" null: 2>&1) || true
-        
+
         # Extract the first number from output (handles scientific notation)
         # Output format is like "2.34399e+09 (35767)" or just "0"
         if [[ -n "$diff_output" ]]; then
@@ -54,15 +54,15 @@ for current in "$EXAMPLES_DIR"/*.png "$EXAMPLES_DIR"/*.jpg; do
         else
             diff_pixels=999999  # Treat empty output as major difference
         fi
-        
+
         if [[ $diff_pixels -gt $TOLERANCE ]]; then
             echo "❌ REGRESSION: $filename ($diff_pixels pixels different, tolerance: $TOLERANCE)"
-            
+
             # Generate visual diff image (red highlights differences)
             compare "$reference" "$current" -compose src "$diff_image" 2>/dev/null || {
                 echo "   (Could not generate diff image - images may be different sizes)"
             }
-            
+
             FAILURES=$((FAILURES + 1))
         else
             echo "✅ PASS: $filename ($diff_pixels pixels different)"
@@ -80,16 +80,16 @@ for current in "$EXAMPLES_DIR"/*.pdf; do
     [[ -f "$current" ]] || continue
     filename=$(basename "$current")
     reference="$REFERENCES_DIR/$filename"
-    
+
     if [[ -f "$reference" ]]; then
         # Just check if PDF was created and has reasonable size
         current_size=$(stat -f%z "$current" 2>/dev/null || stat -c%s "$current" 2>/dev/null || echo 0)
         reference_size=$(stat -f%z "$reference" 2>/dev/null || stat -c%s "$reference" 2>/dev/null || echo 0)
-        
+
         # Allow 20% size difference for PDFs
         size_diff=$(( (current_size - reference_size) * 100 / reference_size ))
         size_diff=${size_diff#-}  # absolute value
-        
+
         if [[ $size_diff -gt 20 ]]; then
             echo "⚠️  PDF SIZE: $filename (${size_diff}% size difference)"
         else
@@ -123,12 +123,14 @@ if [[ $FAILURES -gt 0 ]]; then
     echo "💡 To update failing references (if changes are intentional):"
     echo "   # Review the diffs first, then:"
     echo "   cp tests/examples/failing-file.png tests/references/"
+    echo "   # or all at once:"
+    echo "   cp tests/examples/*.{png,pdf,jpg,json} tests/references/"
 fi
 
 echo ""
 echo "📁 Files:"
 echo "   Current results: $EXAMPLES_DIR"
-echo "   Reference images: $REFERENCES_DIR" 
+echo "   Reference images: $REFERENCES_DIR"
 echo "   Diff images: $DIFFS_DIR"
 
 exit $FAILURES

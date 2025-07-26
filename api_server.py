@@ -66,7 +66,6 @@ from fastapi import FastAPI, HTTPException, Response, Request
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from contextlib import asynccontextmanager
-import asyncio
 import os
 import sys
 from pathlib import Path
@@ -81,7 +80,7 @@ from shot_power_scraper.browser import create_browser_context, Config
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.shot_config import ShotConfig
 from shot_power_scraper.cli import browser_args_option
-from shot_power_scraper.page_utils import evaluate_js, detect_navigation_error, create_tab_context, navigate_to_url
+from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
 
 # Global browser instance for reuse
 browser_instance = None
@@ -348,9 +347,9 @@ async def html(request: HtmlRequest):
             "javascript": request.javascript,
             "silent": True
         })
-        
+
         page = await create_tab_context(browser, shot_config)
-        response_handler = await navigate_to_url(page, shot_config)
+        await navigate_to_url(page, shot_config)
 
         # Extract HTML
         if request.selector:

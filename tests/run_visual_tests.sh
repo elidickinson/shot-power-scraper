@@ -154,10 +154,14 @@ shot-power-scraper ../pages/complex-layout.html \
 # =============================================================================
 echo "⚠️  Testing edge cases and error handling..."
 
-# Non-existent selector (should capture full page)
-shot-power-scraper ../pages/complex-layout.html \
-  -o "edge-MISSING-SELECTOR-fallback-full-page.png" \
-  -s "#does-not-exist" -w 500 -h 400
+# Non-existent selector (should throw error)
+if shot-power-scraper ../pages/complex-layout.html \
+  -o "edge-MISSING-SELECTOR-SHOULD-NOT-EXIST.png" \
+  -s "#does-not-exist" -w 500 -h 400 2>/dev/null; then
+  echo "❌ edge-MISSING-SELECTOR: Expected non-zero exit code, but got zero."
+else
+  echo "✅ edge-MISSING-SELECTOR: Correctly returned non-zero exit code for missing selector."
+fi
 
 # Very small dimensions
 shot-power-scraper ../pages/complex-layout.html \
@@ -175,8 +179,8 @@ shot-power-scraper ../pages/timing-test.html \
   --log-console -w 500 -h 400
 
 # JavaScript execution with output
-shot-power-scraper ../pages/complex-layout.html \
-  --javascript "document.title + ' - ' + document.querySelectorAll('h2').length + ' sections'" \
+shot-power-scraper javascript ../pages/complex-layout.html \
+  "document.title + ' - ' + document.querySelectorAll('h2').length + ' sections'" \
   > debug-javascript-output.json
 
 # =============================================================================

@@ -1,7 +1,6 @@
 """Page interaction utilities for shot-scraper"""
 import time
 import asyncio
-import platform
 import re
 import click
 from shot_power_scraper.browser import Config
@@ -194,7 +193,8 @@ async def navigate_to_url(page, shot_config):
     Handles navigation, load waiting, error checking, Cloudflare bypass,
     JavaScript execution, and post-navigation processing.
 
-    Returns: response_handler (page._response_handler should already be set)
+    Returns: js_result if shot_config.return_js_result is True, otherwise None
+    Response handler is available as page._response_handler
     """
     from shot_power_scraper.utils import url_or_file_path
 
@@ -208,7 +208,7 @@ async def navigate_to_url(page, shot_config):
     # Navigate to the actual URL
     if Config.verbose:
         click.echo(f"Loading page: {url}", err=True)
-    
+
     # Start navigation - network failure events will fire immediately for DNS/connection issues
     try:
         await asyncio.wait_for(page.get(url), timeout=10)
@@ -216,10 +216,10 @@ async def navigate_to_url(page, shot_config):
     except asyncio.TimeoutError:
         msg = "Could not connect to" if response_handler._load_failed.is_set() else "Timeout loading"
         error_msg = f"{msg} {url}"
-        
+
         if Config.skip:
             click.echo(f"{error_msg}, skipping", err=True)
-            raise SystemExit
+            raise SystemExit  # TODO: could be issue for `multi`
         raise click.ClickException(error_msg)
 
     # Wait for window load event unless skipped
@@ -336,9 +336,7 @@ async def navigate_to_url(page, shot_config):
         await page.sleep()
 
     if shot_config.return_js_result:
-        return response_handler, js_result
-    else:
-        return response_handler
+        return js_result
 
 
 async def evaluate_js(page, javascript):
