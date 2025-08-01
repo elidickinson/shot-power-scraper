@@ -22,3 +22,19 @@ extensions/bypass-paywalls-chrome-clean-master/*.backup
 /extensions/blocker-shared/ad-block-rules.json
 /extensions/blocker-shared/cosmetic-ad-block-rules.json
 /extensions/blocker-shared/cosmetic-popup-block-rules.json
+/tests/references
+/nodriver_source
+/debug.log
+/*.har
+/*.mhtml
+/.claude
+/.serena
+/CLAUDE.md
+
+# Development and debug files
+debug_*.py
+task_log.md
+test_*.py
+test_*.html
+*_rules_support.md
+!docs/*

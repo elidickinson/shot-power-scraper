@@ -25,6 +25,9 @@ shot-power-scraper ../pages/timing-test.html -o "timing-WAIT-FOR-shows-all-conte
 echo "📄 Testing PDF..."
 shot-power-scraper pdf ../pages/complex-layout.html -o "pdf-portrait-standard-layout.pdf"
 
+echo "📦 Testing MHTML..."
+shot-power-scraper mhtml ../pages/complex-layout.html -o "mhtml-basic-archive.mhtml"
+
 echo "🌐 Testing external site (proves HTTP works)..."
 shot-power-scraper https://eli.pizza/ -o "external-eli-pizza.png"
 
@@ -46,5 +49,6 @@ echo "🛡️  blocking-BEFORE vs blocking-AFTER (ads should disappear)"
 echo "🎯 selector-FULL-PAGE vs selector-HEADER-ONLY (element isolation)"
 echo "⏱️  timing-NO-WAIT vs timing-WAIT-FOR (delayed content)"
 echo "📄 pdf-portrait-standard-layout.pdf (readable layout)"
-echo "🌐 external-EXAMPLE-DOT-COM-basic-http.png (real HTTP site works)"
-echo "📋 multi-LOCAL-FILE-with-ads.png & multi-EXTERNAL-SITE-example.png (YAML batch works)"
+echo "📦 mhtml-basic-archive.mhtml (complete web archive)"
+echo "🌐 external-eli-pizza.png (real HTTP site works)"
+echo "📋 multi-LOCAL-FILE-with-ads.png & multi-EXTERNAL-SITE-elipizza.png (YAML batch works)"

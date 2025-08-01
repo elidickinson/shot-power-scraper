@@ -16,11 +16,30 @@
     "remove_cookies_select_drop": ["hupLclFreeReadsCookie"],
     "upd_version": "4.1.6.2"
   },
+  "Milenio": {
+    "domain": "milenio.com",
+    "allow_cookies": 1,
+    "block_regex": "\\.tinypass\\.com",
+    "upd_version": "4.1.6.7"
+  },
   "Mittelbayerische Zeitung": {
     "domain": "mittelbayerische.de",
     "allow_cookies": 1,
     "block_regex": "\\.piano\\.io",
     "ld_archive_is": "div.paywall-layer|div#article-body",
     "upd_version": "4.1.6.2"
+  },
+  "Stylist.co.uk": {
+    "domain": "stylist.co.uk",
+    "allow_cookies": 1,
+    "cs_code": "[{\"cond\":\"div.paywall--inline\", \"rm_attrib\":\"class\"}]",
+    "cs_dompurify": 1,
+    "upd_version": "4.1.7.2"
+  },
+  "The Globe and Mail": {
+    "domain": "theglobeandmail.com",
+    "allow_cookies": 1,
+    "block_regex": "(\\.sophi\\.io\\/|\\.theglobeandmail\\.com\\/zephr\\/feature)",
+    "upd_version": "4.1.6.8"
   }
 }

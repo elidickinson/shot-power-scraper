@@ -63,6 +63,9 @@ patch_bypass_paywalls_extension() {
     # Patch background.js - handle both with and without trailing comma
     sed -i.backup 's/optInUpdate: true,*/optInUpdate: true,\
   customOptIn: true/' "$extension_dir/background.js"
+
+  # TODO: this doesn't work right
+  # sed -i.backup 's/ext_api\.runtime\.openOptionsPage();/false && ext_api.runtime.openOptionsPage(); \/\/ Disabled by build script/' "$extension_dir/background.js"
 }
 
 # Download filter list

@@ -4,6 +4,7 @@ import urllib.error
 import re
 import pathlib
 import os
+import nodriver as uc
 
 disallowed_re = re.compile("[^a-zA-Z0-9_-]")
 
@@ -86,3 +87,13 @@ def load_github_script(github_path: str) -> str:
                 )
     except urllib.error.URLError as e:
         raise ValueError(f"Error fetching from GitHub: {e}")
+
+
+async def capture_mhtml(page):
+    """Capture MHTML (web archive) content from a page using Chrome DevTools Protocol"""
+    try:
+        # Use Chrome DevTools Protocol Page.captureSnapshot to get MHTML
+        result = await page.send(uc.cdp.page.capture_snapshot())
+        return result
+    except Exception as e:
+        raise RuntimeError(f"Failed to capture MHTML: {e}")

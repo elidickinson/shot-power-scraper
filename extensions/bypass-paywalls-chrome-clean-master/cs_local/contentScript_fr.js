@@ -214,41 +214,55 @@ else if (matchDomain(fr_be_groupe_rossel_domains)) {
     removeDOMElement(paywall);
     hideDOMStyle('r-mini-panel.r-mini-panel--froomle, div.r-paywall', 2);
     let article = document.querySelector(cs_param.article_sel || 'r-article--section, div.r-content') || document.querySelector('div#article_paywall_es');
-    let match = window.location.pathname.match(/^\/(art\/|id)?(\d+)\//);
-    if (article && match) {
+    if (article) {
       article.removeAttribute('class');
       article.removeAttribute('id');
-      let article_id = match[2];
-      let apps = 'apps';
-      let apps_list = {
-        'aisnenouvelle.fr': 'an',
-        'courrier-picard.fr': 'cp',
-        'lardennais.fr': 'ar',
-        'lest-eclair.fr': 'ee',
-        'liberation-champagne.fr': 'lc',
-        'lunion.fr': 'un'
-      };
-      for (let domain in apps_list) {
-        if (matchDomain(domain))
-          apps += '_' + apps_list[domain];
-      }
-      let url_src = window.location.origin + '/api/article/' + apps + '/' + article_id + '.json';
-      fetch(url_src)
-      .then(response => {
-        if (response.ok) {
-          response.json().then(json => {
-            if (json.body) {
-              let parser = new DOMParser();
-              dompurify_options.ADD_TAGS = dompurify_options.ADD_TAGS.concat(['epigraph', 'i-carousel', 'r-article--section', 'r-carousel', 'r-embed', 'r-img']);
-              let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(json.body, dompurify_options) + '</div>', 'text/html');
-              let article_new = doc.querySelector('div');
-              article_new.querySelectorAll('iframe[allow*="fullscreen"][allowfullscreen]').forEach(e => e.removeAttribute('allowfullscreen'));
-              article.innerHTML = '';
-              article.appendChild(article_new);
-            }
-          })
+      let article_id;
+      let url_src;
+      let match = window.location.pathname.match(/^\/(art\/|id)?(\d+)\//);
+      if (match) {
+        article_id = match[2];
+        let apps = 'apps';
+        let apps_list = {
+          'aisnenouvelle.fr': 'an',
+          'courrier-picard.fr': 'cp',
+          'lardennais.fr': 'ar',
+          'lest-eclair.fr': 'ee',
+          'liberation-champagne.fr': 'lc',
+          'lunion.fr': 'un'
+        };
+        for (let domain in apps_list) {
+          if (matchDomain(domain))
+            apps += '_' + apps_list[domain];
         }
-      }).catch(err => console.log(err));
+        url_src = window.location.origin + '/api/article/' + apps + '/' + article_id + '.json';
+      } else {
+        let match_archive = window.location.pathname.match(/\/art\/(d-\d+-\w+)$/);
+        if (match_archive) {
+          article_id = match_archive[1];
+          url_src = window.location.origin + '/api/archive-detail/apps/' + article_id + '.json';
+        }
+      }
+      if (url_src) {
+        fetch(url_src)
+        .then(response => {
+          if (response.ok) {
+            response.json().then(json => {
+              if (json.body) {
+                let parser = new DOMParser();
+                dompurify_options.ADD_TAGS = dompurify_options.ADD_TAGS.concat(['epigraph', 'i-carousel', 'r-article--section', 'r-carousel', 'r-embed', 'r-img']);
+                let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(json.body, dompurify_options) + '</div>', 'text/html');
+                let article_new = doc.querySelector('div');
+                article_new.querySelectorAll('iframe[allow*="fullscreen"][allowfullscreen]').forEach(e => e.removeAttribute('allowfullscreen'));
+                article.innerHTML = '';
+                article.appendChild(article_new);
+              }
+            })
+          } else
+            header_nofix(article, '', 'BPC > no fix (source file)');
+        }).catch(err => console.log(err));
+      } else
+        header_nofix(article);
     }
   }
   let ads = 'r-pub, div.adm-ad-loading';

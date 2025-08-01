@@ -222,6 +222,31 @@ def test_html(args, expected):
         assert result.output.replace("\n", "") == expected.replace("\n", "")
 
 
+@browser_required
+@pytest.mark.parametrize(
+    "args",
+    (
+        ([]),
+        (["-j", "document.body.removeChild(document.querySelector('h1'))"]),
+        (["--user-agent", "test-agent"]),
+        (["--ad-block"]),
+        (["--popup-block"]),
+        (["--trigger-lazy-load"]),
+    ),
+)
+def test_mhtml(args):
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        open("index.html", "w").write(TEST_HTML)
+        result = runner.invoke(cli, ["mhtml", "index.html"] + args)
+        assert result.exit_code == 0, result.output
+        # MHTML content should start with MIME boundary
+        assert "MIME-Version:" in result.output
+        assert "Content-Type: multipart/related" in result.output
+        # Should contain the HTML content
+        assert "Test title" in result.output
+
+
 @pytest.mark.parametrize(
     "command,flag",
     [
@@ -230,6 +255,8 @@ def test_html(args, expected):
         ("shot", "--devtools"),
         ("multi", "--ad-block"),
         ("multi", "--popup-block"),
+        ("mhtml", "--ad-block"),
+        ("mhtml", "--popup-block"),
     ],
 )
 def test_cli_flags_no_crash(command, flag):

@@ -9,6 +9,9 @@ Usage:
 """
 import sys
 import os
+import faulthandler
+
+faulthandler.enable()
 
 # Add the current directory to Python path so we can import shot_power_scraper
 current_dir = os.path.dirname(os.path.abspath(__file__))

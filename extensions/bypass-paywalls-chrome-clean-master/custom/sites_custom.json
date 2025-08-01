@@ -1,6 +1,6 @@
 {
   "###_remove_sites": {
-    "cs_code": "aoc.media, bisnisindonesia.id, nature.com, group_usa_allcity_network, group_van_magazine, ###_custom_4.1.6.0",
+    "cs_code": "aoc.media, bisnisindonesia.id, nature.com, group_usa_allcity_network, group_van_magazine, ###_custom_4.1.6.2",
     "domain": "###"
   },
   "404media.co": {
@@ -584,6 +584,12 @@
     "domain": "himalmag.com",
     "ld_json": "div#metered-paywall-banner|div[class*='paywall-story-']"
   },
+  "Historischnieuwsblad.nl": {
+    "allow_cookies": 1,
+    "cs_code": "[{\"hide_elem\": \"div.b-premium-paywall__outer\"}]",
+    "domain": "historischnieuwsblad.nl",
+    "ld_json_url": "div.b-premium-paywall__outer|article|1"
+  },
   "Hochparterre.ch": {
     "add_ext_link": "div.paywall|div.article__content",
     "add_ext_link_type": "google_search_tool",
@@ -873,6 +879,11 @@
     "allow_cookies": 1,
     "cs_code": "[{\"cond\":\"body.paywall\", \"rm_class\":\"paywall\", \"elems\":[{\"cond\":\"body[style]\", \"rm_attrib\":\"style\"}, {\"cond\":\"div#paywall-wrapper,div.advertising\", \"rm_elem\":1}]}]",
     "domain": "museumsassociation.org"
+  },
+  "Musicomh.com": {
+    "allow_cookies": 1,
+    "block_regex": "(\\.axate\\.io|\\.musicomh\\.com\\/wp-content\\/.+\\/bundle\\.js)",
+    "domain": "musicomh.com"
   },
   "Myanmar-now.org": {
     "allow_cookies": 1,
@@ -1364,6 +1375,11 @@
     "cs_code": "[{\"cond\":\"div.access-message\", \"rm_elem\":1, \"elems\":[{\"cond\":\"div.hide.paywall-content\", \"rm_attrib\":\"class\"}]}]",
     "domain": "thefederal.com"
   },
+  "Thehub.ca": {
+    "allow_cookies": 1,
+    "domain": "thehub.ca",
+    "useragent": "googlebot"
+  },
   "Theijf.org (refresh)": {
     "allow_cookies": 1,
     "domain": "theijf.org",
@@ -1374,6 +1390,12 @@
     "add_ext_link_type": "google_search_tool",
     "allow_cookies": 1,
     "domain": "theinformation.com"
+  },
+  "Thejc.com": {
+    "allow_cookies": 1,
+    "block_regex": "\\.poool\\.fr",
+    "cs_code": "[{\"cond\":\"div.poool-widget\", \"rm_elem\":1, \"elems\": [{\"cond\":\"div.paywall\", \"rm_attrib\":\"class\"}]}]",
+    "domain": "thejc.com"
   },
   "Theloadstar.com": {
     "allow_cookies": 1,

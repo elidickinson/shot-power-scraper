@@ -62,6 +62,9 @@ var restrictions = {
 for (let domain of grouped_sites['###_au_news_corp'])
   restrictions[domain] = new RegExp('^((?!todayspaper\\.' + domain.replace(/\./g, '\\.') + '\\/).)*$');
 
+for (let domain of grouped_sites['###_fr_be_groupe_rossel'])
+  restrictions[domain] = new RegExp('^((?!journal\\.' + domain.replace(/\./g, '\\.') + '\\/).)*$');
+
 if (typeof browser !== 'object') {
   for (let domain of [])
     restrictions[domain] = new RegExp('((\\/|\\.)' + domain.replace(/\./g, '\\.') + '\\/$|' + restrictions[domain].toString().replace(/(^\/|\/$)/g, '') + ')');
@@ -942,13 +945,12 @@ ext_api.storage.local.get({
         if (sites[site_old])
           delete sites[site_old];
       // reset ungrouped sites
-      let ungrouped_sites = {
-        'The Stage Media (UK)': '###_uk_thestage_media',
-        'The Week (regwall)': 'theweek.com'
+      let new_domain_sites = {
+        'The Times Literary Supplement': 'the-tls.com'
       };
-      for (let key in ungrouped_sites) {
-        if (sites[key] && sites[key] !== ungrouped_sites[key])
-          sites[key] = ungrouped_sites[key];
+      for (let key in new_domain_sites) {
+        if (sites[key] && sites[key] !== new_domain_sites[key])
+          sites[key] = new_domain_sites[key];
       }
       ext_api.storage.local.set({
         sites: sites
@@ -956,7 +958,7 @@ ext_api.storage.local.get({
     } else {
       ext_api.management.getSelf(function (result) {
         if ((result.installType === 'development' || (result.installType !== 'development' && !enabledSites.includes('#options_on_update')))) {
-          let new_groups = ['###_de_ippen_media', '###_se_bonnier_group', '###_uk_independent', '###_uk_thesun', '###_usa_vox_media'];
+          let new_groups = ['###_se_bonnier_group'];
           let open_options = new_groups.some(group => !enabledSites.includes(group) && grouped_sites[group].some(domain => enabledSites.includes(domain) && !customSites_domains.includes(domain)));
           if (open_options)
             ext_api.runtime.openOptionsPage();
@@ -1266,7 +1268,7 @@ if (typeof browser !== 'object') {
     let tab_runs = 5;
     let cs_local = 'en';
     let hostname = urlHost(url);
-    if (hostname.match(/\.(ar|br|cl|mx|pe|uy)$/) || matchUrlDomain(['abcmais.com', 'cambiocolombia.com', 'clarin.com', 'cronista.com', 'elespectador.com', 'elmercurio.com', 'eltiempo.com', 'eltribuno.com', 'eluniverso.com', 'exame.com', 'globo.com', 'latercera.com', 'revistaoeste.com'], url))
+    if (hostname.match(/\.(ar|br|cl|mx|pe|uy)$/) || matchUrlDomain(['abcmais.com', 'cambiocolombia.com', 'clarin.com', 'cronista.com', 'elespectador.com', 'elmercurio.com', 'eltiempo.com', 'eltribuno.com', 'eluniverso.com', 'exame.com', 'globo.com', 'latercera.com', 'milenio.com', 'revistaoeste.com'], url))
       cs_local = 'es.pt';
     else if (hostname.match(/\.(de|at|ch)$/) || matchUrlDomain(['faz.net', 'handelsblatt.com', 'tt.com', 'wochenblatt.com'], url))
       cs_local = 'de';

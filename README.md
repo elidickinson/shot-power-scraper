@@ -29,6 +29,34 @@ You can take a screenshot of a web page like this:
 
 This will create a screenshot in a file called `datasette-io.png`.
 
+## Different Output Formats
+
+Beyond screenshots, `shot-power-scraper` supports multiple output formats:
+
+### Screenshots (default)
+```bash
+shot-power-scraper https://example.com/          # Creates example-com.png
+```
+
+### PDF Documents
+```bash
+shot-power-scraper pdf https://example.com/      # Creates example-com.pdf
+```
+
+### HTML Source
+```bash
+shot-power-scraper html https://example.com/     # Outputs HTML to stdout
+shot-power-scraper html https://example.com/ -o page.html
+```
+
+### MHTML Web Archives
+```bash
+shot-power-scraper mhtml https://example.com/    # Creates example-com.mhtml
+shot-power-scraper mhtml https://example.com/ -o archive.mhtml
+```
+
+MHTML (MIME HTML) archives contain the complete web page including all embedded resources like images, CSS, and JavaScript in a single file - perfect for offline viewing or archival purposes.
+
 ## Anti-Detection Features
 
 This fork includes comprehensive stealth capabilities that make it much harder to detect than standard automation tools.
@@ -74,6 +102,7 @@ This fork has some important differences from the original. It only supports Chr
 - ✅ `pdf`: Fully Implemented
 - ✅ `javascript`: Fully Implemented
 - ✅ `html`: Fully Implemented
+- ✅ `mhtml`: Fully Implemented - Create MHTML web page archives
 - ✅ `auth`: Fully Implemented
 - ✅ `install`: Fully Implemented - also sets up user agent for stealth mode
 - ✅ `config`: Fully Implemented

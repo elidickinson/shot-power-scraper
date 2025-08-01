@@ -686,6 +686,57 @@ def html(url, output, javascript, selector,
 
 
 @cli.command()
+@click.argument("url")
+@click.option(
+    "-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True),
+)
+@click.option("-j", "--javascript", help="Execute this JS prior to capturing the MHTML")
+@common_shot_options
+def mhtml(url, output, javascript,
+         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+         wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
+         auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+         auth_username, auth_password, enable_gpu):
+    """
+    Create an MHTML archive of the specified page
+
+    Usage:
+
+        shot-power-scraper mhtml https://datasette.io/
+
+    Use -o to specify a filename:
+
+        shot-power-scraper mhtml https://datasette.io/ -o page.mhtml
+
+    MHTML (MIME HTML) is a web page archive format that contains
+    the HTML along with all embedded resources like images, CSS, and JavaScript.
+    """
+    setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
+
+    if output is None:
+        output = filename_for_url(url, ext="mhtml")
+
+    shot_config = ShotConfig(locals())
+
+    async def execute_mhtml(page, **kwargs):
+        from shot_power_scraper.page_utils import navigate_to_url
+        from shot_power_scraper.utils import capture_mhtml
+        await navigate_to_url(page, shot_config)
+        mhtml_content = await capture_mhtml(page)
+        return mhtml_content
+
+    mhtml_content = run_browser_command(execute_mhtml, shot_config)
+
+    if output == "-":
+        sys.stdout.write(mhtml_content)
+    else:
+        with open(output, "w") as f:
+            f.write(mhtml_content)
+        if not silent:
+            click.echo(f"MHTML snapshot of '{url}' written to '{output}'", err=True)
+
+
+@cli.command()
 @click.option(
     "--browser",
     "-b",

@@ -55,6 +55,34 @@ shot-power-scraper pdf ../pages/complex-layout.html \
   --scale 0.7
 
 # =============================================================================
+# 📦 MHTML ARCHIVE TESTS
+# =============================================================================
+echo "📦 Testing MHTML web archive generation..."
+
+# Basic MHTML capture
+shot-power-scraper mhtml ../pages/complex-layout.html \
+  -o "mhtml-basic-complete-archive.mhtml"
+
+# MHTML with ad blocking
+shot-power-scraper mhtml ../pages/ad-popup-test.html \
+  -o "mhtml-with-ad-blocking.mhtml" \
+  --ad-block --popup-block
+
+# MHTML with JavaScript execution
+shot-power-scraper mhtml ../pages/complex-layout.html \
+  -o "mhtml-with-javascript.mhtml" \
+  --javascript "document.body.style.backgroundColor='#f0f8ff'"
+
+# MHTML with lazy loading trigger
+shot-power-scraper mhtml ../pages/lazy-loading.html \
+  -o "mhtml-with-lazy-load.mhtml" \
+  --trigger-lazy-load
+
+# External site MHTML
+shot-power-scraper mhtml https://eli.pizza/ \
+  -o "mhtml-external-site.mhtml"
+
+# =============================================================================
 # 🎯 SELECTOR PRECISION TESTS
 # =============================================================================
 echo "🎯 Testing element selection accuracy..."
@@ -248,6 +276,7 @@ echo ""
 echo "📋 REVIEW CHECKLIST:"
 echo "🛡️  Blocking: Compare BEFORE vs AFTER - ads/popups should disappear"
 echo "📄 PDFs: Check portrait vs landscape orientation"
+echo "📦 MHTML: Archives should contain complete pages with resources (view in browser)"
 echo "🎯 Selectors: Verify only targeted elements are captured"
 echo "⏱️  Timing: NO-WAIT should miss content, others should show it"
 echo "🎨 Quality: RETINA should be sharper, JPEG smaller file"

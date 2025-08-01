@@ -1192,20 +1192,26 @@ Grouped in options:\
 [Diario Financiero](https://www.df.cl) -
 [El Mercurio](https://digital.elmercurio.com) -
 [La Tercera](https://www.latercera.com)
+
 ##### Colombia
 [Cambio Colombia](https://cambiocolombia.com) -
 [El Espectador](https://www.elespectador.com) -
 [El Tiempo](https://www.eltiempo.com)
+
 ##### Ecuador
 [El Universo](https://www.eluniverso.com)
+
 ##### Mexico
 [El Universal](https://www.eluniversal.com.mx) -
-[Mexico News Daily](https://mexiconewsdaily.com)
+[Mexico News Daily](https://mexiconewsdaily.com) -
+[Milenio](https://www.milenio.com)
+
 ##### Peru
 *Grupo El Comercio* sites like\
 [Diario Correo](https://diariocorreo.pe) -
 [El Comercio](https://elcomercio.pe) -
 [Gestión](https://gestion.pe)
+
 ##### Uruguay
 [El Observador](https://www.elobservador.com.uy) -
 [El País](https://www.elpais.com.uy) -

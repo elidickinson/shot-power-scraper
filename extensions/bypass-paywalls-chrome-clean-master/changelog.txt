@@ -3,15 +3,24 @@ Changelog Bypass Paywalls Clean - Chrome
 Updates (install zip/crx-file): https://gitflic.ru/project/magnolia1234/bpc_uploads (or check X/Nitter)
 
 Post-release
+Fix El Espectador (amp)
+Fix Stylist.co.uk (css)
+
+* v4.1.7.0 (2025-07-27)
 Add Groupe La Manche Libre (FR; opt-in to custom sites for unlisted)
+Add Milenio (MX)
 Add Mittelbayerische.de (fetch from archive.is)
 Fix Australian Financial Review (json)
 Fix Capital.fr (css)
 Fix Groupe Rossel (mobile & be-domains)
 Fix LaNacion.com.ar (premium; fetch from archive.is)
+Fix LeSoir.be (archive-article)
 Fix Loeb Classical Library (cookie)
+Fix MarketWatch (live coverage)
 Fix McClatchy Group (identify sites)
 Fix Mediahuis Noord (update ld_json_nuxt)
+Fix The Globe and Mail (xhr)
+Fix Vikatan (no content)
 Fix Zeit.de (images)
 
 * v4.1.6.0 (2025-07-13)

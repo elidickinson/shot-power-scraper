@@ -81,7 +81,7 @@ if (matchDomain('afr.com')) {
             response.text().then(html => {
               if (html.includes('__REDUX_STATE__=')) {
                 try {
-                  let json = JSON.parse(html.split('__REDUX_STATE__=')[1].split('};')[0].replace(/:undefined([,}])/g, ':"undefined"$1').replace(/new Map\(\[([",\s\w]+)?\]\)/g, true) + '}');
+                  let json = JSON.parse(html.split('__REDUX_STATE__=')[1].split('};')[0].replace(/:undefined([,}])/g, ':0$1').replace(/new\sMap\(\[([",\s\w]+)?\]\)/g, 0) + '}');
                   if (json) {
                     let placeholders;
                     function find_item(match, p1, offset, string) {
@@ -722,6 +722,9 @@ else if (matchDomain('stylist.co.uk')) {
   let paywall = document.querySelector('div[data-testid="paywall-component"]');
   if (paywall && dompurify_loaded) {
     removeDOMElement(paywall);
+    let paywall_inline = document.querySelector('div.paywall--inline');
+    if (paywall_inline)
+      paywall_inline.removeAttribute('class');
     let json_script = document.querySelector('script#__NEXT_DATA__');
     if (json_script) {
       try {
@@ -2506,6 +2509,11 @@ else if (matchDomain('manoramaonline.com')) {
 }
 
 else if (matchDomain('marketwatch.com')) {
+  if (window.location.pathname.startsWith('/livecoverage/')) {
+    window.setTimeout(function () {
+      fix_dowjones_live();
+    }, 1500);
+  }
   let ads = 'div.element--ad, div.j-ad, div.adWrapper, div#cx-articlecover';
   hideDOMStyle(ads);
 }
@@ -4182,23 +4190,33 @@ else if (matchDomain('vikatan.com')) {
       removeDOMElement(paywall);
       let json_script = getArticleJsonScript();
       if (json_script) {
-        let json = JSON.parse(json_script.text);
-        if (json) {
-          let json_text = parseHtmlEntities(json.articleBody);
-          let content = document.querySelector('div.story-element > div');
-          if (json_text && content) {
-            let parser = new DOMParser();
-            let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(json_text) + '</div>', 'text/html');
-            let content_new = doc.querySelector('div');
-            content.parentNode.replaceChild(content_new, content);
+        try {
+          let json = JSON.parse(json_script.text);
+          if (json) {
+            let article = document.querySelector('div.story-element');
+            if (article) {
+              let parser = new DOMParser();
+              let json_text = parseHtmlEntities(json.articleBody);
+              let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(json_text, dompurify_options) + '</div>', 'text/html');
+              let content_new = doc.querySelector('div');
+              let content = document.querySelector('div.story-element > div');
+              if (content)
+                content.parentNode.replaceChild(content_new, content);
+              else
+                article.appendChild(content_new);
+            }
           }
+        } catch (err) {
+          console.log(err);
         }
       }
+      let story_hidden = document.querySelector('div[class^="styles-m__story-card-wrapper_"]');
+      if (story_hidden)
+        story_hidden.removeAttribute('class');
     }
-    let story_hidden = document.querySelector('div[class^="styles-m__story-card-wrapper_"]');
-    if (story_hidden)
-      story_hidden.removeAttribute('class');
-  }, 500);
+  }, 1500);
+  let ads = 'div[class^="styles-m__popup-wrapper-adb"]';
+  hideDOMStyle(ads);
 }
 
 else if (matchDomain('voguebusiness.com')) {
