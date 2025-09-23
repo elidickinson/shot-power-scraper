@@ -462,20 +462,91 @@ def accessibility(url, output, javascript,
     help="HAR filename",
 )
 @click.option("-j", "--javascript", help="Execute this JavaScript on the page")
+@click.option("--no-response-bodies", is_flag=True, help="Exclude response body content from HAR file (bodies included by default)")
 @common_shot_options
-def har(url, zip_, output, javascript,
+def har(url, zip_, output, javascript, no_response_bodies,
        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
        wait, wait_for, timeout, skip_cloudflare_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
        auth_username, auth_password, enable_gpu):
     """
-    NOT IMPLEMENTED - Record a HAR file for the specified page
+    Record a HAR file for the specified page
 
-    This command is not yet implemented with nodriver.
+    Usage:
+
+        shot-power-scraper har https://example.com
+
+    This will write the HAR file to example-com.har
+
+    Use "-o" to write to a specific file:
+
+        shot-power-scraper har https://example.com -o trace.har
+
+    Use "--zip" to create a compressed .har.zip file:
+
+        shot-power-scraper har https://example.com --zip -o trace.har.zip
+
+    Use "--no-response-bodies" to exclude response content (included by default):
+
+        shot-power-scraper har https://example.com --no-response-bodies
     """
-    click.echo("Error: HAR recording is not implemented with nodriver", err=True)
-    click.echo("Use the screenshot commands instead for capturing page content.", err=True)
-    raise click.Abort()
+    setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
+
+    url = url_or_file_path(url)
+
+    if output is None:
+        ext = "har.zip" if zip_ else "har"
+        output = filename_for_url(url, ext=ext)
+
+    shot_config = ShotConfig(locals())
+
+    async def execute_har(page, **kwargs):
+        from shot_power_scraper.page_utils import navigate_to_url
+        from shot_power_scraper.har_capture import HARCollector
+        
+        # Set up HAR collection before navigation
+        collector = HARCollector(include_response_bodies=not no_response_bodies)
+        await collector.setup(page)
+        collector.start_recording()
+        
+        # Navigate to the page
+        await navigate_to_url(page, shot_config)
+        
+        # Wait a moment for any remaining network activity
+        import asyncio
+        await asyncio.sleep(1)
+        
+        # Get the HAR data
+        har_data = await collector.stop_recording(page)
+        return har_data
+
+    har_data = run_browser_command(execute_har, shot_config)
+
+    # Convert to JSON
+    har_json = json.dumps(har_data, indent=2)
+
+    if zip_:
+        # Create compressed HAR file
+        import zipfile
+        import io
+        
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            # Use base filename without .zip extension for the inner file
+            inner_name = output.replace('.zip', '') if output.endswith('.zip') else output
+            if not inner_name.endswith('.har'):
+                inner_name += '.har'
+            zip_file.writestr(inner_name, har_json)
+        
+        with open(output, "wb") as f:
+            f.write(zip_buffer.getvalue())
+    else:
+        # Write regular HAR file
+        with open(output, "w") as f:
+            f.write(har_json)
+
+    if not silent:
+        click.echo(f"HAR file saved: {output}", err=True)
 
 
 @cli.command()

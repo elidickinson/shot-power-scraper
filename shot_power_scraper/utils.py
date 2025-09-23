@@ -97,3 +97,12 @@ async def capture_mhtml(page):
         return result
     except Exception as e:
         raise RuntimeError(f"Failed to capture MHTML: {e}")
+
+
+async def capture_har(page, include_response_bodies=True):
+    """Capture HAR (HTTP Archive) data from a page using Chrome DevTools Protocol"""
+    try:
+        from shot_power_scraper.har_capture import capture_har as _capture_har
+        return await _capture_har(page, include_response_bodies=include_response_bodies)
+    except Exception as e:
+        raise RuntimeError(f"Failed to capture HAR: {e}")
