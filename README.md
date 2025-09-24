@@ -85,7 +85,6 @@ This can be enabled by default using the `config` command. For detailed informat
 This fork has some important differences from the original. It only supports Chrome/Chromium and some features aren't fully implemented.
 
 ### 🚫 **Commands & Features That Don't Work**
-- `shot-power-scraper har` - Not implemented.
 - `shot-power-scraper accessibility` - Not implemented.
 - `--log-requests` option is not implemented.
 - Selectors like `-s` don't currently work correctly with screenshots
@@ -98,11 +97,12 @@ This fork has some important differences from the original. It only supports Chr
 ## 📋 **Command Status**
 
 - ✅ `shot`: Fully Implemented (except `--log-requests`)
-- ✅ `multi`: Fully Implemented (except HAR options)
+- ✅ `multi`: Fully Implemented
 - ✅ `pdf`: Fully Implemented
 - ✅ `javascript`: Fully Implemented
 - ✅ `html`: Fully Implemented
 - ✅ `mhtml`: Fully Implemented - Create MHTML web page archives
+- ✅ `har`: Fully Implemented - Record HTTP Archive files
 - ✅ `auth`: Fully Implemented
 - ✅ `install`: Fully Implemented - also sets up user agent for stealth mode
 - ✅ `config`: Fully Implemented
