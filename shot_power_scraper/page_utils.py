@@ -479,30 +479,41 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     """)
 
     if Config.verbose and converted_count > 0:
-        click.echo(f"Converted {converted_count} lazy load attributes", err=True)
+        click.echo(f"Converted {converted_count} lazy load attributes. Now will scroll...", err=True)
 
-    await page.scroll_down(1000)
-    await page.sleep(0.1)
-    await page.scroll_up(1000)
-    await page.sleep(0.1)
+    for _ in range(10):
+        await page.scroll_down(200)
+        await page.sleep()
+        at_bottom = await page.evaluate(
+            "document.body.offsetHeight - window.innerHeight == window.scrollY"
+        )
+        if at_bottom:
+            if Config.verbose:
+                click.echo(f"Lazy load scrolled to bottom", err=True)
+            break
+    await page.evaluate("window.scrollTo(0, 0)")
+    await page.sleep()
+
 
     # Try CDP-based viewport scaling to trigger image loading in headless mode. I had strange problems
     # triggering loading=lazy images when in headless. Both scrolling and rewriting img attributes
     # didn't seem to work. Something peculiar to --headless (or --headless=new perhaps)
-    if Config.verbose:
-        click.echo(f"Attempting viewport scaling trick for headless image loading...", err=True)
-    viewport_width = await page.evaluate("window.innerWidth")
-    # This makes Chrome think the viewport is very tall
-    await page.send(uc.cdp.emulation.set_device_metrics_override(
-        width=viewport_width,
-        height=10000,  # Very tall viewport
-        device_scale_factor=0.5,  # scaled down
-        mobile=False
-    ))
+    # if Config.verbose:
+    #     click.echo(f"Attempting viewport scaling trick for headless image loading...", err=True)
+    # viewport_width = await page.evaluate("window.innerWidth")
+    # # This makes Chrome think the viewport is very tall
+    # await page.send(uc.cdp.emulation.set_device_metrics_override(
+    #     width=viewport_width,
+    #     height=10000,  # Very tall viewport
+    #     device_scale_factor=0.5,  # scaled down
+    #     mobile=False
+    # ))
+
     await page  # give it a breather to actually do the emulation
     # Wait for all images to load with timeout
-    max_wait = 5  # seconds (TODO: don't hardcode this)
+    max_wait = 7  # seconds (TODO: don't hardcode this)
     start_wait = time.time()
+    # await asyncio.sleep(0.5)  # min time to wait after emulation resize
     while time.time() - start_wait < max_wait:
         all_loaded = await page.evaluate("""
             Array.from(document.querySelectorAll('img[src]')).every(img => img.complete)
@@ -511,11 +522,11 @@ async def trigger_lazy_load(page, timeout_ms=5000):
             if Config.verbose:
                 click.echo(f"All images loaded after {time.time() - start_wait:.2f}s", err=True)
             break
-
-        await page.sleep(0.1)
+        await page.sleep()
 
     # Clear the override to restore normal viewport
-    await page.send(uc.cdp.emulation.clear_device_metrics_override())
+    # await page.send(uc.cdp.emulation.clear_device_metrics_override())
+    # await page.sleep()
     await page
     if Config.verbose:
         click.echo(f"Lazy load complete", err=True)
