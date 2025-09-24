@@ -8,8 +8,17 @@ var ext_manifest_version = manifestData.manifest_version;
 var navigator_ua = navigator.userAgent;
 var navigator_ua_mobile = navigator_ua.toLowerCase().includes('mobile');
 
-if (ext_manifest_version === 3)
+var mv3_alive_max = 15;
+var mv3_alive_counter = mv3_alive_max;
+if (ext_manifest_version === 3) {
   self.importScripts('sites.js');
+  setInterval(function () {
+    if (mv3_alive_counter < mv3_alive_max) {
+      mv3_alive_counter++;
+      ext_api.runtime.getPlatformInfo();
+    }
+  }, 20000);
+}
 
 if (typeof ext_api.action !== 'object') {
   ext_api.action = ext_api.browserAction;
@@ -36,12 +45,14 @@ var restrictions = {
   'ft.com': /^((?!\/cn\.ft\.com\/).)*$/,
   'hilltimes.com': /^((?!\.hilltimes\.com\/slideshow\/).)*$/,
   'hindustantimes.com': /^((?!\/epaper\.hindustantimes\.com\/).)*$/,
+  'iai.tv': /^((?!\/iai\.tv\/video\/).)*$/,
   'ilmanifesto.it': /^((?!\/ilmanifesto\.it\/edizioni\/).)*$/,
   'ilsole24ore.com': /^((?!\/ntplus.+\.ilsole24ore\.com\/).)*$/,
   'leparisien.fr': /^((?!\/l\.leparisien\.fr\/).)*$/,
   'livemint.com': /^((?!\/epaper\.livemint\.com\/).)*$/,
   'lopinion.fr': /^((?!\.lopinion\.fr\/lejournal).)*$/,
   'mid-day.com': /^((?!\/epaper\.mid-day\.com\/).)*$/,
+  'newyorker.com': /^((?!\/archives\.newyorker\.com\/).)*$/,
   'nytimes.com': /^((?!\/(help|myaccount|timesmachine)\.nytimes\.com\/).)*$/,
   'nzz.ch': /^((?!\/epaper\.nzz\.ch\/).)*$/,
   'quora.com': /^((?!quora\.com\/search\?q=).)*$/,
@@ -174,10 +185,10 @@ function initSetRules() {
 }
 
 const userAgentDesktopG = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
-const userAgentMobileG = "Chrome/115.0.5790.171 Mobile Safari/537.36 (compatible ; Googlebot/2.1 ; +http://www.google.com/bot.html)";
+const userAgentMobileG = "Chrome/137.0.7151.119 Mobile Safari/537.36 (compatible ; Googlebot/2.1 ; +http://www.google.com/bot.html)";
 
 const userAgentDesktopB = "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)";
-const userAgentMobileB = "Chrome/115.0.5790.171 Mobile Safari/537.36 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)";
+const userAgentMobileB = "Chrome/137.0.7151.119 Mobile Safari/537.36 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)";
 
 const userAgentDesktopF = 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)';
 
@@ -279,7 +290,7 @@ add_session_rule = function (domain, rule, blockedRegexes_rule = '', blockedRege
   function regexToUrlFilter(rule, regex, domain) {
     let urlFilter;
     if (!(regex.match(/([([|*{$\^]|\\[a-z\?])/) || regex.match(/([^\.]|\\\.)\+/))) {
-      let match_domain = gpw_domains.concat(['tinypass.com', domain]).find(x => regex.replace(/\\/g, '').match(new RegExp(x.replace(/\./, '\\.'))));
+      let match_domain = gpw_domains.concat(['tinypass.com', 'wallkit.net', domain]).find(x => regex.replace(/\\/g, '').match(new RegExp(x.replace(/\./, '\\.'))));
       urlFilter = regex.replace(/\\/g, '').replace(/\.\+/g, '*');
       if (match_domain)
         urlFilter = '||' + urlFilter.replace(/^[\.\/]/g, '');
@@ -393,9 +404,12 @@ add_session_rule = function (domain, rule, blockedRegexes_rule = '', blockedRege
       },
       "condition": {
         "urlFilter": "||" + domain,
-        "resourceTypes": ["main_frame", "sub_frame", "xmlhttprequest"]
+        "resourceTypes": ["main_frame", "sub_frame", "xmlhttprequest", "script"]
       }
     };
+    
+    if (['economist.com'].includes(domain))
+      header_rule.condition.resourceTypes = header_rule.condition.resourceTypes.concat(["stylesheet", "image"]);
     
     if (!allow_cookies.includes(domain)) {
       header_rule.action.requestHeaders.push({
@@ -874,7 +888,7 @@ function add_grouped_enabled_domains(groups) {
       enabledSites = enabledSites.concat(groups[key]);
     else
       disabledSites = disabledSites.concat(groups[key]);
-  }   
+  }
   // custom
   for (let site in customSites) {
     let group = customSites[site].group;
@@ -902,6 +916,7 @@ ext_api.storage.local.get({
   sites_updated: {},
   sites_excluded: [],
   ext_version_old: '2.3.9.0',
+  ext_update_check: 0,
   optIn: false,
   optInUpdate: true,
   customOptIn: true
@@ -946,6 +961,7 @@ ext_api.storage.local.get({
           delete sites[site_old];
       // reset ungrouped sites
       let new_domain_sites = {
+        'Medium (opt-in to custom sites for custom domains)': '###_medium',
         'The Times Literary Supplement': 'the-tls.com'
       };
       for (let key in new_domain_sites) {
@@ -958,7 +974,7 @@ ext_api.storage.local.get({
     } else {
       ext_api.management.getSelf(function (result) {
         if ((result.installType === 'development' || (result.installType !== 'development' && !enabledSites.includes('#options_on_update')))) {
-          let new_groups = ['###_se_bonnier_group'];
+          let new_groups = ['###_dk_berlingske_media', '###_se_bonnier_group'];
           let open_options = new_groups.some(group => !enabledSites.includes(group) && grouped_sites[group].some(domain => enabledSites.includes(domain) && !customSites_domains.includes(domain)));
           if (open_options)
             ext_api.runtime.openOptionsPage();
@@ -979,14 +995,20 @@ ext_api.storage.local.get({
     rule_excluded_base_domains = disabledSites.filter(x => !x.match(/(^###|_)/) && !gpw_domains.includes(x));
   }
   set_rules(sites, updatedSites, customSites);
-  if (optin_update)
-    check_update();
   if (enabledSites.includes('#options_optin_update_rules') && self_hosted) {
     sites_updated_json = sites_updated_json_online;
     sites_custom_ext_json = ext_path + 'sites_custom.json' + '&rel=' + randomInt(100000);
   }
-  check_sites_updated(sites_updated_json, optin_update);
-  check_sites_custom_ext();
+  var ext_update_check = items.ext_update_check;
+  if (!ext_update_check || (Date.now() - ext_update_check > 60 * 60 * 1000) || (ext_manifest_version === 2)) {
+    if (optin_update)
+      check_update();
+    check_sites_updated(sites_updated_json, optin_update);
+    check_sites_custom_ext();
+    ext_api.storage.local.set({
+      ext_update_check: Date.now()
+    });
+  }
   if (!Object.keys(sites).length)
     ext_api.runtime.openOptionsPage();
 });
@@ -1267,20 +1289,22 @@ if (typeof browser !== 'object') {
     let use_cs_all_frames = !!matchUrlDomain(cs_all_frames, url);
     let tab_runs = 5;
     let cs_local = 'en';
-    let hostname = urlHost(url);
-    if (hostname.match(/\.(ar|br|cl|mx|pe|uy)$/) || matchUrlDomain(['abcmais.com', 'cambiocolombia.com', 'clarin.com', 'cronista.com', 'elespectador.com', 'elmercurio.com', 'eltiempo.com', 'eltribuno.com', 'eluniverso.com', 'exame.com', 'globo.com', 'latercera.com', 'milenio.com', 'revistaoeste.com'], url))
+    let hostname = urlHost(url).replace(/^www\./, '');
+    if (hostname.match(/^thelocal\.\w{2}/))
+      cs_local = 'en';
+    else if (hostname.match(/\.(ar|br|cl|mx|pe|uy)$/) || matchUrlDomain(['abcmais.com', 'cambiocolombia.com', 'clarin.com', 'cronista.com', 'elespectador.com', 'elmercurio.com', 'eltiempo.com', 'eltribuno.com', 'eluniverso.com', 'exame.com', 'globo.com', 'latercera.com', 'milenio.com', 'revistaoeste.com'], url))
       cs_local = 'es.pt';
-    else if (hostname.match(/\.(de|at|ch)$/) || matchUrlDomain(['faz.net', 'handelsblatt.com', 'tt.com', 'wochenblatt.com'], url))
+    else if ((hostname.match(/\.(de|at|ch)$/) && !matchUrlDomain(grouped_sites['###_ch_esh_medias'], url)) || matchUrlDomain(['handelsblatt.com', 'tt.com', 'wochenblatt.com'], url))
       cs_local = 'de';
     else if (hostname.match(/\.(dk|fi|se)$/))
       cs_local = 'fi.se';
     else if (hostname.match(/\.(es|pt|cat)$/) || matchUrlDomain(['diariocordoba.com', 'diariovasco.com', 'elconfidencial.com', 'elcorreo.com', 'elespanol.com', 'elpais.com', 'elperiodico.com', 'elperiodicodearagon.com', 'elperiodicoextremadura.com', 'elperiodicomediterraneo.com', 'emporda.info', 'expansion.com', 'larioja.com', 'lavanguardia.com', 'levante-emv.com', 'marca.com', 'mundodeportivo.com', 'politicaexterior.com'], url))
       cs_local = 'es.pt';
-    else if ((hostname.endsWith('.fr') && !matchUrlDomain(['lemagit.fr'], url)) || matchUrlDomain(['aoc.media', 'bienpublic.com', 'connaissancedesarts.com', 'courrierinternational.com', 'jeuneafrique.com', 'journaldunet.com', 'ledauphine.com', 'legrandcontinent.eu', 'lejsl.com', 'lerevenu.com', 'lesinrocks.com', 'lesoir.be', 'loeildelaphotographie.com', 'marianne.net', 'parismatch.com', 'philonomist.com', 'pourleco.com', 'reforme.net', 'science-et-vie.com', 'scienceshumaines.com', 'sudinfo.be'].concat(grouped_sites['###_fr_groupe_nice_matin']), url))
+    else if ((hostname.endsWith('.fr') && !matchUrlDomain(['lemagit.fr'], url)) || matchUrlDomain(['aoc.media', 'bienpublic.com', 'connaissancedesarts.com', 'courrierinternational.com', 'jeuneafrique.com', 'journaldunet.com', 'ledauphine.com', 'legrandcontinent.eu', 'lejsl.com', 'lerevenu.com', 'lesinrocks.com', 'lesoir.be', 'loeildelaphotographie.com', 'marianne.net', 'parismatch.com', 'philonomist.com', 'pourleco.com', 'reforme.net', 'science-et-vie.com', 'scienceshumaines.com', 'sudinfo.be'].concat(grouped_sites['###_be_groupe_ipm'], grouped_sites['###_ch_esh_medias'], grouped_sites['###_fr_groupe_nice_matin']), url))
       cs_local = 'fr';
     else if (hostname.endsWith('.it') || matchUrlDomain(['eastwest.eu', 'ilsole24ore.com', 'italian.tech', 'quotidiano.net', 'tuttosport.com'], url))
       cs_local = 'it';
-    else if (hostname.match(/\.(nl|be)$/) || matchUrlDomain(['lavenir.net', 'projectcargojournal.com', 'railfreight.cn', 'railfreight.com', 'railtech.com'], url))
+    else if (hostname.match(/\.(nl|be)$/) || matchUrlDomain(['projectcargojournal.com', 'railfreight.cn', 'railfreight.com', 'railtech.com'], url))
       cs_local = 'nl';
     else if (hostname.match(/\.pl$/) || matchUrlDomain(['parkiet.com', 'wyborcza.biz'], url))
       cs_local = 'pl';
@@ -1316,6 +1340,7 @@ if (typeof browser !== 'object') {
             })
           });
         } else if (ext_manifest_version === 3) {
+          mv3_alive_counter = 0;
           let script_world = "ISOLATED";
           if (matchUrlDomain(['hbr.org', 'lepoint.fr', 'ouest-france.fr', 'thehindu.com', 'thehindubusinessline.com'].concat(grouped_sites['###_fr_groupe_ebra']), url))
             script_world = "MAIN";
@@ -1392,7 +1417,7 @@ if (typeof browser !== 'object') {
     }
   }
 
-  var set_var_sites = ['dagsavisen.no', 'journaldemontreal.com', 'journaldequebec.com', 'nzherald.co.nz'].concat(grouped_sites['###_de_madsack']);
+  var set_var_sites = ['journaldemontreal.com', 'journaldequebec.com', 'nzherald.co.nz'];
   function runOnTab_once_var(tab) {
     let tabId = tab.id;
     let url = tab.url;
@@ -1424,7 +1449,7 @@ if (typeof browser !== 'object') {
 ext_api.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   let tab_status = changeInfo.status;
   if (/^http/.test(tab.url)) {
-    if ((tab_status && (tab_status === 'complete' || matchUrlDomain(['startribune.com'], tab.url))) || changeInfo.url) {
+    if ((tab_status && (tab_status === 'complete' || matchUrlDomain(['startribune.com'].concat(grouped_sites['###_usa_tribune']), tab.url))) || changeInfo.url) {
       let timeout = changeInfo.url ? 500 : 0;
       setTimeout(function () {
         if (isSiteEnabled(tab)) {
@@ -1933,37 +1958,39 @@ ext_api.runtime.onMessage.addListener(function (message, sender) {
   if (message.request === 'custom_domain' && message.data && message.data.domain) {
     let custom_domain = message.data.domain;
     let group = message.data.group;
+    let nofix = message.data.nofix;
     if (group) {
-      let nofix_groups = ['###_au_nomedia', '###_beehiiv', '###_cl_elmercurio_local', '###_fi_alma_talent', '###_fi_kaleva', '###_ghost', '###_it_citynews', '###_nl_vmnmedia', '###_se_gota_media', '###_substack_custom', '###_uk_aspermont', '###_usa_cherryroad'];
       if (!custom_flex_domains.includes(custom_domain)) {
+        if (nofix && !nofix_groups.includes(group))
+          nofix_groups.push(group);
         if (!nofix_groups.includes(group)) {
-        if (custom_flex[group])
-          custom_flex[group].push(custom_domain);
-        else
-          custom_flex[group] = [custom_domain];
-        custom_flex_domains.push(custom_domain);
-        if (enabledSites.includes(group)) {
-          if (!enabledSites.includes(custom_domain))
-            enabledSites.push(custom_domain);
-          let rules = Object.values(defaultSites).filter(x => x.domain === group)[0];
-          if (rules) {
+          if (custom_flex[group])
+            custom_flex[group].push(custom_domain);
+          else
+            custom_flex[group] = [custom_domain];
+          custom_flex_domains.push(custom_domain);
+          if (enabledSites.includes(group)) {
+            if (!enabledSites.includes(custom_domain))
+              enabledSites.push(custom_domain);
+            let rules = Object.values(defaultSites).find(x => x.domain === group);
+            if (rules) {
               if (rules.hasOwnProperty('exception')) {
                 let exception_rule = rules.exception.filter(x => custom_domain === x.domain || (typeof x.domain !== 'string' && x.domain.includes(custom_domain)));
                 if (exception_rule.length)
                   rules = exception_rule[0];
               }
-            if (group === '###_de_madsack') {
-              if (!set_var_sites.includes(custom_domain))
-                set_var_sites.push(custom_domain);
+              if ([].includes(group)) {
+                if (!set_var_sites.includes(custom_domain))
+                  set_var_sites.push(custom_domain);
+              }
+            } else
+              rules = Object.values(customSites).find(x => x.domain === group);
+            if (rules) {
+              customFlexAddRules(custom_domain, rules);
             }
-          } else
-            rules = Object.values(customSites).filter(x => x.domain === group)[0];
-          if (rules) {
-            customFlexAddRules(custom_domain, rules);
-          }
-        } else if (disabledSites.includes(group)) {
-          if (!disabledSites.includes(custom_domain))
-            disabledSites.push(custom_domain);
+          } else if (disabledSites.includes(group)) {
+            if (!disabledSites.includes(custom_domain))
+              disabledSites.push(custom_domain);
           }
         } else
           nofix_sites.push(custom_domain);

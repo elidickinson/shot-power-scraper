@@ -123,8 +123,7 @@ _* free articles only._
 [The Business Journals](https://www.bizjournals.com)* -
 [The Business of Fashion](https://www.businessoffashion.com) -
 [The Wall Street Journal](https://www.wsj.com) -
-[Vogue Business](https://www.voguebusiness.com) -
-[ZeroHedge](https://www.zerohedge.com)
+[Vogue Business](https://www.voguebusiness.com)
 
 Grouped in options:\
 *[American Banker](https://www.americanbanker.com) (+ [Arizent](https://www.arizent.com/brands)*; opt-in to custom sites)\
@@ -157,8 +156,7 @@ Global Polymer Group:
 [Glossy](https://www.glossy.co) -
 [ModernRetail](https://www.modernretail.co)\
 *[Industry Dive](https://www.industrydive.com/publications)* sites (opt-in to custom sites)\
-*[Inside Retail](https://octomedia.com.au/our-brands/inside-retail)* sites (opt-in to custom sites)\
-*[PEI Media](https://www.pei.group/brands)* sites (opt-in to custom sites)
+*[Inside Retail](https://octomedia.com.au/our-brands/inside-retail)* sites (opt-in to custom sites)
 
 ##### Tech/Science
 [Brill](https://brill.com) -
@@ -234,9 +232,10 @@ Grouped in options:\
 [Dwell](https://www.dwell.com) -
 [Field & Stream](https://www.fieldandstream.com) -
 [First Things](https://www.firstthings.com) -
+[FMR](https://www.fmrmagazine.com) -
 [Foreign Affairs](https://www.foreignaffairs.com) -
 [Foreign Policy](https://www.foreignpolicy.com) -
-[Harper's Magazine](https://harpers.org) -
+[Harper's Magazine](https://harpers.org)* -
 [Jazzwise](https://www.jazzwise.com) -
 [National Review](https://www.nationalreview.com) -
 [Newsweek](https://www.newsweek.com) -
@@ -262,7 +261,6 @@ Grouped in options:\
 [The Daily Wire](https://www.dailywire.com) -
 [The Diplomat](https://thediplomat.com) -
 [The Dispatch](https://thedispatch.com) -
-[The Impression](https://theimpression.com) -
 [The Intercept](https://theintercept.com) -
 [The Juggernaut](https://www.thejuggernaut.com) -
 [The Lamp Magazine](https://thelampmagazine.com) -
@@ -345,11 +343,13 @@ Grouped in options:\
 ##### Local USA news
 [Albuquerque Journal](https://www.abqjournal.com) -
 [CNN](https://www.cnn.com) -
+[Daily Herald](https://www.dailyherald.com) -
 [Fox News](https://www.foxnews.com) -
 [Honolulu Star-Advertiser](https://www.staradvertiser.com) -
 [Las Vegas Review-Journal](https://www.reviewjournal.com) -
 [Los Angeles Times](https://www.latimes.com) -
 [Mountain View Voice](https://www.mv-voice.com) -
+[New York Post](https://nypost.com) -
 [Newsday](https://www.newsday.com) -
 [Palo Alto Online](https://www.paloaltoonline.com) -
 [Pittsburgh Post Gazette](https://www.post-gazette.com) -
@@ -399,6 +399,7 @@ Grouped in options:\
 [The Indianapolis Star](https://www.indystar.com) -
 [The News-Press](https://www.news-press.com) -
 [The Oklahoman](https://www.oklahoman.com) -
+[The Palm Beach Post](https://www.palmbeachpost.com) -
 [The Record (North Jersey)](https://www.northjersey.com) -
 [The Tennessean](https://www.tennessean.com)\
 *Hearst Communications (newspapers)* sites like (opt-in to custom sites for unlisted)\
@@ -500,6 +501,9 @@ Grouped in options:\
 [EUobserver](https://euobserver.com) -
 [Follow the Money (ftm.eu)](https://www.ftm.eu)
 
+Grouped in options:\
+*[The Local Group](https://www.thelocal.com)* sites (opt-in to custom sites)
+
 ##### United Kingdom/Ireland
 [Autocar](https://www.autocar.co.uk) -
 [Autosport](https://www.autosport.com)* -
@@ -512,6 +516,7 @@ Grouped in options:\
 [GB News](https://www.gbnews.com) -
 [Granta Magazine](https://granta.com) -
 [iNews](https://inews.co.uk) -
+[Institute of Art and Ideas](https:/iai.tv) -
 [Investors' Chronicle](https://www.investorschronicle.co.uk) -
 [Irish Independent](https://www.independent.ie) -
 [Literary Review](https://literaryreview.co.uk) -
@@ -527,8 +532,8 @@ Grouped in options:\
 [The Irish News](https://www.irishnews.com) -
 [The Irish Times](https://www.irishtimes.com) -
 [The Lawyer](https://www.thelawyer.com) -
-[The New European](https://www.theneweuropean.co.uk) -
 [The New Statesman](https://www.newstatesman.com) -
+[The New World](https://www.thenewworld.co.uk) -
 [The Spectator](https://www.spectator.co.uk) -
 [The Telegraph](https://www.telegraph.co.uk) -
 [The Times](https://www.thetimes.com) -
@@ -568,9 +573,11 @@ Grouped in options:\
 [Deník](https://www.denik.cz)
 
 ##### Denmark
-[Berlingske](https://www.berlingske.dk)
 
 Grouped in options:\
+*Berlingske Media* sites like\
+[Berlingske](https://www.berlingske.dk) -
+[Weekendavisen](https://www.weekendavisen.dk)\
 *[DK Medier](https://www.dkmedier.dk)* sites (opt-in to custom sites)
 
 ##### Finland
@@ -597,6 +604,7 @@ Grouped in options:\
 [L'Écho](https://lecho.be) -
 [L'Équipe](https://www.lequipe.fr) -
 [L'Express](https://www.lexpress.fr) -
+[L'Humanité](https://www.humanite.fr) -
 [L'Oeil de la Photographie (fr/en)](https://loeildelaphotographie.com) -
 [L'Opinion](https://www.lopinion.fr) -
 [Le Courrier des Stratèges](https://lecourrierdesstrateges.fr) -
@@ -650,7 +658,8 @@ Grouped in options:\
 *Groupe IPM* sites like\
 [DH Les Sports+](https://www.dhnet.be) -
 [L'Avenir](https://www.lavenir.net) -
-[La Libre](https://www.lalibre.be)\
+[La Libre](https://www.lalibre.be) -
+[Moustique](https://www.moustique.be)\
 *Groupe La Dépêche* sites like\
 [Centre Presse](https://www.centrepresseaveyron.fr) -
 [Journal de Millau](https://www.journaldemillau.fr) -
@@ -698,8 +707,8 @@ Grouped in options:\
 [Aachener Zeitung](https://www.aachener-zeitung.de) -
 [Ärzte Zeitung](https://www.aerztezeitung.de) -
 [Automobilwoche](https://www.automobilwoche.de) -
-[Berliner Zeitung](https://www.berliner-zeitung.de) -
 [Bild](https://www.bild.de) -
+[Berliner Zeitung](https://www.berliner-zeitung.de) -
 [Börsen-Zeitung](https://www.boersen-zeitung.de) -
 [Der Freitag](https://www.freitag.de) -
 [Der Spiegel](https://www.spiegel.de) -
@@ -708,7 +717,6 @@ Grouped in options:\
 [Die Welt](https://www.welt.de) -
 [Die Zeit](https://www.zeit.de) -
 [Focus+](https://www.focusplus.de) -
-[Frankfurter Allgemeine Zeitung](https://www.faz.net) -
 [Hamburger Morgenpost](https://www.mopo.de) -
 [Handelsblatt](https://www.handelsblatt.com) -
 [Heise online](https://www.heise.de) -
@@ -721,6 +729,7 @@ Grouped in options:\
 [Mittelbayerische Zeitung](https://www.mittelbayerische.de) -
 [Neue Westfälische](https://www.nw.de) -
 [Nordwest Zeitung](https://www.nwzonline.de) -
+[Passauer Neue Presse](https://www.pnp.de) -
 [Philosophie Magazin](https://www.philomag.de) -
 [Piqd](https://www.piqd.de) -
 [Profil.at](https://www.profil.at) -
@@ -734,7 +743,8 @@ Grouped in options:\
 [Vorarlberg Nachrichten](https://www.vn.at) -
 [Vorarlberg Online](https://www.vol.at) -
 [Weltkunst](https://www.weltkunst.de) -
-[Weser-Kurier](https://www.weser-kurier.de)
+[Weser-Kurier](https://www.weser-kurier.de) -
+[WirtschaftsWoche](https://www.wiwo.de)
 
 Grouped in options:\
 *[Deutscher Fachverlag Mediengruppe](https://www.dfv.de)* (opt-in to custom sites)\
@@ -885,7 +895,8 @@ Grouped in options:\
 [Flair.be](https://www.flair.be/nl) -
 [Knack](https://www.knack.be) -
 [Krant van West-Vlaanderen](https://kw.be) -
-[Libelle.be](https://www.libelle.be)
+[Libelle.be](https://www.libelle.be)\
+*[VmnMedia Group](https://vmnmedia.nl)* sites (opt-in to custom sites)
 
 ##### Norway
 [Bergens Tidende](https://www.bt.no) -
@@ -939,6 +950,7 @@ Grouped in options:\
 [El Diario.es](https://www.eldiario.es) -
 [El Español](https://www.elespanol.com) -
 [El País](https://elpais.com) -
+[Hola](https://www.hola.com) -
 [InfoLibre](https://www.infolibre.es) -
 [La Vanguardia](https://www.lavanguardia.com) -
 [Mundo Deportivo](https://www.mundodeportivo.com) -
@@ -1116,7 +1128,6 @@ Grouped in options:\
 [The Leaflet](https://theleaflet.in) -
 [The News Minute](https://www.thenewsminute.com) -
 [The Quint](https://www.thequint.com) -
-[Times of India](https://timesofindia.indiatimes.com) -
 [Vikatan](https://www.vikatan.com)
 
 ##### Indonesia
@@ -1138,6 +1149,11 @@ Grouped in options:\
 [Mainichi Shimbun](https://mainichi.jp) -
 [Nikkei Asian Review](https://asia.nikkei.com) -
 [The Japan Times](https://www.japantimes.co.jp)
+
+Grouped in options:\
+*Chunichi Shimbun Group* sites like\
+[Chunichi Shimbun](https://www.chunichi.co.jp) -
+[Tokyo Shimbun](https://www.tokyo-np.co.jp)
 
 ##### Singapore
 [Initium Media](https://theinitium.com) -

@@ -20,17 +20,23 @@ window.setTimeout(function () {
   let hostname = window.location.hostname.replace(/^www\./, '');
   let custom_domain = getCookieDomain(hostname);
   let group;
+  let nofix;
   if (hostname && ext_api.runtime) {
     if (document.querySelector('head > link[href*=".medium.com/"]') || matchDomain(['gitconnected.com', 'gopubby.com', 'plainenglish.io']))
       group = 'medium.com';
-    else if (document.querySelector('head > meta[property="og:image"][content*="beehiiv"]'))
-      group = '###_beehiiv'; // no fix
-    else if (document.querySelector('head > meta[name="generator"][content^="Ghost"]') && !document.querySelector('script[src^="https://steadyhq.com/"]'))
-      group = '###_ghost'; // no fix
-    else if (document.querySelector('head > link[href*="/leaky-paywall"], script[src*="/leaky-paywall"], div[id^="issuem-leaky-paywall-"]'))
+    else if (document.querySelector('head > meta[property="og:image"][content*="beehiiv"]')) {
+      group = '###_beehiiv';
+      nofix = 1;
+    } else if (document.querySelector('head > meta[name="generator"][content^="Ghost"]') && !document.querySelector('script[src^="https://steadyhq.com/"]')) {
+      group = '###_ghost';
+      nofix = 1;
+    } else if (document.querySelector('head > link[href*="/leaky-paywall"], script[src*="/leaky-paywall"], div[id^="issuem-leaky-paywall-"]'))
       group = '###_wp_leaky_paywall';
-    else if (document.querySelector('head > link[href^="https://substackcdn.com/"]'))
-      group = '###_substack_custom'; // no fix
+    else if (document.querySelector('head > link[href^="https://substackcdn.com/"]')) {
+      group = '###_substack_custom';
+      nofix = 1;
+    } else if (hostname.match(/^thelocal\.(at|ch|com|de|dk|es|fr|it|no|se)$/))
+      group = '###_eu_thelocal';
     else if (matchDomain(['monitor.co.ug', 'mwananchi.co.tz', 'mwanaspoti.co.tz', 'thecitizen.co.tz', 'theeastafrican.co.ke']))
       group = '###_ke_nation_media';
     else if (document.querySelector('head > link[href="//ppt.promedia.nl"]') || document.querySelector('head > script[src*="/pmgnews/scripts/promedia.js"]'))
@@ -42,7 +48,7 @@ window.setTimeout(function () {
     else if (matchDomain(['epochtimes-romania.com']) || hostname.match(/\.epochtimes\.(com\.br|cz|de|fr|jp)/))
       group = '###_usa_epochtimes';
     else if (hostname.match(/\.(com|net)\.au$/) && !matchDomain(['insideretail.com.au'])) {
-      if (document.querySelector('a[href^="https://austcommunitymedia.my.site.com/"]'))
+      if (document.querySelector('div#footer a[href^="https://acm.media/"]'))
         group = '###_au_comm_media';
       else if (hostname.endsWith('.com.au')) {
         if (document.querySelector('head > link[href="https://images.thewest.com.au"]'))
@@ -51,14 +57,19 @@ window.setTimeout(function () {
           group = '###_au_mmg';
         else if (matchDomain('ntnews.com.au'))
           group = '###_au_news_corp';
-        else if (document.querySelector('div.c-footer__copyright > a[href^="https://nemedia.com.au"]'))
-          group = '###_au_nomedia'; // no fix
-        else if (hostname.match('farmingahead.com.au'))
-          group = '###_uk_aspermont'; // no fix
+        else if (document.querySelector('div.c-footer__copyright > a[href^="https://nemedia.com.au"]')) {
+          group = '###_au_nomedia';
+          nofix = 1;
+        } else if (hostname.match('farmingahead.com.au')) {
+          group = '###_uk_aspermont';
+          nofix = 1;
+        }
       }
     } else if (hostname.endsWith('.cl')) {
-      if (document.querySelector('head > meta[property="og:image"][content*="/impresa.soy-chile.cl/"]'))
-        group = '###_cl_elmercurio_local'; // no fix
+      if (document.querySelector('head > meta[property="og:image"][content*="/impresa.soy-chile.cl/"]')) {
+        group = '###_cl_elmercurio_local';
+        nofix = 1;
+      }
     } else if (hostname.match(/\.(de|at|ch)$/) || matchDomain(['horizont.net', 'lebensmittelzeitung.net'])) {
       if (document.querySelector('head > script[src*="/dfv.containers.piwik.pro/"]'))
         group = '###_de_dfv_medien';
@@ -76,7 +87,7 @@ window.setTimeout(function () {
         else if (matchDomain('schwaebische-post.de') || document.querySelector('header a[href^="https://www.ippen.media"]'))
           group = '###_de_ippen_media';
       } else if (hostname.endsWith('.ch')) {
-        if (document.querySelector('head > link[href*="/assets.static-chmedia.ch/"]'))
+        if (document.querySelector('head > script[src^="https://static.data.chmedia.ch/"]'))
           group = '###_ch_media'; // custom
         else if (document.querySelector('div#__next > div.page-section li > a[href^="https://jobs.tamedia.ch/"]'))
           group = '###_ch_tamedia';
@@ -92,10 +103,13 @@ window.setTimeout(function () {
       else if (document.querySelector('div > ul > li > a[href="https://www.sportlife.es/"]'))
         group = '###_es_sport_life';
     } else if (hostname.endsWith('.fi')) {
-      if (document.querySelector('head > link[href^="https://assets.almatalent.fi"]'))
-        group = '###_fi_alma_talent'; // no fix
-      else if (document.querySelector('head[prefix*=".kalevamedia.fi/"]'))
-        group = '###_fi_kaleva'; // no fix
+      if (document.querySelector('head > link[href^="https://assets.almatalent.fi"]')) {
+        group = '###_fi_alma_talent';
+        nofix = 1;
+      } else if (document.querySelector('head[prefix*=".kalevamedia.fi/"]')) {
+        group = '###_fi_kaleva';
+        nofix = 1;
+      }
     } else if (hostname.endsWith('.fr')) {
       if (matchDomain(['larep.fr', 'leberry.fr', 'lechorepublicain.fr', 'lejdc.fr', 'lepopulaire.fr', 'leveil.fr', 'lyonne.fr']))
         group = '###_fr_gcf';
@@ -104,17 +118,19 @@ window.setTimeout(function () {
       else if (matchDomain(['echoancenis.fr', 'echoduberry.fr', 'hautanjou.fr', 'larenaissancehebdo.fr', 'lecourriercauchois.fr', 'lecourrierdelamayenne.fr']))
         group = '###_fr_groupe_la_manche_libre';
     } else if (hostname.endsWith('.it')) {
-      if (document.querySelector('head > link[href^="//citynews.stgy.ovh/"]'))
-        group = '###_it_citynews'; // no fix
+      if (document.querySelector('head > link[href^="//citynews.stgy.ovh/"]')) {
+        group = '###_it_citynews';
+        nofix = 1;
+      }
       else if (matchDomain(['gazzettadimodena.it', 'gazzettadireggio.it', 'lanuovaferrara.it']))
         group = '###_it_gruppo_sae';
-    } else if (hostname.endsWith('.nl')) {
+    } else if (hostname.endsWith('.nl') || matchDomain(['bike-eu.com'])) {
       if (document.querySelector('head > link[href*=".ndcmediagroep.nl/"]'))
         group = '###_nl_mediahuis_noord';
       else if (matchDomain(['gooieneemlander.nl', 'ijmuidercourant.nl']))
         group = '###_nl_mediahuis_region';
-      else if (document.querySelector('head > link[rel="dns-prefetch"][href^="https://vmn-"][href$="imgix.net"]'))
-        group = '###_nl_vmnmedia'; // no fix
+      else if (matchDomain(['bike-eu.com']) || document.querySelector('head > link[rel="dns-prefetch"][href^="https://vmn-"][href$="imgix.net"]'))
+        group = '###_nl_vmnmedia';
     } else if (hostname.endsWith('.no')) {
       if (hostname.endsWith('watch.no') && document.querySelector('head > link[as="image"][imagesrcset^="https://photos.watchmedier.dk/"]'))
         group = '###_dk_watch_media'; // custom
@@ -123,14 +139,16 @@ window.setTimeout(function () {
         group = '###_se_nwt_media';
       else if (document.querySelector('footer ul > li > a[href^="https://privacy.bonniernews.se/cookiepolicy"]'))
         group = '###_se_bonnier_group';
-      else if (document.querySelector('head > link[href^="https://cdn.gotamedia.se/"]'))
-        group = '###_se_gota_media'; // no fix
+      else if (document.querySelector('head > link[href^="https://cdn.gotamedia.se/"]')) {
+        group = '###_se_gota_media';
+        nofix = 1;
+      }
     } else if (hostname.match(/\.(co\.uk|scot)$/)) {
       if (matchDomain(['motortransport.co.uk']))
         group = '###_uk_dvv_media';
-      else if (document.querySelector('footer > div a[href^="https://www.nationalworldplc.com"]'))
+      else if (document.querySelector('footer > div a[href^="https://corporate.nationalworld.com"]'))
         group = '###_uk_nat_world';
-      else if (document.querySelector('footer li > a[href^="https://www.newsquest.co.uk/"]'))
+      else if (document.querySelector('footer a[href^="https://www.newsquest.co.uk/"]'))
         group = '###_uk_newsquest';
       else if (document.querySelector('div#wrbm-footer-div'))
         group = '###_uk_william_reed';
@@ -141,9 +159,10 @@ window.setTimeout(function () {
         group = '###_ca_gcm';
       else if (matchDomain(['montrealgazette.com']) || document.querySelector('head > script[src*=".postmedia.digital/"], head > meta[content*=".postmedia.digital/"]'))
         group = '###_ca_postmedia';
-      else if (document.querySelector('div.asp_logo > a > img[src$="aspermont.png"]'))
-        group = '###_uk_aspermont'; // no fix
-      else if (document.querySelector('head > script[src*=".axate.io/"], head > script[src*=".agate.io/"]'))
+      else if (document.querySelector('div.asp_logo > a > img[src$="aspermont.png"]')) {
+        group = '###_uk_aspermont';
+        nofix = 1;
+      } else if (document.querySelector('head > script[src*=".axate.io/"], head > script[src*=".agate.io/"]'))
         group = '###_uk_axate.io';
       else if (matchDomain(['flightglobal.com', 'freightcarbonzero.com', 'heavyliftpfi.com', 'personneltoday.com', 'railwaygazette.com']))
         group = '###_uk_dvv_media';
@@ -157,9 +176,10 @@ window.setTimeout(function () {
         group = '###_usa_bridge_tower';
       else if (document.querySelector('head > script[type][src*="-cnhi-pw.newsmemory.com"]'))
         group = '###_usa_cnhi';
-      else if (document.querySelector('footer#footer li > a[href^="https://cherryroad-media.com"]'))
-        group = '###_usa_cherryroad'; // no fix
-      else if (document.querySelector('head > link[href*=".gannettdigital.com/"], head > link[href*=".gannett-cdn.com/"]'))
+      else if (document.querySelector('footer#footer li > a[href^="https://cherryroad-media.com"]')) {
+        group = '###_usa_cherryroad';
+        nofix = 1;
+      } else if (document.querySelector('head > link[href*=".gannettdigital.com/"], head > link[href*=".gannett-cdn.com/"]'))
         group = '###_usa_gannett';
       else if (document.querySelector('head > script[src*="/treg.hearstnp.com/"]'))
         group = '###_usa_hearst_comm';
@@ -171,6 +191,8 @@ window.setTimeout(function () {
         group = '###_usa_mcc';
       else if (document.querySelector('head > link[rel="stylesheet"][id^="dfm-accuweather-"], footer li > a[href^="https://www.medianewsgroup.com"]'))
         group = '###_usa_mng';
+      else if (document.querySelector('head > link[href$=".wallkit.net"]'))
+        group = '###_wp_wallkit';
       else if (hostname.match(/\.com$/)) {
         if (document.querySelector('div.footer-note > div.text > a[href^="https://www.valnetinc.com"]'))
           group = '###_ca_valnet';
@@ -192,9 +214,10 @@ window.setTimeout(function () {
           group = '###_usa_industrydive';
         else if (matchDomain(['centralmaine.com', 'pressherald.com', 'sunjournal.com']))
           group = '###_usa_maine_trust';
-        else if (document.querySelector('head > meta[name="peim_article_access_type"]'))
+        else if (document.querySelector('head > meta[name="peim_article_access_type"]')) {
           group = '###_usa_pei';
-        else if (document.querySelector('footer[id] a[href^="https://www.soundpublishing.com"]'))
+          nofix = 1;
+        } else if (document.querySelector('footer[id] a[href^="https://www.soundpublishing.com"]'))
           group = '###_usa_sound_publishing';
         else if (matchDomain(['accountingtoday.com', 'benefitnews.com', 'bondbuyer.com', 'dig-in.com', 'financial-planning.com', 'nationalmortgagenews.com']))
           group = 'americanbanker.com'; // Arizent
@@ -209,7 +232,8 @@ window.setTimeout(function () {
       request: 'custom_domain',
       data: {
         domain: custom_domain,
-        group: group
+        group: group,
+        nofix: nofix
       }
     });
   }

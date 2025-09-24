@@ -3,8 +3,88 @@ Changelog Bypass Paywalls Clean - Chrome
 Updates (install zip/crx-file): https://gitflic.ru/project/magnolia1234/bpc_uploads (or check X/Nitter)
 
 Post-release
+Add Chunichi Shimbun Group (JP)
+Add FMR
+Remove Times of India
+Fix Courrier international (ld_json_app)
+Fix Domani (ld_json)
+Fix Newsquest Media Group (identify sites)
+Fix NOZ/MHN Mediengruppe (podcasts)
+Fix NYTimes (loading)
+Fix Sz.de (images & charts)
+Fix The Economist (images/css - mv3-headers)
+Fix Vn.nl (podcasts & audio-tts)
+Fix WSJ (not pro)
+
+* v4.2.1.0 (2025-09-14)
+Add Berliner Zeitung
+Add Humanite.fr
+Add Moustique.be (Groupe IPM)
+Add Pnp.de
+Remove PEI Media
+Remove The Impression (Wallkit)
+Remove ZeroHedge
+Fix Adweek (ld_json)
+Fix Business-standard.com (css)
+Fix Business Insider (international)
+Fix Financial Times (vpn)
+Fix Groupe ESH Medias (timing)
+Fix Irish Examiner (premium)
+Fix Observador.pt (js)
+Fix Zeit.de (no images - GST-link)
+Update block general paywall script (Wallkit)
+
+* v4.2.0.0 (2025-08-31)
+Add Hola
+Add Institute of Art and Ideas
+Add New York Post
+Add VmnMedia.nl Group (opt-in to custom sites)
+Fix Australian Community Media (identify sites)
+Fix CharlieHebdo.fr (ld_json_url)
+Fix Dagsavisen.no (bot)
+Fix Harper's Magazine (free articles only)
+Fix Irish Examiner (cookie)
+Fix Madsack Mediengruppe (ld_json_fusion)
+Fix Mediahuis Belgie (widgets)
+Fix The Columbian (cookie)
+Fix The Economic Times (charts)
+Fix The New York Sun (xhr)
+Fix Zeit.de (videos)
+
+* v4.1.9.0 (2025-08-24)
+Add Daily Herald (USA)
+Add The Local Group (EU; opt-in to custom sites)
+Add The Palm Beach Post (Gannett)
+Add Weekendavisen.dk (Berlingske Media)
+Add Wiwo.de
+Remove Berliner Zeitung
+Fix Berlingske.dk (ld_json_next)
+Fix Groupe Rossel (css)
+Fix Interesting Engineering (css)
+Fix LeFigaro.fr (social media)
+Fix Lequipe.fr (Les notes - playing_field)
+Fix Mediahuis Belgie (intro video)
+Fix The West Australian (timing)
+Fix Vice (ld_json_url)
+Fix WaPo (bot)
+
+* v4.1.8.0 (2025-08-10)
+Add TheNewWorld.co.uk (former TheNewEuropean.co.uk)
+Remove Faz.net
+Fix Ad.nl (no article & media)
+Fix Ajc.com (bot)
+Fix Barron's (host permission)
+Fix Capital.bg (css)
+Fix Dn.pt (ld_json)
+Fix Doorbraak.be (timing)
 Fix El Espectador (amp)
+Fix FocusPlus.de (xhr)
+Fix LePoint.fr (var)
+Fix MarketWatch (referer & backup-fetch)
+Fix National World Publishing (identify sites)
+Fix Stern.de (charts)
 Fix Stylist.co.uk (css)
+Maintenance keep alive & limit update check (mv3)
 
 * v4.1.7.0 (2025-07-27)
 Add Groupe La Manche Libre (FR; opt-in to custom sites for unlisted)
@@ -1972,7 +2052,7 @@ Update block general paywall script (remove GoogleTagManager)
 * v2.7.3.0 (2022-06-26)
 Add Artforum
 Add Initium Media
-Add L'Avenir (Belgium)
+Add L'Avenir (BE)
 Add The Banker
 Remove Dn.se
 Remove Valor Economico
@@ -2793,7 +2873,7 @@ Update grouped sites (popup-toggle)
 * v1.9.8.0 (2020-12-06)
 Add El Comercio, Ideal & La Voz de Cadiz (ES)
 Add Esprit.presse.fr
-Add Groupe Rossel (France/Belgium)
+Add Groupe Rossel (FR/BR)
 Add The Spectator USA
 Remove Aftonbladet.se
 Remove NK News
@@ -2842,7 +2922,7 @@ Fix error during tabs.get (no tab with id)
 Update custom sites: allow_cookies
 
 * v1.9.4.0 (2020-11-08)
-Add Gazet van Antwerpen (Belgium)
+Add Gazet van Antwerpen (BE)
 Add MarketWatch (free articles only)
 Fix Australian Provincial Newspapers
 Fix Deutsche Wirtschafts Nachrichten
@@ -2916,7 +2996,7 @@ Add Westdeutsche Allgemeine Zeitung
 Add Westfalenpost
 Add Westfaelische Rundschau
 Fix Australian Financial Review (images)
-Fix Domani (IT)
+Fix Domani
 Fix El Pais (ES)
 Fix The Globe and Mail (FF for Android v68)
 Fix The Hindu (menu)

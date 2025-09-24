@@ -1,6 +1,5 @@
 //"use strict";
 
-var be_groupe_ipm_domains = ['dhnet.be', 'lalibre.be', 'lavenir.net'];
 var be_mediahuis_domains = ['gva.be', 'hbvl.be', 'nieuwsblad.be', 'standaard.be'];
 var be_roularta_domains = ['beleggersbelangen.nl', 'femmesdaujourdhui.be', 'flair.be', 'knack.be', 'kw.be', 'levif.be', 'libelle.be'];
 var nl_dpg_adr_domains = ['ad.nl', 'bd.nl', 'bndestem.nl', 'destentor.nl', 'ed.nl', 'gelderlander.nl', 'pzc.nl', 'tubantia.nl'];
@@ -22,20 +21,6 @@ if (matchDomain('adformatie.nl')) {// custom
   hideDOMStyle(ads);
 }
 
-else if (matchDomain(be_groupe_ipm_domains)) {
-  let paywall = document.querySelector('div.is-preview');
-  if (paywall) {
-    paywall.classList.remove('is-preview');
-    window.setTimeout(function () {
-      let div_hidden = document.querySelector('div.is-hidden');
-      if (div_hidden)
-        div_hidden.classList.remove('is-hidden');
-    }, 1000);
-  }
-  let ads = 'div.ap-AdContainer, div.ap-Outbrain';
-  hideDOMStyle(ads);
-}
-
 else if (matchDomain(be_mediahuis_domains)) {
   window.setTimeout(function () {
     let video = document.querySelector('div.video, div[data-testid="article-video"]');
@@ -43,6 +28,11 @@ else if (matchDomain(be_mediahuis_domains)) {
       let article = document.querySelector(article_sel);
       if (article) {
         if (video) {
+          if (matchDomain(['gva.be', 'nieuwsblad.be'])) {
+            let placeholder = video.querySelector('div[class^="Placeholder_placeholder"]');
+            if (placeholder)
+              placeholder.removeAttribute('class');
+          }
           let video_new = article.querySelector('div[id$="-streamone"], div[id^="video-player-"], div[id^="player_"]');
           if (video_new && video_new.parentNode)
             video_new.parentNode.replaceChild(video, video_new);
@@ -52,6 +42,13 @@ else if (matchDomain(be_mediahuis_domains)) {
             if (header)
               header.after(br, video, br);
           }
+        }
+        let errors = document.querySelectorAll('div[height][old-src]:not([src]):has(div#__next_error__)');
+        for (let elem of errors) {
+          let iframe = document.createElement('iframe');
+          iframe.src = elem.getAttribute('old-src');
+          iframe.style = 'width: 100%; height: ' + elem.getAttribute('height') + 'px;';
+          elem.parentNode.replaceChild(iframe, elem);
         }
         if (mobile) {
           if (article_main) {
@@ -85,6 +82,8 @@ else if (matchDomain(be_mediahuis_domains)) {
     if (popup)
       popup.click();
   }, 1500);
+  let ads = 'div[id^="ad_inline-"]';
+  hideDOMStyle(ads);
 }
 
 else if (matchDomain('businessam.be')) {
@@ -115,33 +114,37 @@ else if (matchDomain('businessinsider.nl')) {
 }
 
 else if (matchDomain('doorbraak.be')) {
-  let paywall_sel = 'div.paywall';
-  let paywall = document.querySelector(paywall_sel);
-  if (paywall && dompurify_loaded) {
-    removeDOMElement(paywall);
-    waitDOMElement(paywall_sel, 'DIV', removeDOMElement, false);
-    let json_script = document.querySelector('script#__NUXT_DATA__');
-    if (json_script) {
-      try {
-        if (!json_script.text.substr(0, 500).includes(window.location.pathname))
-          refreshCurrentTab();
-        let json = JSON.parse(json_script.text);
-        json = json.filter(x => typeof x === 'string' && x.startsWith('<p>'));
-        let json_text = json[0];
-        if (json_text) {
-          let parser = new DOMParser();
-          let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(json_text) + '</div>', 'text/html');
-          let content_new = doc.querySelector('div');
-          let article = document.querySelector('div > div.prose');
-          if (article) {
-            article.appendChild(content_new);
+  window.setTimeout(function () {
+    let plus = document.querySelector('h1 > svg');
+    let article = document.querySelector('div > div.prose');
+    if (plus && article && dompurify_loaded) {
+      let paywall_sel = 'div.paywall';
+      let paywall = document.querySelector(paywall_sel);
+      let pars = article.querySelectorAll('p');
+      if (paywall || pars.length < 2) {
+        removeDOMElement(paywall);
+        waitDOMElement(paywall_sel, 'DIV', removeDOMElement, false);
+        let json_script = document.querySelector('script#__NUXT_DATA__');
+        if (json_script) {
+          try {
+            if (!json_script.text.substr(0, 500).includes(window.location.pathname))
+              refreshCurrentTab();
+            let json = JSON.parse(json_script.text);
+            json = json.filter(x => typeof x === 'string' && x.startsWith('<p>'));
+            let json_text = json[0];
+            if (json_text) {
+              let parser = new DOMParser();
+              let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(json_text, dompurify_options) + '</div>', 'text/html');
+              let content_new = doc.querySelector('div');
+              article.appendChild(content_new);
+            }
+          } catch (err) {
+            console.log(err);
           }
         }
-      } catch (err) {
-        console.log(err);
       }
     }
-  }
+  }, 1000);
 }
 
 else if (matchDomain('ftm.nl')) {
@@ -255,7 +258,7 @@ else if (matchDomain(['lc.nl', 'dvhn.nl']) || document.querySelector('head > lin
           let intro_meta_dom = document.querySelector('head > meta[data-hid="description"][content]');
           if (intro_match || intro_meta_dom) {
             intro = document.createElement('p');
-            intro.innerText = intro_match ? intro_match[1] : intro_meta_dom.content;
+            intro.innerText = intro_match ? intro_match[1].replace(/\\u002F/g, '/') : intro_meta_dom.content;
             intro.style = 'font-weight: bold;';
           }
           let json_text = json.split(',body:')[1].split(/,(leadText|brand_key|tts|pianoKeywords):/)[0].replace(/([{,])(\w+)(?=:(["\{\[]|[\w$]{1,2}[,\}]))/g, "$1\"$2\"").replace(/(Image\\":)(\d)([,}])/g, '$1\\"$2\\"$3').replace(/\":(\[)?([\w\$\.]+)([\]},])/g, "\":$1\"$2\"$3");
@@ -291,10 +294,10 @@ else if (matchDomain(['lc.nl', 'dvhn.nl']) || document.querySelector('head > lin
               figure.appendChild(img);
               if (child.relation.caption) {
                 if (child.relation.caption.length <= 2)
-                  child.relation.caption = findNuxtText(child.relation.caption).replace(/\\"/g, '"').replace(/\\n/g, ' - ');
-                if (child.relation.caption.photographer) {
+                  child.relation.caption = findNuxtText(child.relation.caption).replace(/\\"/g, '"').replace(/\\n/g, ' - ').replace(/\\u002F/g, '/');
+                if (child.relation.photographer) {
                   if (child.relation.photographer.length <= 2)
-                    child.relation.photographer = findNuxtText(child.relation.photographer);
+                    child.relation.photographer = findNuxtText(child.relation.photographer).replace(/\\u002F/g, '/');
                   child.relation.caption += ' - ' + child.relation.photographer;
                 }
                 let caption = document.createElement('figcaption');
@@ -314,7 +317,9 @@ else if (matchDomain(['lc.nl', 'dvhn.nl']) || document.querySelector('head > lin
                 } else if (child.relation && child.relation.link) {
                   if (child.relation.link.length <= 2)
                     child.relation.link = findNuxtText(child.relation.link).replace(/\\u002F/g, '/');
-                  addLink(elem, decodeURIComponent(child.relation.title.length > 2 ? child.relation.title : child.relation.link), child.relation.link);
+                  if (child.relation.title.length <= 2)
+                    child.relation.title = findNuxtText(child.relation.title);
+                  addLink(elem, child.relation.title, child.relation.link);
                 } else if (child.children) {
                   if (child.children.length) {
                     for (let item of child.children) {
@@ -348,7 +353,8 @@ else if (matchDomain(['lc.nl', 'dvhn.nl']) || document.querySelector('head > lin
                   }
                 }
               } else if (par.text) {
-                addParText(elem, par.text);
+                if (findNuxtText(par.type) !== 'streamer')
+                  addParText(elem, par.text);
               } else if (par.children) {
                 addChildren(elem, par.children);
               } else if (par.typename.length > 2)
@@ -450,32 +456,71 @@ else if (matchDomain(nl_dpg_adr_domains.concat(['hln.be']))) {
   if (sub)
     sub.click();
   func_post = function () {
-    let shades = document.querySelectorAll('div[style*="background-color"][style*=";width"]');
-    for (let elem of shades)
-      elem.style.width = '85%';
-    let lazy_images = document.querySelectorAll('picture img[loading="lazy"][style]');
-    for (let elem of lazy_images)
-      elem.style = 'width: 95%;';
-    let widgets = document.querySelectorAll('div[old-src^="https://valley.ad.nl/widgets/"]:not([src])');
-    for (let elem of widgets) {
-      let iframe = document.createElement('iframe');
-      iframe.src = elem.getAttribute('old-src');
-      iframe.style = 'height: 400px; border: none;';
-      elem.parentNode.replaceChild(iframe, elem);
-    }
-    let errors = document.querySelectorAll('div > div[old-src]:not([src]):has(div#main-frame-error)');
-    for (let elem of errors) {
-      let elem_new = document.createElement('iframe');
-      elem_new.src = elem.getAttribute('old-src');
-      elem_new.style = 'width: 100%; height: 400px; border: none;';
-      elem.parentNode.removeAttribute('style');
-      elem.parentNode.replaceChild(elem_new, elem);
+    let article = document.querySelector(article_src_sel);
+    if (article) {
+      let shades = article.querySelectorAll('div[style*="background-color"][style*=";width"]');
+      for (let elem of shades)
+        elem.style.width = '85%';
+      let lazy_images = article.querySelectorAll('picture img[loading="lazy"][style]');
+      for (let elem of lazy_images)
+        elem.style = 'width: 95%;';
+      let widgets = article.querySelectorAll('div > div > div div[old-src^="https://valley.ad.nl/widgets/"]:not([src])');
+      for (let elem of widgets) {
+        let iframe = document.createElement('iframe');
+        iframe.src = elem.getAttribute('old-src');
+        iframe.style = 'height: 400px; border: none;';
+        elem.parentNode.replaceChild(iframe, elem);
+      }
+      let errors = article.querySelectorAll('div > div[old-src]:not([src]):has(div#main-frame-error)');
+      for (let elem of errors) {
+        let elem_new = document.createElement('iframe');
+        elem_new.src = elem.getAttribute('old-src');
+        elem_new.style = 'width: 100%; height: 400px; border: none;';
+        elem.parentNode.removeAttribute('style');
+        elem.parentNode.replaceChild(elem_new, elem);
+      }
+      let picture_divs = article.querySelectorAll('picture > div[style*="min-height:"]:has(svg)');
+      for (let elem of picture_divs) {
+        elem.parentNode.removeAttribute('style');
+        removeDOMElement(elem);
+      }
+      let podcast = article.querySelector('div > div[old-src^="https://omny.fm/"]:not([src])');
+      if (podcast) {
+        let iframe = document.createElement('iframe');
+        iframe.src = podcast.getAttribute('old-src');
+        podcast.parentNode.replaceChild(iframe, podcast);
+      }
+      let video_scripts = article.querySelectorAll('div > div > script[type="application/ld+json"], article > script[type="application/ld+json"]');
+      for (let elem of video_scripts) {
+        if (elem.text.includes(',"embedUrl":"')) {
+          let iframe = document.createElement('iframe');
+          iframe.src = elem.text.split(',"embedUrl":"')[1].split('"')[0];
+          iframe.style = 'width: 100%; height: 400px;';
+          let container = elem.parentNode;
+          if (elem.parentNode.tagName === 'DIV')
+            container = container.parentNode;
+          container.parentNode.replaceChild(iframe, container);
+        }
+      }
     }
     header_nofix('footer', sub_sel, 'BPC > no archive-fix');
   }
-  let article_sel = 'div#remaining-paid-content';
   let url = window.location.href;
-  getArchive(url, article_sel + '[data-reduced="true"]', {rm_attrib: 'data-reduced'}, article_sel);
+  let article_sel = 'div#remaining-paid-content';
+  let article_src_sel = 'div#fjs-paywall-intro + div';
+  let article = document.querySelector(article_sel);
+  if (article) {
+    article_src_sel += ', ' + article_sel;
+    getArchive(url, article_sel + '[data-reduced="true"]', {rm_attrib: 'data-reduced'}, article_sel, '', article_src_sel);
+  } else {
+    let article_sel = 'article#article-content';
+    article_src_sel += ', ' + article_sel + ' > section';
+    getArchive(url, article_sel + ' > section[class]:empty', {rm_attrib: 'class'}, article_sel + ' > section:empty', '', article_src_sel);
+    let ads = 'span[style*="background-color:"]:has(> span[style*="min-height:"])';
+    hideDOMStyle(ads, 2);
+  }
+  let ads = 'div.dfp-space';
+  hideDOMStyle(ads);
 }
 
 else if (matchDomain(nl_dpg_media_domains)) {
@@ -623,6 +668,16 @@ else if (matchDomain('vn.nl')) {
               let content_new = doc.querySelector('div');
               article.innerHTML = '';
               article.appendChild(content_new);
+              let audio = document.querySelector('div.c-author-info__audio-player');
+              if (audio) {
+                if (json.props.pageProps.article.audioplayer.audioFile.node.mediaItemUrl) {
+                  let audio_new = document.createElement('audio');
+                  audio_new.src = json.props.pageProps.article.audioplayer.audioFile.node.mediaItemUrl;
+                  audio_new.style = 'height: 50px; width: 60%;';
+                  audio_new.setAttribute('controls', '');
+                  audio.parentNode.replaceChild(audio_new, audio);
+                }
+              }
             } else
               refreshCurrentTab();
           } catch (err) {

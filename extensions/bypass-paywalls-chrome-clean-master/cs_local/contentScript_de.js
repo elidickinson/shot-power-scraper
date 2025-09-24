@@ -17,7 +17,7 @@ if (bg2csData && bg2csData.cs_param)
 
 if (!(csDone || csDoneOnce)) {
 
-if (window.location.hostname.match(/\.(de|at|ch)$/) || matchDomain(['faz.net', 'handelsblatt.com', 'tt.com', 'wochenblatt.com'])) {//germany/austria/switzerland - ch
+if (window.location.hostname.match(/\.(de|at|ch)$/) || matchDomain(['handelsblatt.com', 'tt.com', 'wochenblatt.com'])) {//germany/austria/switzerland - ch
 
 if (matchDomain('aachener-zeitung.de')) {
   let url = window.location.href;
@@ -28,6 +28,8 @@ if (matchDomain('aachener-zeitung.de')) {
   let noscroll = document.querySelectorAll('html[class], body[class]');
   for (let elem of noscroll)
     elem.removeAttribute('class');
+  let ads = 'section[data-theme-sponsored-content]';
+  hideDOMStyle(ads);
 }
 
 else if (matchDomain('aerztezeitung.de')) {
@@ -50,64 +52,6 @@ else if (matchDomain('aerztezeitung.de')) {
   }
 }
 
-else if (matchDomain(['arcinfo.ch', 'lacote.ch', 'lenouvelliste.ch'])) {// Groupe ESH Médias
-  let paywall = document.querySelector('section#paywall-articles');
-  if (paywall && dompurify_loaded) {
-    removeDOMElement(paywall);
-    let url_id = window.location.pathname.match(/\d+$/).pop();
-    let html = document.documentElement.outerHTML;
-    let json;
-    if (html.includes('window.__NUXT__=')) {
-      json = html.split('window.__NUXT__=')[1].split('</script>')[0].trim().replace(/blocs:\[\{.*?\}\],/g, '');
-      if (url_id && !json.includes('{"' + url_id + '":'))
-        refreshCurrentTab();
-    }
-    let article = document.querySelector('div.html-content');
-    let no_intro = false;
-    if (!article) {
-      article = document.querySelector('div.container-mobile-full');
-      no_intro = true;
-    }
-    if (article && json) {
-      let content = '';
-      if (json.includes('text_1="'))
-        content = json.split('text_1="').pop().split('";')[0];
-      else {
-        let parts = json.split('html:"');
-        parts.splice(0, 1);
-        for (let part of parts)
-          content += part.split('",has_pre_content')[0];
-      }
-      if (content) {
-        content = content.replace(/\\u003C/g, '<').replace(/\\u003E/g, '>').replace(/\\u002F/g, '/').replace(/\\"/g, '"').replace(/\\r\\n/g, '');
-        let parser = new DOMParser();
-        let content_new = parser.parseFromString('<div class="html-content">' + DOMPurify.sanitize(content, dompurify_options) + '</div>', 'text/html');
-        let iframely = content_new.querySelectorAll('div > div.fr-iframely');
-        for (let elem of iframely) {
-          let url_dom = elem.querySelector('[data-iframely-url]');
-          if (url_dom) {
-            let iframe = document.createElement('iframe');
-            iframe.src = url_dom.getAttribute('data-iframely-url');
-            iframe.style = 'width: 100%; height: 400px;';
-            elem.parentNode.replaceChild(iframe, elem);
-          }
-        }
-        let article_top;
-        if (!no_intro) {
-          article_top = article.parentNode.parentNode;
-          removeDOMElement(article.parentNode);
-        } else
-          article_top = article;
-        article_top.appendChild(content_new.querySelector('div'));
-      } else {
-        refreshCurrentTab();
-      }
-    }
-  }
-  let ads = 'div[class*="ads_type_"]';
-  hideDOMStyle(ads);
-}
-
 else if (matchDomain('automobilwoche.de')) {
   let body_hidden = document.querySelector('body[class]');
   if (body_hidden)
@@ -122,9 +66,11 @@ else if (matchDomain('automobilwoche.de')) {
 }
 
 else if (matchDomain(['beobachter.ch', 'handelszeitung.ch'])) {
+  window.setTimeout(function () {
   let paywall = document.querySelector('div#piano-inlined');
   if (paywall && dompurify_loaded) {
-    removeDOMElement(paywall);
+    let fade = document.querySelector('div.article-body > div.paywall-wrapper-with-print-info');
+    removeDOMElement(paywall, fade);
     let json_script = document.querySelector('script#hydrationdata');
     if (json_script) {
       try {
@@ -141,11 +87,14 @@ else if (matchDomain(['beobachter.ch', 'handelszeitung.ch'])) {
             for (let paragraph of paragraphs)
               paragraph.innerHTML = '';
             let parser = new DOMParser();
+            let img_first = true;
+            let img_use = false;
+            let img_caption;
             for (let par in pars) {
               let par_elem = pars[par];
               let elem = document.createElement('div');
               elem.style = 'font-size: 1.7rem; margin: 25px;';
-              let sub_elem = '';
+              let sub_elem;
               if (par_elem.__typename === 'TextParagraph' && par_elem.text) {
                 let content_new = parser.parseFromString('<div>' + DOMPurify.sanitize(par_elem.text) + '</div>', 'text/html');
                 sub_elem = content_new.querySelector('div');
@@ -160,26 +109,49 @@ else if (matchDomain(['beobachter.ch', 'handelszeitung.ch'])) {
                 }
               } else if (par_elem.__typename === 'ImageFile') {
                 if (par_elem.origin) {
-                  sub_elem = document.createElement('img');
-                  sub_elem.src = par_elem.origin;
-                  sub_elem.alt = par_elem.alt;
-                  if (par_elem.width) {
-                    let ratio = par_elem.width / (mobile ? 320 : 640);
-                    sub_elem.width = par_elem.width / ratio;
-                    sub_elem.height = par_elem.height / ratio;
-                  }
+                  if (!img_first) {
+                    let img_attrib = {alt: par_elem.alt};
+                    if (par_elem.width) {
+                      let ratio = par_elem.width / (mobile ? 320 : 640);
+                      img_attrib.width = par_elem.width / ratio;
+                      img_attrib.height = par_elem.height / ratio;
+                    }
+                    sub_elem = makeFigure(par_elem.origin, '_', img_attrib);
+                    img_caption = sub_elem.querySelector('figcaption');
+                    img_use = true;
+                  } else
+                    img_first = false;
                 }
               } else if (par_elem.__typename === 'Image') {
-                if (par_elem.credit) {
-                  sub_elem = document.createElement('p');
-                  sub_elem.appendChild(document.createTextNode(par_elem.credit));
-                }
+                if (img_use && img_caption && par_elem.credit)
+                  img_caption.after('Quelle: ', par_elem.credit);
               } else if (par_elem.__typename === 'ImageParagraph') {
-                if (par_elem.caption) {
-                  let content_new = parser.parseFromString('<div>' + DOMPurify.sanitize(par_elem.caption) + '</div>', 'text/html');
-                  sub_elem = content_new.querySelector('div');
+                if (img_use && img_caption && par_elem.caption)
+                  img_caption.innerText = par_elem.caption.replace(/(<\/?[^>]+>)/g, '');
+              } else if (par_elem.__typename === 'MinistageParagraph') {
+                if (par_elem.ministage && par_elem.ministage.headline) {
+                  sub_elem = document.createElement('p');
+                  sub_elem.append(par_elem.ministage.headline, ' - ' + par_elem.ministage.lead);
+                  if (par_elem.ministage.link) {
+                    let sub_link = document.createElement('a');
+                    sub_link.href = par_elem.ministage.link.path;
+                    sub_link.innerText = par_elem.ministage.link.label;
+                    sub_elem.append(document.createElement('br'), sub_link);
+                  }
                 }
-              } else if (!['Article', 'Author', 'Channel', 'LandingPage', 'Query'].includes(par_elem.__typename)) {
+              } else if (par_elem.__typename === 'ListicleItemParagraph') {
+                if (par_elem.title &&par_elem.text && par_elem.link && par_elem.link.path) {
+                  sub_elem = document.createElement('a');
+                  sub_elem.href = par_elem.link.path;
+                  sub_elem.innerText = par_elem.title + ' - ' + par_elem.text.replace(/(<\/?[^>]+>)/g, '');
+                }
+              } else if (par_elem.__typename === 'Product') {
+                if (par_elem.title && par_elem.link && par_elem.link.path) {
+                  sub_elem = document.createElement('a');
+                  sub_elem.href = par_elem.link.path;
+                  sub_elem.innerText = (par_elem.shortTitle ? par_elem.shortTitle + ' - ' : '') + par_elem.title;
+                }
+              } else if (!['Article', 'Author', 'BlockquoteParagraph', 'Channel', 'InfoBoxParagraph', 'LandingPage', 'Query', 'TeaserParagraph', 'TeaserStageParagraph'].includes(par_elem.__typename)) {
                 console.log(par_elem);
               }
               if (sub_elem) {
@@ -194,12 +166,15 @@ else if (matchDomain(['beobachter.ch', 'handelszeitung.ch'])) {
       }
     }
   }
-  let ads = 'div.ad-wrapper, div[id^="apn-ad-slot-"]';
+  }, 1000);
+  let ads = 'div.ad-wrapper, div[id^="apn-ad-slot-"], div[class^="piano-article-aside"]';
   hideDOMStyle(ads);
 }
 
 else if (matchDomain('berliner-zeitung.de')) {
-  let ads = 'div[class^="traffective_"], div[class^="article_billboard-"], div[class*="_ad_"], div[class^="outbrain_"]';
+  let url = window.location.href;
+  getArchive(url, 'div[class^="soft-paywall_wrapper_"]', '', 'div#articleBody');
+  let ads = 'div[class^="traffective_"], div[class^="article_billboard-"], div[class*="_ad_"], div[class^="outbrain_"], div[id^="qmn-ad-"], div[style]:empty';
   hideDOMStyle(ads);
 }
 
@@ -230,6 +205,11 @@ else if (matchDomain('bild.de')) {
   getArchive(url, 'div.offer-module', '', 'article');
 }
 
+else if (matchDomain('blick.ch')) {
+  let ads = 'aside[class*="slot-code"], aside[class*="_teaser_"][class*="slot-code"]';
+  hideDOMStyle(ads);
+}
+
 else if (matchDomain('boersen-zeitung.de')) {
   window.setTimeout(function () {
     let paywall = document.querySelector('storefront-section#paywall');
@@ -239,76 +219,6 @@ else if (matchDomain('boersen-zeitung.de')) {
       replaceDomElementExt(url, false, false, 'article');
     }
   }, 1000);
-}
-
-else if (matchDomain('faz.net')) {
-  if (matchDomain('zeitung.faz.net')) { // legacy
-    let paywall_z = document.querySelector('div.c-red-carpet');
-    if (paywall_z) {
-      removeDOMElement(paywall_z);
-      let og_url = document.querySelector('head > meta[property="og:url"][content]');
-      if (og_url)
-        window.location.href = og_url.content;
-      else
-        header_nofix('div.article__text');
-    }
-    let sticky_advt = document.querySelector('div.sticky-advt');
-    removeDOMElement(sticky_advt);
-  } else {
-    let ads = 'div.lay-PaySocial, div.iqadtile_wrapper, div.iqdcontainer';
-    hideDOMStyle(ads);
-  }
-}
-
-else if (matchDomain('focusplus.de')) {
-  let paywall = document.querySelector('div#piano-offer-container');
-  if (paywall && dompurify_loaded) {
-    removeDOMElement(paywall);
-    let article = document.querySelector('header');
-    let article_id_match = window.location.pathname.match(/\d+$/);
-    if (article && article_id_match) {
-      let json_script = document.querySelector('script#__NEXT_DATA__');
-      if (json_script) {
-        try {
-          let json = JSON.parse(json_script.text);
-          if (json && json.props.pageProps.__APOLLO_STATE__) {
-            let url_next = json.props.pageProps.path;
-            if (url_next && !window.location.pathname.includes(url_next))
-              refreshCurrentTab();
-            let article_key = Object.keys(json.props.pageProps.__APOLLO_STATE__).find(x => x.endsWith('Article:' + article_id_match[0]));
-            if (article_key) {
-              let pars = json.props.pageProps.__APOLLO_STATE__[article_key].content;
-              if (pars) {
-                addStyle('header p:not([class]) {font-size: 20px; font-family: Vollkorn; line-height: 30px; margin: 20px 0px;} header h2 {font-size: 32px; font-family: Vollkorn; font-weight: bold}');
-                let parser = new DOMParser();
-                for (let par of pars) {
-                  let elem;
-                  if (par.text) {
-                    let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(par.text, dompurify_options) + '</div>', 'text/html');
-                    elem = doc.querySelector('div');
-                    let par_new = document.createElement('div');
-                    if (par.__typename === 'ParagraphQuote') {
-                      if (par.author) {
-                        let span = document.createElement('span');
-                        span.innerText = par.author;
-                        elem.appendChild(span);
-                      }
-                      elem.style = 'font-style: italic; margin: 0px 20px;';
-                    }
-                  } else if (!par.image)
-                    console.log(par);
-                  if (elem)
-                    article.appendChild(elem);
-                }
-              }
-            }
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      }
-    }
-  }
 }
 
 else if (matchDomain('freitag.de')) {
@@ -407,7 +317,7 @@ else if (matchDomain('heise.de')) {
 
 else if (matchDomain('jacobin.de')) {
   let paywall = pageContains('h3.m-auto', 'Dieser Artikel ist nur mit Abo zugänglich.');
-  if (paywall.length) {
+  if (paywall.length && dompurify_loaded) {
     let slash = document.querySelector('div.slash');
     removeDOMElement(paywall[0].parentNode, slash);
     let json_script = document.querySelector('script#__NEXT_DATA__');
@@ -449,6 +359,9 @@ else if (matchDomain('jacobin.de')) {
                     console.log(par);
                 }
               }
+              let author_footer = article.querySelector('div.content-element > div > h3');
+              if (author_footer)
+                article.appendChild(author_footer.parentNode.parentNode);
             }
           }
         }
@@ -501,7 +414,7 @@ else if (matchDomain('kurier.at')) {
   hideDOMStyle(ads);
 }
 
-else if (matchDomain('mittelbayerische.de')) {
+else if (matchDomain(['mittelbayerische.de', 'pnp.de'])) {
   let url = window.location.href;
   getArchive(url, 'div.paywall-layer', '', 'div#article-body');
   let ads = 'div.d-sm-block';
@@ -518,6 +431,22 @@ else if (matchDomain('motorradonline.de')) {
 }
 
 else if (matchDomain(['noz.de', 'shz.de'])) {
+  func_post = function () {
+    let podcasts = document.querySelectorAll('div > div[allow][old-src]');
+    for (let elem of podcasts) {
+      let iframe = document.createElement('iframe');
+      iframe.src = elem.getAttribute('old-src');
+      iframe.style = 'width: 100%; height: 300px;';
+      elem.parentNode.replaceChild(iframe, elem);
+    }
+    if (mobile) {
+      let lazy_images = document.querySelectorAll('div > figure > picture > img[loading="lazy"][style]');
+      for (let elem of lazy_images) {
+        elem.style = 'width: 95%;';
+        elem.parentNode.parentNode.parentNode.removeAttribute('style');
+      }
+    }
+  }
   let url = window.location.href;
   getArchive(url, 'div.paywall', '', 'article');
   let ads = 'div.ad_label';
@@ -666,11 +595,22 @@ else if (matchDomain('stern.de')) {
           article_opulent.removeAttribute('style');
       }
     }
+    let charts = document.querySelectorAll('ws-socialwidget > slot > slot[slot="content"]');
+    for (let chart of charts) {
+      if (chart.innerText.includes('src="')) {
+        let chart_url = chart.innerText.split('src="')[1].split('"')[0];
+        let iframe = document.createElement('iframe');
+        iframe.src = chart_url;
+        iframe.style = "width: 100%; height: 600px; border: none;";
+        let container = chart.parentNode.parentNode;
+        container.parentNode.replaceChild(iframe, container);
+      }
+    }
   }
   let paywall_sel = cs_param.paywall_sel || 'ws-paywall';
   let article_sel = cs_param.article_sel || 'div.article__body';
   let article_src_sel = cs_param.article_src_sel || 'main > article > div:last-child';
-  let link_sel = cs_param.link_sel || 'div.page__content-inner, div.page-opulent__body';
+  let link_sel = cs_param.link_sel || 'div.page__content-inner, div.page-opulent';
   let url = window.location.href;
   getArchive(url, paywall_sel, '', article_sel, '', article_src_sel, link_sel);
 }
@@ -729,9 +669,20 @@ else if (matchDomain('sueddeutsche.de')) {
                     let elem_type = par.content.html.startsWith('<div>') ? 'div' : 'p';
                     let content_new = parser.parseFromString('<' + elem_type + '>' + DOMPurify.sanitize(parseHtmlEntities(par.content.html), dompurify_options) + '</' + elem_type + '>', 'text/html');
                     let iframe = content_new.querySelector('iframe');
-                    if (iframe)
-                      iframe.style = 'width: 100%; height: 400px; margin-bottom: 32px;';
+                    if (iframe) {
+                      iframe.style = 'width: 100%; margin-bottom: 32px;';
+                      if (!iframe.height)
+                        iframe.height = '400px';
+                    }
                     elem = content_new.querySelector(elem_type);
+                  }
+                } else if (par.component === 'ercms') {
+                  if (par.content && par.content.url) {
+                    elem = document.createElement('div');
+                    let iframe = document.createElement('iframe');
+                    iframe.src = par.content.url;
+                    iframe.style = 'width: 100%; height: 400px; margin-bottom: 32px;';
+                    elem.appendChild(iframe);
                   }
                 } else if (par.component === 'subheading') {
                   if (par.content && par.content.text) {
@@ -739,9 +690,9 @@ else if (matchDomain('sueddeutsche.de')) {
                     elem.style = 'font-weight: bold;';
                   }
                 } else if (par.component === 'image') {
-                  if (par.content && par.content.image) {
-                    let caption = par.content.caption ? par.content.caption.html + ' (Foto: ' + par.content.imageSource + ')' : '';
-                    let sub_elem = makeFigure(par.content.image.url, caption);
+                  if (par.image) {
+                    let caption = par.caption ? par.caption.html + ' (Foto: ' + par.imageSource + ')' : '';
+                    let sub_elem = makeFigure(par.image.url, caption);
                     elem.appendChild(sub_elem);
                   }
                 } else if (!(['articleHeader', 'articleTeaserM', 'newsletterEmbed'].includes(par.component) || par.component.startsWith('iqadtile')))
@@ -762,8 +713,17 @@ else if (matchDomain('sueddeutsche.de')) {
 }
 
 else if (matchDomain('suedkurier.de')) {
+  func_post = function () {
+    let article = document.querySelector(article_sel);
+    if (article) {
+      let pars = article.querySelectorAll('section > div > div[style^="box-sizing:"]');
+      if (pars && pars.length < 3)
+        header_nofix(article_sel, '', 'BPC > no archive-fix');
+    }
+  }
   let url = window.location.href;
-  getArchive(url, 'aside.article-paywall', '', 'main > article');
+  let article_sel = 'main > article';
+  getArchive(url, 'aside.article-paywall', '', article_sel);
 }
 
 else if (matchDomain('t3n.de')) {
@@ -972,6 +932,31 @@ else if (matchDomain('weser-kurier.de')) {
   hideDOMStyle(ads);
 }
 
+else if (matchDomain('wiwo.de')) {
+  let paywall = document.querySelector('app-paywall');
+  if (paywall) {
+    removeDOMElement(paywall);
+    let article = document.querySelector('app-blind-text');
+    if (article) {
+      let url = window.location.href;
+      article.before(googleSearchToolLink(url));
+      let json_script = getArticleJsonScript();
+      if (json_script) {
+        let json = JSON.parse(json_script.text);
+        if (json) {
+          let json_text = json.find(x => x.articleBody).articleBody;
+          let article_new = document.createElement('div');
+          article_new.innerText = json_text.replace(/[\r\n]/g, '\r\n\r\n');
+          article_new.style = 'margin: 20px;';
+          article.parentNode.replaceChild(article_new, article);
+        }
+      }
+    }
+  }
+  let ads = 'div.iqadtile';
+  hideDOMStyle(ads);
+}
+
 else if (matchDomain('zeit.de')) {
   let header_sel = 'article > header';
   let header = document.querySelector(header_sel);
@@ -984,19 +969,33 @@ else if (matchDomain('zeit.de')) {
     let comments_link = document.querySelector('div[style*="align-items"] a[href$="#comments"]');
     if (comments_link)
       comments_link.href = '#comments';
+    let gst_link = false;
     let figures = document.querySelectorAll('figure:has(img[loading="lazy"][style])');
     for (let figure of figures) {
       let lazy_image = figure.querySelector('img');
       if (lazy_image.src.startsWith('data:image/')) {
-        let json_script = figure.querySelector('script');
+        let json_script = figure.querySelector('script[type="application/ld+json"]:not(:empty)');
         if (json_script && json_script.text.match(/"url":\s?"/)) {
           let img_url = json_script.text.split(/"url":\s?"/)[1].split('",')[0];
-          lazy_image.src = img_url;
-          lazy_image.style = 'width: 95%;';
-          figure.removeAttribute('style');
+          if (!img_url.includes('.zeit.de/newsletter/')) {
+            lazy_image.src = img_url;
+            lazy_image.style = 'width: 95%;';
+            figure.removeAttribute('style');
+          }
+        } else if (!gst_link && !figure.querySelector('figcaption[style*="display:none;"]')) {
+          gst_link = true;
+          header.append(googleSearchToolLink(url));
+          header_nofix('div#bpc_archive', '', 'BPC > no images (see GST-link)');
         }
       } else if (mobile)
         lazy_image.style = 'width: 95%;';
+    }
+    let videos = document.querySelectorAll('div > div[allowfullscreen][old-src]');
+    for (let elem of videos) {
+      let iframe = document.createElement('iframe');
+      iframe.src = elem.getAttribute('old-src');
+      iframe.style = 'width: 100%; height: 400px;';
+      elem.parentNode.replaceChild(iframe, elem);
     }
     if (mobile) {
       let span_empty = document.querySelectorAll('span:empty');
@@ -1097,9 +1096,111 @@ else if (matchDomain(de_rp_medien_domains)) {
   hideDOMStyle(ads);
 }
 
-else if (matchDomain(de_madsack_domains) || document.querySelector('head > link[href*=".rndtech.de/"]')) {
-  // plus code in contentScript_once_var.js (timing)
-  if (!window.location.search.includes('outputType=valid_amp')) {
+else if (matchDomain(de_madsack_domains) || document.querySelector('link[href*=".rndtech.de/"]')) {
+  if (!window.location.search.startsWith('?outputType=valid_amp')) {
+    window.setTimeout(function () {
+      let paywall = document.querySelector('div.paywalledContent');
+      if (paywall && dompurify_loaded) {
+        paywall.classList.remove('paywalledContent');
+        let paywall_banners = document.querySelectorAll('div[class^="ArticleContentLoaderstyled__Gradient"], div[class^="Articlestyled__FullscreenPaywallScrollContainer-"], div[class^="Articlestyled_"] > svg');
+        removeDOMElement(...paywall_banners);
+        let article = paywall;
+        let fusion_script = document.querySelector('script#fusion-metadata');
+        if (fusion_script && fusion_script.text.includes('Fusion.globalContent=')) {
+          try {
+            let json = JSON.parse(fusion_script.text.split('Fusion.globalContent=')[1].split(';Fusion.')[0]);
+            if (json) {
+              let article_top = article.querySelector('p');
+              if (article_top) {
+                let style_height = 'height: auto;';
+                article_top.style = style_height;
+                let par_class = article_top.className;
+                let parser = new DOMParser();
+                let authors = json.authors;
+                if (authors) {
+                  let info = document.createElement('p');
+                  info.style = 'font-size: 20px; margin: 20px 0px;';
+                  for (let author of authors) {
+                    if (author.imageUrl) {
+                      let img = document.createElement('img');
+                      img.src = author.imageUrl;
+                      img.style = 'border-radius: 50%; overflow: hidden; height: 56px; width: 56px;';
+                      info.append(img);
+                    }
+                    let name_link = document.createElement('a');
+                    name_link.innerText = author.name;
+                    name_link.href = author.url;
+                    name_link.style = 'margin: 0px 20px;';
+                    info.append(name_link);
+                  }
+                  if (json.displayDate) {
+                    let date = new Date(json.displayDate);
+                    let date_str = date.toLocaleDateString('de-DE') + ', ' + date.toLocaleTimeString('de-DE', {hour: "2-digit", minute: "2-digit"}) + ' Uhr';
+                    info.append(date_str)
+                  }
+                  article.append(info);
+                }
+                let first_par = true;
+                let pars = json.elements;
+                for (let par of pars) {
+                  let elem = document.createElement('p');
+                  if (par.type === 'header') {
+                    let sub_elem = document.createElement('h2');
+                    sub_elem.innerText = par.text;
+                    sub_elem.className = par_class;
+                    sub_elem.style = 'font-family: \'DIN Next LT Pro\', Arial, Roboto, sans-serif; font-weight:bold; letter-spacing:-0.25px; font-size:22px; padding-bottom:4px; height: auto;';
+                    elem.appendChild(sub_elem);
+                  } else if (par.type === 'image') {
+                    if (par.imageInfo) {
+                      elem = makeFigure(par.imageInfo.src, par.imageInfo.caption + '\r\n' + par.imageInfo.credit, {style: 'width:100%', alt: par.imageInfo.alt}, {style: 'font-family: Inter, Arial, Roboto, sans-serif; font-size: 12px; line-height: 16px; padding: 0px;'});
+                    }
+                  } else if (par.type === 'list' && par.list.items) {
+                    let sub_elem = document.createElement('ul');
+                    for (let item of par.list.items) {
+                      let li = document.createElement('li');
+                      li.className = par_class;
+                      li.style = style_height;
+                      let doc = parser.parseFromString('<span><strong>• </strong>' + DOMPurify.sanitize(item.text) + '</span>', 'text/html');
+                      li.appendChild(doc.querySelector('span'));
+                      sub_elem.appendChild(li);
+                    }
+                    elem.appendChild(sub_elem);
+                  } else if (par.type === 'oembed') {
+                    if (par.html) {
+                      let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(par.html, dompurify_options) + '</div>', 'text/html');
+                      elem.appendChild(doc.querySelector('div'));
+                    }
+                  } else if (par.type === 'rawHtml') {
+                    if (par.html) {
+                      let doc = parser.parseFromString('<div>' + DOMPurify.sanitize(par.html, dompurify_options) + '</div>', 'text/html');
+                      elem.appendChild(doc.querySelector('div'));
+                    }
+                  } else if (par.text) {
+                    if (par.text.trim()) {
+                      if (first_par) {
+                        if (json.location) {
+                          par.text = '<strong>' + json.location + '. </strong>' + par.text;
+                          first_par = false;
+                        }
+                      }
+                      elem.className = par_class;
+                      elem.style = style_height + ' font-weight: normal;';
+                      let doc = parser.parseFromString('<span>' + DOMPurify.sanitize(par.text) + '</span>', 'text/html');
+                      elem.appendChild(doc.querySelector('span'));
+                    }
+                  } else if (!['ad', 'newsletterAd', 'piano'])
+                    console.log(par);
+                  if (elem.hasChildNodes())
+                    article.appendChild(elem);
+                }
+              }
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      }
+    }, 1000);
     let ads = 'div[class^="Adstyled__AdWrapper"]';
     hideDOMStyle(ads);
   } else {

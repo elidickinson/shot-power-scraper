@@ -89,7 +89,7 @@ if (bg2csData.ld_json_next && dompurify_loaded) {
             if (query_slug && Array.isArray(query_slug))
               query_slug = query_slug.pop();
             let url_next = query_slug || findKeyJson(json, ['slug']);
-            if (url_next && (typeof url_next === 'string') && !window.location.pathname.endsWith(url_next))
+            if (url_next && (typeof url_next === 'string') && !decodeURIComponent(window.location.pathname).endsWith(decodeURIComponent(url_next)))
               refreshCurrentTab();
             let json_text = findKeyJson(json, ['blocks', 'body', 'BodyPlainText', 'content', 'contentHtml', 'description', 'html'], 500);
             if (typeof json_text === 'string')
@@ -948,8 +948,8 @@ function getArticleQuintype() {
       article_new = document.createElement('div');
       let parser = new DOMParser();
       let json = JSON.parse(json_script.text);
-      let slug = json.qt.data.story.slug;
-      if (slug && !window.location.pathname.includes(slug))
+      let slug = decodeURIComponent(json.qt.data.story.slug);
+      if (slug && !decodeURIComponent(window.location.pathname).includes(slug))
         refreshCurrentTab_bg();
       let pars = json.qt.data.story.cards;
       for (let par of pars) {

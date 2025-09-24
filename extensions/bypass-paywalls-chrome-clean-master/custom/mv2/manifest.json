@@ -29,5 +29,5 @@
     "webRequestBlocking",
     "*://*/*"
   ],
-  "version": "4.1.7.2"
+  "version": "4.2.1.5"
 }

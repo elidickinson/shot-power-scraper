@@ -42,12 +42,15 @@ else if (matchDomain('diariodenavarra.es')) {
 }
 
 else if (matchDomain('dn.pt')) {
-  if (window.location.pathname.endsWith('/amp/')) {
-    let amp_list = 'amp-list';
-    hideDOMStyle(amp_list);
-  } else {
-    let ads = document.querySelectorAll('div.sk-pub');
-    removeDOMElement(...ads);
+  let paywall = document.querySelector('div#metered-paywall-banner');
+  if (paywall && dompurify_loaded) {
+    removeDOMElement(paywall);
+    let article = document.querySelector('div.paywall');
+    if (article) {
+      let article_new = getArticleQuintype();
+      if (article_new && article.parentNode)
+        article.parentNode.replaceChild(article_new, article);
+    }
   }
 }
 
@@ -258,7 +261,7 @@ else if (matchDomain(['lavanguardia.com', 'mundodeportivo.com'])) {
 }
 
 else if (matchDomain('observador.pt')) {
-  let ads = 'div.obs-ad-placeholder';
+  let ads = 'div.obs-ad-placeholder, obs-toaster-seats, obs-moa-btn-seats';
   hideDOMStyle(ads);
 }
 

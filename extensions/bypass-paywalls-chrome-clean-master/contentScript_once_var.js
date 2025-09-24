@@ -2,39 +2,8 @@
 var ext_api = (typeof browser === 'object') ? browser : chrome;
 
 var hostname = window.location.hostname;
-var de_madsack_domains = ['haz.de', 'kn-online.de', 'ln-online.de', 'lvz.de', 'maz-online.de', 'neuepresse.de', 'ostsee-zeitung.de', 'rnd.de', 'saechsische.de'];
 
-if (hostname.match(/\.de$/)) {
-
-if (matchDomain(de_madsack_domains) || document.querySelector('head > link[href*=".rndtech.de/"]')) {
-  function madsack_main() {
-    for (let n = 0; n < 25; n++) {
-      window.setTimeout(function () {
-        if (window.Fusion) {
-          window.Fusion.globalContent.isPaid = false;
-        }
-      }, n * 50);
-    }
-  }
-  insert_script(madsack_main);
-}
-
-}
-
-if (matchDomain('dagsavisen.no')) {
-  function dagsavisen_main() {
-    for (let n = 0; n < 25; n++) {
-      window.setTimeout(function () {
-        if (window.Fusion && window.Fusion.globalContent.content_restrictions) {
-         window.Fusion.globalContent.content_restrictions.content_code = 0;
-        }
-      }, n * 50);
-    }
-  }
-  insert_script(dagsavisen_main);
-}
-
-else if (matchDomain(['journaldemontreal.com', 'journaldequebec.com'])) {
+if (matchDomain(['journaldemontreal.com', 'journaldequebec.com'])) {
   for (let n = 0; n < 50; n++) {
     window.setTimeout(function () {
       let article = document.querySelector('div.article-main-txt.composer-content');
