@@ -1,0 +1,118 @@
+{
+  "Adweek": {
+    "domain": "adweek.com",
+    "remove_cookies_select_drop": ["blaize_session"],
+    "block_regex": "\\.adweek\\.com\\/wp-content\\/plugins\\/adw-zephr\\/",
+    "ld_json": "div.paywall|div.non-paywall",
+    "cs_code": "[{\"hide_elem\":\"div.adw-article-body div[style*='linear-gradient']\"}]",
+    "upd_version": "4.2.0.3"
+  },
+  "Berliner Zeitung": {
+    "domain": "berliner-zeitung.de",
+    "allow_cookies": 1,
+    "ld_archive_is": "div[class^='soft-paywall_wrapper_']|div#articleBody",
+    "upd_version": "4.2.0.4"
+  },
+  "Business Insider": {
+    "domain": "businessinsider.com",
+    "allow_cookies": 1,
+    "block_regex": "(\\.businessinsider\\.com\\/chunks\\/scripts\\/\\d.+\\.js|\\.sophi\\.io\\/)",
+    "useragent": "googlebot",
+    "upd_version": "4.2.0.9"
+  },
+  "Domani": {
+    "domain": "editorialedomani.it",
+    "allow_cookies": 1,
+    "block_regex": "(\\.editorialedomani\\.it\\/pelcro\\.js|js\\.pelcro\\.com\\/)",
+    "ld_json": "div.paywallbox|div.article-preview",
+    "cs_code": "[{\"cond\":\"div.article-faded\", \"rm_class\":\"article-faded\"}]",
+    "upd_version": "4.2.1.4"
+  },
+  "Financial Times": {
+    "domain": "ft.com",
+    "allow_cookies": 1,
+    "useragent_custom": "Mozilla/5.0 (Java) outbrain",
+    "cs_dompurify": 1,
+    "upd_version": "4.2.0.9"
+  },
+  "Grupo Prensa Ibérica": {
+    "domain": "###_es_epiberica",
+    "group": [
+      "diariodemallorca.es",
+      "eldia.es",
+      "elperiodico.com",
+      "epe.es",
+      "farodevigo.es",
+      "informacion.es",
+      "laprovincia.es",
+      "levante-emv.com",
+      "lne.es",
+      "mallorcazeitung.es",
+      "superdeporte.es"
+    ],
+    "allow_cookies": 1,
+    "block_regex": "\\.piano\\.io",
+    "cs_code": "[{\"cond\":\"p.ft-helper-closenews\", \"rm_class\":\"ft-helper-closenews\"}]",
+    "upd_version": "4.2.1.6"
+  },
+  "Libération.fr": {
+    "domain": "liberation.fr",
+    "allow_cookies": 1,
+    "cs_dompurify": 1,
+    "cs_param": {"x-api-key": "a7X29mBvQeP1Ld98CgF2rK5uTzWY4h"},
+    "upd_version": "4.2.1.6"
+  },
+  "Moustique.be": {
+    "domain": "moustique.be",
+    "allow_cookies": 1,
+    "block_regex": "(\\.piano\\.io\\/xbuilder\\/experience\\/execute|\\.cxense\\.com\\/)",
+    "cs_code": "[{\"cond\":\"div.is-preview\", \"rm_class\":\"is-preview\"}, {\"cond\":\"div.is-hidden\", \"rm_class\":\"is-hidden\"}]",
+    "upd_version": "4.2.0.1"
+  },
+  "Newspack (WordPress plugin)": {
+    "domain": "###_wp_newspack_gate",
+    "allow_cookies": 1,
+    "block_regex_general": "\\/wp-content\\/plugins\\/newspack-plugin\\/dist\\/memberships-gate-metering\\.js",
+    "upd_version": "4.2.1.7"
+  },
+  "The New York Times": {
+    "domain": "nytimes.com",
+    "allow_cookies": 1,
+    "block_regex": "(\\.nytimes\\.com\\/(meter\\.js|svc\\/onsite-messaging\\/query)|mwcm\\.nyt\\.com\\/.+\\.js|cooking\\.nytimes\\.com\\/api\\/.+\\/access)",
+    "useragent_custom": "Mozilla/5.0 (compatible; Google-InspectionTool/1.0)",
+    "upd_version": "4.2.1.2"
+  },
+  "Observador.pt": {
+    "domain": "observador.pt",
+    "allow_cookies": 1,
+    "block_regex": "\\/observador\\.pt\\/wp-content\\/.+\\/paywall-price-.+\\.js",
+    "upd_version": "4.2.0.4"
+  },
+  "Passauer Neue Presse": {
+    "domain": "pnp.de",
+    "allow_cookies": 1,
+    "block_regex": "\\.piano\\.io",
+    "ld_archive_is": "div.paywall-layer|div#article-body",
+    "upd_version": "4.2.0.5"
+  },
+  "PEI Media (removed)": {
+    "domain": "###_usa_pei",
+    "group": [],
+    "allow_cookies": 1,
+    "nofix": 1,
+    "upd_version": "4.2.0.1"
+  },
+  "The Business Journals (unblock)": {
+    "domain": "bizjournals.com",
+    "allow_cookies": 1,
+    "block_regex": "\\.cxense\\.com",
+    "cs_dompurify": 1,
+    "upd_version": "4.2.1.9"
+  },
+  "Wallkit": {
+    "domain": "###_wp_wallkit",
+    "allow_cookies": 1,
+    "block_regex_general": "\\.wallkit\\.net\\/js",
+    "upd_version": "4.2.0.8"
+  }
+}

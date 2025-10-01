@@ -107,7 +107,7 @@ async def create_browser_context(shot_config, extensions=None):
 
 async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_block):
     """Setup blocking extensions based on requested flags"""
-    base_extensions_path = pathlib.Path(__file__).parent.parent / 'extensions'
+    base_extensions_path = pathlib.Path(__file__).parent / 'extensions'
 
     # Load appropriate extensions
     loaded_extensions = []

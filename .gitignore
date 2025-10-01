@@ -11,18 +11,20 @@ examples/
 *.png
 *.jpg
 *.pdf
-/extensions/shot-scraper-blocker/downloads
-
+/ad-block-rules.json
+/custom-ad-block-filters.txt
+/custom-popup-block-filters.txt
+/plan.md
 # Keep downloads directory ignored
-extensions/blocker-shared/downloads/*
+shot_power_scraper/extensions/blocker-shared/downloads/*
 
 # Chrome-generated extension metadata (runtime cache files)
-extensions/*/_metadata/
-extensions/bypass-paywalls-chrome-clean-master/*.backup
-/extensions/blocker-shared/ad-block-rules.json
-/extensions/blocker-shared/cosmetic-ad-block-rules.json
-/extensions/blocker-shared/cosmetic-popup-block-rules.json
-/extensions/blocker-shared/abp2dnr/
+shot_power_scraper/extensions/*/_metadata/
+shot_power_scraper/extensions/bypass-paywalls-chrome-clean-master/*.backup
+
+# Blocker-shared build artifacts (only final extensions are committed)
+shot_power_scraper/extensions/blocker-shared/abp2dnr/
+shot_power_scraper/extensions/blocker-shared/*.json
 /abp2dnr/
 /tests/references
 /nodriver_source

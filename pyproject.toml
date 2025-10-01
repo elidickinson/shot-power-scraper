@@ -30,6 +30,16 @@ api = [
     "pydantic>=2.0.0",
 ]
 
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.packages.find]
-include = ["shot_power_scraper*", "extensions*"]
+include = ["shot_power_scraper*"]
 exclude = ["nodriver_source*"]
+
+[tool.setuptools.package-data]
+shot_power_scraper = ["extensions/**/*"]
