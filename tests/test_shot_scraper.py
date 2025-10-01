@@ -238,7 +238,7 @@ def test_mhtml(args):
     runner = CliRunner()
     with runner.isolated_filesystem():
         open("index.html", "w").write(TEST_HTML)
-        result = runner.invoke(cli, ["mhtml", "index.html"] + args)
+        result = runner.invoke(cli, ["mhtml", "index.html", "-o", "-"] + args)
         assert result.exit_code == 0, result.output
         # MHTML content should start with MIME boundary
         assert "MIME-Version:" in result.output
