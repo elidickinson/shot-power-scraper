@@ -22,6 +22,8 @@ extensions/bypass-paywalls-chrome-clean-master/*.backup
 /extensions/blocker-shared/ad-block-rules.json
 /extensions/blocker-shared/cosmetic-ad-block-rules.json
 /extensions/blocker-shared/cosmetic-popup-block-rules.json
+/extensions/blocker-shared/abp2dnr/
+/abp2dnr/
 /tests/references
 /nodriver_source
 /debug.log
