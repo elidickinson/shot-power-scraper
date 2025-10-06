@@ -143,7 +143,7 @@ async def create_tab_context(browser_obj, shot_config):
     if Config.verbose:
         click.echo(f"Setting up tab context", err=True)
 
-    # Create blank page and set window size
+    # Create blank page and set window size (important for non-headless modes)
     page = await browser_obj.get("about:blank")
     await page.set_window_size(shot_config.width, shot_config.height)
 
@@ -304,6 +304,19 @@ async def navigate_to_url(page, shot_config):
     if wait_for:
         timeout_seconds = shot_config.timeout
         await wait_for_condition(page, wait_for, timeout_seconds)
+
+    # Set viewport dimensions immediately after navigation if width and height are explicitly specified
+    # This ensures lazy loading operates with the correct viewport context
+    if shot_config.width and shot_config.height_explicitly_set:
+        if Config.verbose:
+            click.echo(f"Setting viewport to {shot_config.width}x{shot_config.height} before lazy loading", err=True)
+        await page.send(uc.cdp.emulation.set_device_metrics_override(
+            width=shot_config.width,
+            height=shot_config.height,
+            device_scale_factor=1,
+            mobile=False
+        ))
+        await page
 
     # Trigger lazy load if requested
     if shot_config.trigger_lazy_load:

@@ -69,6 +69,7 @@ class ShotConfig:
         self.skip_wait_for_load = shot.get("skip_wait_for_load", False)
         self.javascript = shot.get("javascript")
         self.full_page = not shot.get("height")
+        self.height_explicitly_set = "height" in shot
         self.ad_block = shot.get("ad_block", config_file_settings.get("ad_block", False))
         self.popup_block = shot.get("popup_block", config_file_settings.get("popup_block", False))
         self.paywall_block = shot.get("paywall_block", config_file_settings.get("paywall_block", False))

@@ -175,3 +175,40 @@ This section outlines the major code path and functions called when executing `s
 - Comprehensive cleanup of browser and temporary files
 
 The architecture is fully async-based using nodriver for enhanced stealth capabilities and automatic anti-detection. All configuration is centralized through `ShotConfig` for consistency and maintainability.
+
+## How It Works: Understanding Execution Order
+
+### Standard Screenshot Sequence
+
+1. **CLI Parsing** (`cli.py:shot()`) - Parse command-line arguments and create `ShotConfig`
+2. **Browser Initialization** (`browser.py:create_browser_context()`) - Start nodriver browser with stealth features
+3. **Tab Creation** (`page_utils.py:create_tab_context()`) - Create new tab and configure user agent
+4. **Page Navigation** (`page_utils.py:navigate_to_url()`) - Navigate to target URL and wait for load
+5. **Viewport Setup** (`page_utils.py:navigate_to_url()`) - Set viewport dimensions if width/height explicitly specified (not full page)
+6. **Error Detection** - Check for Chrome error pages and DNS failures
+7. **Cloudflare Handling** - Detect and wait for Cloudflare challenge bypass
+8. **Wait Operations** - Apply `--wait` delay and `--wait-for` conditions
+9. **JavaScript Execution** - Execute any provided JavaScript code
+10. **Lazy Loading** (`page_utils.py:trigger_lazy_load()`) - Trigger lazy-loaded content if requested
+11. **Viewport Expansion** - Apply viewport expansion when blocking extensions are enabled
+12. **Screenshot Capture** (`screenshot.py:_save_screenshot()`) - Set final viewport and capture screenshot
+13. **HTML Saving** - Save HTML content if `--save-html` specified
+14. **Browser Cleanup** (`browser.py:cleanup_browser()`) - Stop browser and clean up temporary files
+
+### Feature Interaction Notes
+
+- **Dual Viewport Approach**:
+  - **Window Size** (`set_window_size`) - Controls physical browser window dimensions (important for `--interactive` and `--devtools` modes)
+  - **Viewport Metrics** (`set_device_metrics_override`) - Controls page layout dimensions for rendering and screenshot capture
+- **Viewport Timing**: Viewport metrics are set immediately after navigation (step 5) if width/height explicitly specified (not full page), aiding lazy loading of images
+- **Extension Effects**: Ad/popup blocking may require viewport expansion to fix intersection observer behavior (step 11)
+- **Lazy Loading**: Only runs if `--trigger-lazy-load` is specified, after viewport setup but before final screenshot capture
+- **Full Page Screenshots**: Skip early viewport setup; use calculated document height for viewport dimensions during screenshot capture (step 12)
+- **Selector Screenshots**: Process JavaScript selectors before taking element-specific screenshots
+
+### Error Handling Flow
+
+- HTTP errors are checked after navigation and can trigger `--skip` (exit silently) or `--fail` (exit with error)
+- Navigation errors are detected and can be handled with the same skip/fail logic
+- Cloudflare challenges are automatically detected and waited for (unless disabled)
+- All errors fail loudly with exceptions for debugging unless explicitly configured otherwise
