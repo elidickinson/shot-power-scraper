@@ -1,4 +1,4 @@
-"""Page interaction utilities for shot-scraper"""
+"""Page interaction utilities for shot-power-scraper"""
 import time
 import asyncio
 import re
@@ -329,7 +329,7 @@ async def navigate_to_url(page, shot_config):
         ))
 
         # Wait a moment for lazy loading to trigger
-        await page.sleep(0.5)
+        await page.sleep()
 
         # Clear the override to restore normal viewport
         await page.send(uc.cdp.emulation.clear_device_metrics_override())
@@ -386,11 +386,12 @@ async def wait_for_cloudflare_bypass(page, max_wait_seconds=8):
                     if Config.verbose:
                         click.echo(f"Cloudflare challenge bypassed in {elapsed_seconds:.1f}s", err=True)
                     return True
-            await page.sleep(0.3)  # Check more frequently
+            await page.sleep()
+            await asyncio.sleep(0.1)
         except Exception as e:
             if Config.verbose:
                 click.echo(f"Cloudflare bypass check failed: {e}", err=True)
-            await page.sleep(0.3)
+            await page.sleep()
 
     if Config.verbose:
         click.echo(f"Cloudflare bypass timeout after {max_wait_seconds}s", err=True)
@@ -412,7 +413,8 @@ async def wait_for_condition(page, wait_for_expression, timeout_seconds=30):
                 elapsed = int((time.time() - start_time) * 1000)
                 click.echo(f"Wait condition met after {elapsed}ms", err=True)
             return True
-        await page.sleep(0.1)
+        await page.sleep()
+        await asyncio.sleep(0.1)
 
     raise click.ClickException(f"Timeout waiting for condition: {wait_for_expression}")
 
@@ -484,6 +486,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     for _ in range(10):
         await page.scroll_down(200)
         await page.sleep()
+        await asyncio.sleep(0.5)
         at_bottom = await page.evaluate(
             "document.body.offsetHeight - window.innerHeight == window.scrollY"
         )
@@ -491,8 +494,9 @@ async def trigger_lazy_load(page, timeout_ms=5000):
             if Config.verbose:
                 click.echo(f"Lazy load scrolled to bottom", err=True)
             break
-    await page.evaluate("window.scrollTo(0, 0)")
+    await page.evaluate("document.documentElement.scrollTop = 0")
     await page.sleep()
+    await asyncio.sleep(0.5)
 
 
     # Try CDP-based viewport scaling to trigger image loading in headless mode. I had strange problems
@@ -515,6 +519,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     start_wait = time.time()
     # await asyncio.sleep(0.5)  # min time to wait after emulation resize
     while time.time() - start_wait < max_wait:
+        await asyncio.sleep(0.1)
         all_loaded = await page.evaluate("""
             Array.from(document.querySelectorAll('img[src]')).every(img => img.complete)
         """)

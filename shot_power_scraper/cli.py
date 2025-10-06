@@ -208,30 +208,30 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 
     Usage:
 
-        shot-scraper www.example.com
+        shot-power-scraper www.example.com
 
     This will write the screenshot to www-example-com.png
 
     Use "-o" to write to a specific file:
 
-        shot-scraper https://www.example.com/ -o example.png
+        shot-power-scraper https://www.example.com/ -o example.png
 
     You can also pass a path to a local file on disk:
 
-        shot-scraper index.html -o index.png
+        shot-power-scraper index.html -o index.png
 
     Using "-o -" will output to standard out:
 
-        shot-scraper https://www.example.com/ -o - > example.png
+        shot-power-scraper https://www.example.com/ -o - > example.png
 
     Use -s to take a screenshot of one area of the page, identified using
     one or more CSS selectors:
 
-        shot-scraper https://simonwillison.net -s '#bighead'
+        shot-power-scraper https://simonwillison.net -s '#bighead'
 
     Full page screenshots are taken by default. Use --height to limit the screenshot height:
 
-        shot-scraper https://www.example.com/ --height 600 -o partial.png
+        shot-power-scraper https://www.example.com/ --height 600 -o partial.png
     """
     setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
@@ -449,7 +449,7 @@ def accessibility(url, output, javascript,
 
     Usage:
 
-        shot-scraper accessibility https://datasette.io/
+        shot-power-scraper accessibility https://datasette.io/
     """
     raise NotImplementedError("Accessibility tree dumping is not implemented in shot-power-scraper")
 
@@ -555,7 +555,7 @@ def har(url, zip_, output, javascript, no_response_bodies,
 @click.option(
     "-i", "--input", default="-",
     help=("Read input JavaScript from this file or use gh:username/script "
-          "to load from github.com/username/shot-scraper-scripts/script.js"),
+          "to load from github.com/username/shot-power-scraper-scripts/script.js"),
 )
 @click.option("-o", "--output", type=click.Path(file_okay=True, writable=True, dir_okay=False, allow_dash=True), default="-", help="Save output JSON to this file")
 @click.option(
@@ -572,7 +572,7 @@ def javascript(url, javascript, input, output, raw,
 
     Usage:
 
-        shot-scraper javascript https://datasette.io/ "document.title"
+        shot-power-scraper javascript https://datasette.io/ "document.title"
 
     To return a JSON object, use this:
 
@@ -717,11 +717,11 @@ def html(url, output, javascript, selector,
 
     Usage:
 
-        shot-scraper html https://datasette.io/
+        shot-power-scraper html https://datasette.io/
 
     Use -o to specify a filename:
 
-        shot-scraper html https://datasette.io/ -o index.html
+        shot-power-scraper html https://datasette.io/ -o index.html
     """
     setup_common_config(verbose, debug, silent, skip, fail, enable_gpu)
 
@@ -825,7 +825,7 @@ def install(browser, browser_args):
 
     Usage:
 
-        shot-scraper install
+        shot-power-scraper install
 
     No manual browser installation is required with nodriver.
     This command will also detect the browser's user agent and set it as default.
@@ -966,7 +966,7 @@ def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced
 
     Usage:
 
-        shot-scraper auth https://github.com/ auth.json
+        shot-power-scraper auth https://github.com/ auth.json
     """
     async def execute_auth(browser_obj, **kwargs):
         page = await browser_obj.get(url)

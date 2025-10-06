@@ -1,6 +1,6 @@
-# shot-scraper Configuration Reference
+# shot-power-scraper Configuration Reference
 
-The configuration file is located at `~/.shot-scraper/config.json` and sets default values for command-line options.
+The configuration file is located at `~/.shot-power-scraper/config.json` and sets default values for command-line options.
 
 ## Currently Supported Options
 
@@ -10,7 +10,7 @@ The configuration file is located at `~/.shot-scraper/config.json` and sets defa
 }
 ```
 
-- **user_agent**: Default user agent string for all requests. Set automatically via `shot-scraper set-default-user-agent`.
+- **user_agent**: Default user agent string for all requests. Set automatically via `shot-power-scraper set-default-user-agent`.
 
 ## Planned Options (Not Yet Implemented)
 
@@ -60,6 +60,6 @@ Once these options are implemented, you could set defaults like:
 
 Then every screenshot would use these defaults unless overridden:
 ```bash
-shot-scraper https://example.com              # Uses all defaults
-shot-scraper https://example.com --width 800  # Overrides just width
+shot-power-scraper https://example.com              # Uses all defaults
+shot-power-scraper https://example.com --width 800  # Overrides just width
 ```

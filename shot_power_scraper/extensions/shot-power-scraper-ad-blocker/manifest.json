@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Shot Scraper Popup Blocker",
+  "name": "Shot Power Scraper Ad Blocker",
   "version": "1.0",
-  "description": "Popup and cookie notice blocker for shot-scraper",
+  "description": "Ad blocker for shot-power-scraper",
   "permissions": ["declarativeNetRequest", "declarativeNetRequestFeedback", "activeTab", "webNavigation"],
   "host_permissions": ["<all_urls>"],
   "background": {"service_worker": "background.js"},
@@ -13,7 +13,7 @@
     "resources": ["cosmetic-rules.json"],
     "matches": ["<all_urls>"]
   }],
-  "action": {"default_title": "Shot Scraper Popup Blocker", "default_popup": "popup.html"},
+  "action": {"default_title": "Shot Power Scraper Ad Blocker", "default_popup": "popup.html"},
   "content_scripts": [{
     "matches": ["<all_urls>"],
     "js": ["content.js"],

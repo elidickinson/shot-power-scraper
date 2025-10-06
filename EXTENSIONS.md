@@ -4,8 +4,8 @@ shot-power-scraper includes Chrome extensions for blocking ads and popups during
 
 ## Extensions
 
-- **shot-scraper-ad-blocker**: Blocks advertisements using AdGuard Base filter lists
-- **shot-scraper-popup-blocker**: Blocks cookie notices, popups, and newsletter prompts using specialized filter lists  
+- **shot-power-scraper-ad-blocker**: Blocks advertisements using AdGuard Base filter lists
+- **shot-power-scraper-popup-blocker**: Blocks cookie notices, popups, and newsletter prompts using specialized filter lists  
 - **bypass-paywalls-chrome-clean-master**: Third-party extension for bypassing paywalls (automatically downloaded)
 
 All extensions can be loaded simultaneously for comprehensive blocking.
@@ -143,7 +143,7 @@ All standard ABP network rules are supported via Chrome's Declarative Net Reques
 ## Architecture
 
 - **Shared Source**: `extensions/blocker-shared/` contains all common code
-- **Generated Extensions**: `extensions/shot-scraper-{ad,popup}-blocker/` are build artifacts
+- **Generated Extensions**: `extensions/shot-power-scraper-{ad,popup}-blocker/` are build artifacts
 - **Third-party Extension**: `extensions/bypass-paywalls-chrome-clean-master/` downloaded from external source
 - **Filter Lists**: Downloaded from AdGuard, EasyList, and other sources
 - **Build Script**: `build.sh` handles downloading, conversion, and file copying

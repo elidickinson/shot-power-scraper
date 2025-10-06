@@ -1,4 +1,4 @@
-"""Core screenshot functionality for shot-scraper"""
+"""Core screenshot functionality for shot-power-scraper"""
 import os
 import json
 import secrets
@@ -9,6 +9,7 @@ import base64
 import urllib.parse
 import click
 import nodriver as uc
+import asyncio
 from shot_power_scraper.browser import Config
 from shot_power_scraper.page_utils import evaluate_js
 from shot_power_scraper.utils import filename_for_url, url_or_file_path
@@ -36,6 +37,7 @@ async def _save_screenshot(page_or_element, output, shot_config):
         page = page_or_element.tab
         element = page_or_element
         await page  # gotta give the browser a chance to lay out the elements
+        await asyncio.sleep(0.1)
         pos = await element.get_position()
         clip = pos.to_viewport(1)  # scale=1
         capture_beyond_viewport = True  # Elements might be outside viewport
@@ -142,7 +144,7 @@ def js_selector_javascript(js_selectors, js_selectors_all):
 
 def selector_javascript(selectors, selectors_all, padding=0):
     """Generate JavaScript to create a box around selected elements"""
-    selector_to_shoot = f"shot-scraper-{secrets.token_hex(8)}"
+    selector_to_shoot = f"shot-power-scraper-{secrets.token_hex(8)}"
     selector_javascript = textwrap.dedent(
         """
     new Promise(takeShot => {

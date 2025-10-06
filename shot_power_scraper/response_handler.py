@@ -1,4 +1,4 @@
-"""HTTP Response handler for shot-scraper"""
+"""HTTP Response handler for shot-power-scraper"""
 import asyncio
 from typing import Optional, Tuple
 import nodriver as uc

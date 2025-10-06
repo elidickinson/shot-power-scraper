@@ -1,12 +1,12 @@
 # Shot Scraper API Server
 
-A FastAPI-based REST API server for the shot-scraper screenshot tool. This server provides HTTP endpoints for taking screenshots of web pages with various options.
+A FastAPI-based REST API server for the shot-power-scraper screenshot tool. This server provides HTTP endpoints for taking screenshots of web pages with various options.
 
 ## Features
 
 - Simple REST API for taking screenshots
 - Shared browser instance for better performance
-- Support for all shot-scraper features:
+- Support for all shot-power-scraper features:
   - Custom viewport sizes
   - Element selectors (CSS and JavaScript)
   - Full page screenshots
@@ -195,9 +195,9 @@ sudo apt-get update
 sudo apt-get install google-chrome-stable
 
 # 2. Set up the application
-sudo mkdir -p /opt/shot-scraper
-sudo cp -r . /opt/shot-scraper/
-cd /opt/shot-scraper
+sudo mkdir -p /opt/shot-power-scraper
+sudo cp -r . /opt/shot-power-scraper/
+cd /opt/shot-power-scraper
 
 # 3. Create virtual environment
 python3 -m venv venv
@@ -205,10 +205,10 @@ source venv/bin/activate
 pip install -r requirements-api.txt
 
 # 4. Install systemd service
-sudo cp shot-scraper-api.service /etc/systemd/system/
+sudo cp shot-power-scraper-api.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable shot-scraper-api
-sudo systemctl start shot-scraper-api
+sudo systemctl enable shot-power-scraper-api
+sudo systemctl start shot-power-scraper-api
 ```
 
 ## Error Handling

@@ -52,7 +52,7 @@ def load_github_script(github_path: str) -> str:
     Load JavaScript script from GitHub
 
     Format: username/repo/path/to/file.js
-      or username/file.js which means username/shot-scraper-scripts/file.js
+      or username/file.js which means username/shot-power-scraper-scripts/file.js
     """
     if not github_path.endswith(".js"):
         github_path += ".js"

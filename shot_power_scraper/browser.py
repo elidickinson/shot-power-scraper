@@ -1,4 +1,4 @@
-"""Browser management for shot-scraper"""
+"""Browser management for shot-power-scraper"""
 import json
 import click
 import nodriver as uc
@@ -113,12 +113,12 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_b
     loaded_extensions = []
 
     if ad_block:
-        ad_extension_path = (base_extensions_path / 'shot-scraper-ad-blocker').resolve()
+        ad_extension_path = (base_extensions_path / 'shot-power-scraper-ad-blocker').resolve()
         extensions.append(str(ad_extension_path))
         loaded_extensions.append("ad blocking")
 
     if popup_block:
-        popup_extension_path = (base_extensions_path / 'shot-scraper-popup-blocker').resolve()
+        popup_extension_path = (base_extensions_path / 'shot-power-scraper-popup-blocker').resolve()
         extensions.append(str(popup_extension_path))
         loaded_extensions.append("popup blocking")
 

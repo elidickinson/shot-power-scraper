@@ -2,7 +2,7 @@
 
 > A command-line utility for taking automated screenshots of websites, powered by **nodriver** for enhanced stealth and anti-detection capabilities.
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/shot-scraper/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/elidickinson/shot-power-scraper/blob/main/LICENSE)
 
 This is a fork of Simon Willison's excellent [shot-scraper](https://github.com/simonw/shot-scraper), migrated from Playwright to [nodriver](https://github.com/ultrafunkamsterdam/nodriver). This provides powerful, built-in bypass capabilities for CAPTCHAs and services like Cloudflare.
 
@@ -125,12 +125,13 @@ shot-power-scraper config --clear
 
 ## Examples
 
-The following examples use the original `shot-scraper`, but the concepts can be adapted for this fork.
+The following examples demonstrate concepts that can be adapted for shot-power-scraper.
 
-- The [shot-scraper-demo](https://github.com/simonw/shot-scraper-demo) repository uses the tool to capture recently spotted owls in El Granada, CA.
-- The [Datasette Documentation](https://docs.datasette.io/en/latest/) uses screenshots taken by `shot-scraper`.
-- Ben Welsh built [@newshomepages](https://twitter.com/newshomepages), a Twitter bot that uses `shot-scraper` and GitHub Actions to take and publish screenshots of news homepages.
-- [scrape-hacker-news-by-domain](https://github.com/simonw/scrape-hacker-news-by-domain) uses `shot-scraper javascript` to scrape a web page.
+- Examples of similar usage patterns can be found in projects that use the original shot-scraper as a reference
+- The concepts demonstrated in [shot-scraper-demo](https://github.com/simonw/shot-scraper-demo) can be adapted for shot-power-scraper
+- The [Datasette Documentation](https://docs.datasette.io/en/latest/) shows how screenshots can be integrated into documentation workflows
+- Projects like [@newshomepages](https://twitter.com/newshomepages) demonstrate automated screenshot workflows
+- [scrape-hacker-news-by-domain](https://github.com/simonw/scrape-hacker-news-by-domain) shows JavaScript execution patterns that can be adapted
 
 ## Code Architecture: `shot-power-scraper shot` Execution Path
 

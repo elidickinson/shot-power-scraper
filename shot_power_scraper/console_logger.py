@@ -1,4 +1,4 @@
-"""Console logging functionality for shot-scraper using nodriver CDP"""
+"""Console logging functionality for shot-power-scraper using nodriver CDP"""
 import click
 import nodriver as uc
 from typing import List, Dict, Any
