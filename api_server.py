@@ -63,7 +63,7 @@ Example API calls:
 """
 
 from fastapi import FastAPI, HTTPException, Response, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 from contextlib import asynccontextmanager
 import os
@@ -72,14 +72,15 @@ from pathlib import Path
 import click
 import logging
 from datetime import datetime
+import re
 
 # Add parent directory to path to import shot_power_scraper
 sys.path.insert(0, str(Path(__file__).parent))
 
-from shot_power_scraper.browser import create_browser_context, Config
+from shot_power_scraper.browser import create_browser_context, Config, setup_blocking_extensions
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.shot_config import ShotConfig
-from shot_power_scraper.cli import browser_args_option
+from shot_power_scraper.cli import simple_browser_options
 from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
 
 # Global browser instance for reuse
@@ -103,7 +104,8 @@ async def lifespan(app: FastAPI):
     global browser_instance
     if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
         browser_args = getattr(app.state, 'browser_args', [])
-        await get_browser(browser_args)
+        browser_type = getattr(app.state, 'browser', 'chromium')
+        await get_browser(browser_type, browser_args)
 
     yield
 
@@ -111,8 +113,8 @@ async def lifespan(app: FastAPI):
     if browser_instance:
         try:
             await browser_instance.stop()
-        except:
-            pass
+        except Exception as e:
+            logger.warning(f"Error stopping browser during shutdown: {e}")
         browser_instance = None
 
 
@@ -147,9 +149,20 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-class ShotRequest(BaseModel):
+class BaseRequest(BaseModel):
+    """Base request model with shared validation"""
+    url: str = Field(..., description="URL to process")
+    
+    @validator('url')
+    def validate_url(cls, v):
+        """Validate that URL is HTTP or HTTPS"""
+        if not re.match(r'^https?://', v):
+            raise ValueError('URL must start with http:// or https://')
+        return v
+
+
+class ShotRequest(BaseRequest):
     """Request model for screenshot endpoint"""
-    url: str = Field(..., description="URL to screenshot")
     width: Optional[int] = Field(None, description="Viewport width in pixels")
     height: Optional[int] = Field(None, description="Viewport height in pixels")
     selectors: Optional[List[str]] = Field([], description="CSS selectors for elements to screenshot")
@@ -169,6 +182,7 @@ class ShotRequest(BaseModel):
     trigger_lazy_load: Optional[bool] = Field(False, description="Trigger lazy loading of images")
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
 
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -181,14 +195,14 @@ class ShotRequest(BaseModel):
         }
 
 
-class HtmlRequest(BaseModel):
+class HtmlRequest(BaseRequest):
     """Request model for HTML content extraction endpoint"""
-    url: str = Field(..., description="URL to extract HTML from")
     selector: Optional[str] = Field(None, description="CSS selector for specific element (returns outerHTML)")
     javascript: Optional[str] = Field(None, description="JavaScript to execute before extracting HTML")
     wait: Optional[int] = Field(250, description="Wait time in milliseconds before extracting HTML")
     timeout: Optional[int] = Field(30000, description="Timeout in milliseconds")
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
+
 
     class Config:
         json_schema_extra = {
@@ -200,22 +214,48 @@ class HtmlRequest(BaseModel):
         }
 
 
-async def get_browser(browser_args=None):
+async def get_browser(browser="chromium", browser_args=None):
     """Get or create a shared browser instance"""
     global browser_instance
     if browser_instance is None:
         Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
         Config.silent = not Config.verbose
 
+        # Get blocking options from app state
+        blocking_options = {
+            'ad_block': getattr(app.state, 'ad_block', False),
+            'popup_block': getattr(app.state, 'popup_block', False),
+            'paywall_block': getattr(app.state, 'paywall_block', False),
+        }
+
+        # Create a ShotConfig object with the browser settings
+        shot_config = ShotConfig({
+            "browser": browser,
+            "browser_args": browser_args or [],
+            **blocking_options,
+        })
+
         # Debug logging
         if browser_args:
             logger.info(f"Creating browser with args: {browser_args}")
 
-        browser_instance = await create_browser_context(
-            browser="chromium",
-            browser_args=browser_args or [],
-            timeout=60000,
-        )
+        blocking_features = [
+            name for name, enabled in [
+                ('ad_block', blocking_options['ad_block']),
+                ('popup_block', blocking_options['popup_block']),
+                ('paywall_block', blocking_options['paywall_block'])
+            ]
+            if enabled
+        ]
+        if blocking_features:
+            logger.info(f"Creating browser with blocking: {' + '.join(blocking_features)}")
+
+        # Setup blocking extensions if needed
+        extensions = []
+        if any(blocking_options.values()):
+            await setup_blocking_extensions(extensions, blocking_options['ad_block'], blocking_options['popup_block'], blocking_options['paywall_block'])
+
+        browser_instance = await create_browser_context(shot_config, extensions)
         logger.info("Browser instance created successfully")
     return browser_instance
 
@@ -282,7 +322,7 @@ async def shot(request: ShotRequest):
     """Take a screenshot and return the image"""
     try:
         # Get browser instance
-        browser = await get_browser()
+        browser = await get_browser(browser="chromium")
 
         # Build shot configuration
         shot_config = ShotConfig({
@@ -306,11 +346,20 @@ async def shot(request: ShotRequest):
             "silent": True
         })
 
-        # Take the screenshot
+        # Get browser instance
+        browser = await get_browser(browser="chromium")
+
+        # Create a tab context using the browser object
+        from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
+        page = await create_tab_context(browser, shot_config)
+        await navigate_to_url(page, shot_config)
+
+        # Take the screenshot using the page context
         screenshot_bytes = await take_shot(
-            browser,
+            page,
             shot_config,
             return_bytes=True,
+            skip_navigation=True,  # Already navigated above
         )
 
         # Determine content type based on quality setting
@@ -336,8 +385,9 @@ async def shot(request: ShotRequest):
 async def html(request: HtmlRequest):
     """Extract HTML content from a page"""
     try:
+        # Use create_tab_context + navigate_to_url for consistent page setup including Cloudflare detection
         # Get browser instance
-        browser = await get_browser()
+        browser = await get_browser(browser="chromium")
 
         # Use create_tab_context + navigate_to_url for consistent page setup including Cloudflare detection
         shot_config = ShotConfig({
@@ -373,7 +423,10 @@ async def html(request: HtmlRequest):
 
 
 @click.command()
-@browser_args_option
+@simple_browser_options
+@click.option("--ad-block/--no-ad-block", default=False, help="Enable ad blocking using built-in filter lists")
+@click.option("--popup-block/--no-popup-block", default=False, help="Enable popup blocking (cookie notices, etc.)")
+@click.option("--paywall-block/--no-paywall-block", default=False, help="Enable paywall bypass using Bypass Paywalls Clean extension")
 @click.option(
     "--host",
     default=lambda: os.getenv("HOST", "127.0.0.1"),
@@ -391,15 +444,31 @@ async def html(request: HtmlRequest):
     default=lambda: os.getenv("RELOAD", "false").lower() in ("true", "1", "yes"),
     help="Enable auto-reload (default: false, can be overridden with RELOAD env var)"
 )
-def main(browser_args, host, port, reload):
+def main(browser_args, host, port, reload, browser, user_agent, enable_gpu, reduced_motion,
+         ad_block, popup_block, paywall_block):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
 
-    # Store browser args in app state for lifespan to access
+    # Store browser args and browser type in app state for lifespan to access
     app.state.browser_args = list(browser_args)
+    app.state.browser = browser
+    app.state.ad_block = ad_block
+    app.state.popup_block = popup_block
+    app.state.paywall_block = paywall_block
 
     click.echo(f"Starting Shot Power Scraper API Server on {host}:{port}")
     click.echo(f"API documentation available at http://{host}:{port}/docs")
+
+    # Show blocking options if enabled
+    if ad_block or popup_block or paywall_block:
+        blocking_features = []
+        if ad_block:
+            blocking_features.append("ad blocking")
+        if popup_block:
+            blocking_features.append("popup blocking")
+        if paywall_block:
+            blocking_features.append("paywall bypass")
+        click.echo(f"Blocking features enabled: {' + '.join(blocking_features)}")
 
     if browser_args:
         click.echo(f"Browser args: {list(browser_args)}")

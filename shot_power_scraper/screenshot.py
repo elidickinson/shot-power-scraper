@@ -30,7 +30,6 @@ async def _save_screenshot(page_or_element, output, shot_config):
     """Save screenshot to file"""
     # Check if this is an element (has get_position method) or a page
     is_element = hasattr(page_or_element, 'get_position')
-
     page = page_or_element
     if is_element:
         # Element screenshot - get position and create clip

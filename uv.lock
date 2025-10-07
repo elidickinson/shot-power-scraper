@@ -153,16 +153,12 @@ wheels = [
 
 [[package]]
 name = "nodriver"
-version = "0.46.1"
-source = { registry = "https://pypi.org/simple" }
+version = "0.46.2"
+source = { git = "https://github.com/elidickinson/nodriver.git#ec52fdd28beeb04fa7c5d182f79a4a9b7baa99a0" }
 dependencies = [
     { name = "deprecated" },
     { name = "mss" },
     { name = "websockets" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4c/5f/10cdc4b40c356d0f94a0b59ca16511dfb2993cea4f47b60c370a314dd010/nodriver-0.46.1.tar.gz", hash = "sha256:cc5c9e4b030924ba08ac4f8227bf6426b145e2a40e5ae9ff0053bae097bce38d", size = 332362, upload_time = "2025-05-16T16:11:02.778Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/04/f8/b9bc0f97218e61a29401c85a0375b2198b3638c44318182cafae24c12286/nodriver-0.46.1-py3-none-any.whl", hash = "sha256:cde4e1ad4405610394051d305161dbb3e8976b56c76a6985d316e8e947df25d8", size = 354157, upload_time = "2025-05-16T16:10:59.081Z" },
 ]
 
 [[package]]
@@ -346,7 +342,7 @@ requires-dist = [
     { name = "cogapp", marker = "extra == 'test'" },
     { name = "fastapi", specifier = ">=0.115.14" },
     { name = "fastapi", marker = "extra == 'api'", specifier = ">=0.104.0" },
-    { name = "nodriver" },
+    { name = "nodriver", git = "https://github.com/elidickinson/nodriver.git" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic", marker = "extra == 'api'", specifier = ">=2.0.0" },
     { name = "pytest", specifier = ">=8.4.1" },
