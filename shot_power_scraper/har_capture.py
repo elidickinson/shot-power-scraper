@@ -65,7 +65,8 @@ class HARCollector:
                     pass
 
         # Get page info
-        self.page_title = await page.evaluate("document.title")
+        from shot_power_scraper.page_utils import evaluate_js
+        self.page_title = await evaluate_js(page, "document.title || ''")
         self.page_url = page.url
 
         return self.to_har_format()

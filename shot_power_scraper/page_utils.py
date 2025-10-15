@@ -328,8 +328,8 @@ async def navigate_to_url(page, shot_config):
             click.echo("Applying viewport expansion to fix intersection observers...", err=True)
 
         # Get viewport width and document height
-        viewport_width = await page.evaluate("window.innerWidth")
-        document_height = await page.evaluate("document.documentElement.scrollHeight")
+        viewport_width = await evaluate_js(page, "window.innerWidth")
+        document_height = await evaluate_js(page, "(document.documentElement || {}).scrollHeight || 10000")
 
         # Use document height, minimum 10000px
         viewport_height = max(document_height, 10000)
@@ -353,11 +353,34 @@ async def navigate_to_url(page, shot_config):
 
 
 async def evaluate_js(page, javascript):
-    """Safely evaluate JavaScript on a page"""
-    try:
-        return await page.evaluate(javascript)
-    except Exception as error:
-        raise click.ClickException(str(error))
+    """
+    Wrapper for page.evaluate() that converts ExceptionDetails to proper exceptions.
+    
+    nodriver has a design flaw where page.evaluate() returns cdp.runtime.ExceptionDetails
+    objects instead of throwing exceptions when JavaScript evaluation fails. This wrapper
+    fixes that by converting ExceptionDetails to proper ClickExceptions, ensuring errors
+    fail fast and loud as required by the project principles.
+    
+    Args:
+        page: nodriver page object
+        javascript: JavaScript code to evaluate
+        
+    Returns:
+        The result of the JavaScript evaluation
+        
+    Raises:
+        click.ClickException: If JavaScript evaluation fails
+    """
+    from nodriver import cdp
+    
+    result = await page.evaluate(javascript)
+    
+    # Convert ExceptionDetails to proper exceptions
+    if isinstance(result, cdp.runtime.ExceptionDetails):
+        error_msg = result.text or "JavaScript evaluation failed"
+        raise click.ClickException(f"JavaScript evaluation error: {error_msg}")
+    
+    return result
 
 
 async def detect_cloudflare_challenge(page):
@@ -438,8 +461,9 @@ async def wait_for_condition(page, wait_for_expression, timeout_seconds=30):
 async def detect_navigation_error(page, expected_url):
     """Detect if page navigation failed (DNS errors, network failures, etc.)"""
     current_url = page.url
-    page_title = await page.evaluate("document.title")
-    body_text = await page.evaluate("document.body ? document.body.innerText.trim() : ''")
+    # For navigation error detection, we can handle missing page info gracefully
+    page_title = await evaluate_js(page, "document.title || ''")
+    body_text = await evaluate_js(page, "(document.body || {}).innerText || ''")
 
     # Check for Chrome error pages
     if current_url.startswith('chrome-error://'):
@@ -460,7 +484,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
         click.echo("Triggering lazy-loaded content...", err=True)
 
     # First, convert all data-src to src and remove loading="lazy"
-    converted_count = await page.evaluate("""
+    converted_count = await evaluate_js(page, """
         (() => {
             let count = 0;
             // Handle lazy loaded images (some have loading as a JS property not an attribute)
@@ -500,9 +524,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
         await page.scroll_down(200)
         await page.sleep()
         await asyncio.sleep(0.5)
-        at_bottom = await page.evaluate(
-            "document.body.offsetHeight - window.innerHeight == window.scrollY"
-        )
+        at_bottom = await evaluate_js(page, "((document.body || {}).offsetHeight || 0) - (window.innerHeight || 0) <= (window.scrollY || 0)")
         if at_bottom:
             if Config.verbose:
                 click.echo(f"Lazy load scrolled to bottom", err=True)
@@ -533,8 +555,8 @@ async def trigger_lazy_load(page, timeout_ms=5000):
     # await asyncio.sleep(0.5)  # min time to wait after emulation resize
     while time.time() - start_wait < max_wait:
         await asyncio.sleep(0.1)
-        all_loaded = await page.evaluate("""
-            Array.from(document.querySelectorAll('img[src]')).every(img => img.complete)
+        all_loaded = await evaluate_js(page, """
+            Array.from((document || {}).querySelectorAll('img[src]') || []).every(img => img.complete)
         """)
         if all_loaded:
             if Config.verbose:

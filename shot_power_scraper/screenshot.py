@@ -44,7 +44,8 @@ async def _save_screenshot(page_or_element, output, shot_config):
         # Full page screenshot
         await page  # give a moment for everything to settle on the page
         layout_width = shot_config.width  # user specified width, or default
-        layout_height = await page.evaluate("document.documentElement.scrollHeight")
+        from shot_power_scraper.page_utils import evaluate_js
+        layout_height = await evaluate_js(page, "(document.documentElement || {}).scrollHeight || 10000")
         if shot_config.resize_viewport:
             if Config.verbose:
                 click.echo(f"Resizing viewport for screenshot to {layout_width}x{layout_height}", err=True)
