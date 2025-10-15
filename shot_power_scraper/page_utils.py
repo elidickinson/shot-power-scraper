@@ -263,14 +263,14 @@ async def navigate_to_url(page, shot_config):
             elif Config.fail:
                 raise click.ClickException(f"{response_status} error for {url}")
 
-    # Automatic Cloudflare detection and waiting
-    if not shot_config.skip_cloudflare_check and await detect_cloudflare_challenge(page):
+    # Automatic challenge page detection and waiting
+    if not shot_config.skip_challenge_page_check and await detect_challenge_page(page):
         if not Config.silent:
-            click.echo("Detected Cloudflare challenge, waiting for bypass...", err=True)
-        success = await wait_for_cloudflare_bypass(page)
+            click.echo("Detected challenge page, waiting for bypass...", err=True)
+        success = await wait_for_challenge_bypass(page)
         if not success:
             if not Config.silent:
-                click.echo("Warning: Cloudflare challenge may still be active", err=True)
+                click.echo("Warning: Challenge page may still be active", err=True)
 
     # Check if page failed to load
     has_error, error_msg = await detect_navigation_error(page, url)
@@ -398,12 +398,36 @@ async def detect_cloudflare_challenge(page):
         return False
 
 
-async def wait_for_cloudflare_bypass(page, max_wait_seconds=8):
-    """Wait for Cloudflare challenge to complete"""
+async def detect_siteground_challenge(page):
+    """Detect if the current page is showing a SiteGround challenge"""
+    try:
+        return await page.evaluate("""
+        (() => {
+            return document.title === 'Robot Challenge Screen' ||
+                   !!window.sgchallenge ||
+                   Array.from(document.querySelectorAll('script')).some(script => 
+                       script.textContent.includes('sgchallenge')
+                   );
+        })()
+        """)
+    except Exception:
+        return False
+
+
+async def detect_challenge_page(page):
+    """Detect if the current page is showing any challenge page (Cloudflare or SiteGround)"""
+    try:
+        return await detect_cloudflare_challenge(page) or await detect_siteground_challenge(page)
+    except Exception:
+        return False
+
+
+async def wait_for_challenge_bypass(page, max_wait_seconds=8):
+    """Wait for challenge pages (Cloudflare or SiteGround) to complete"""
     start_time = time.time()
 
     if Config.verbose:
-        click.echo(f"Waiting for Cloudflare challenge bypass (max {max_wait_seconds}s)...", err=True)
+        click.echo(f"Waiting for challenge page bypass (max {max_wait_seconds}s)...", err=True)
 
     check_count = 0
     while time.time() - start_time < max_wait_seconds:
@@ -411,26 +435,35 @@ async def wait_for_cloudflare_bypass(page, max_wait_seconds=8):
             elapsed_seconds = time.time() - start_time
             check_count += 1
 
+            challenge_detected = await detect_challenge_page(page)
             cf_detected = await detect_cloudflare_challenge(page)
+            sg_detected = await detect_siteground_challenge(page)
 
             if Config.verbose and not Config.silent and check_count % 10 == 0:  # Log every 10 checks
-                click.echo(f"Cloudflare check #{check_count}: challenge_detected={cf_detected}, elapsed={elapsed_seconds:.1f}s", err=True)
+                challenge_type = "none"
+                if cf_detected and sg_detected:
+                    challenge_type = "both"
+                elif cf_detected:
+                    challenge_type = "cloudflare"
+                elif sg_detected:
+                    challenge_type = "siteground"
+                click.echo(f"Challenge check #{check_count}: type={challenge_type}, elapsed={elapsed_seconds:.1f}s", err=True)
 
-            if not cf_detected:
+            if not challenge_detected:
                 # Wait minimum 1 second for page stability after challenge clears
                 if elapsed_seconds >= 1:
                     if Config.verbose:
-                        click.echo(f"Cloudflare challenge bypassed in {elapsed_seconds:.1f}s", err=True)
+                        click.echo(f"Challenge page bypassed in {elapsed_seconds:.1f}s", err=True)
                     return True
             await page.sleep()
             await asyncio.sleep(0.1)
         except Exception as e:
             if Config.verbose:
-                click.echo(f"Cloudflare bypass check failed: {e}", err=True)
+                click.echo(f"Challenge bypass check failed: {e}", err=True)
             await page.sleep()
 
     if Config.verbose:
-        click.echo(f"Cloudflare bypass timeout after {max_wait_seconds}s", err=True)
+        click.echo(f"Challenge bypass timeout after {max_wait_seconds}s", err=True)
     return False
 
 

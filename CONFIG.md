@@ -25,7 +25,7 @@ These options currently only work as command-line arguments but may be added to 
   "timeout": 30000,                     // Page load timeout in ms
   "skip_wait_for_dom_ready": false,    // Skip waiting for DOM ready
   "wait_for_dom_ready_timeout": 10000, // DOM ready timeout in ms
-  "skip_cloudflare_check": false,      // Disable Cloudflare detection
+  "skip_challenge_page_check": false,  // Disable challenge page detection (Cloudflare, SiteGround, etc.)
   "scale_factor": 1,                    // Device scale factor (2 = retina)
   "omit_background": false,             // Transparent background
   "bypass_csp": false,                  // Bypass Content Security Policy

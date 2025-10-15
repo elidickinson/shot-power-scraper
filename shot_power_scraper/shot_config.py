@@ -64,7 +64,7 @@ class ShotConfig:
         self.wait = shot.get("wait", 250)
         self.wait_for = shot.get("wait_for")
         self.padding = shot.get("padding", 0)
-        self.skip_cloudflare_check = shot.get("skip_cloudflare_check", False)
+        self.skip_challenge_page_check = shot.get("skip_challenge_page_check", False)
         self.timeout = shot.get("timeout", 30)
         self.skip_wait_for_load = shot.get("skip_wait_for_load", False)
         self.javascript = shot.get("javascript")

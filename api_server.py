@@ -179,7 +179,7 @@ class ShotRequest(BaseRequest):
     timeout: Optional[int] = Field(30000, description="Timeout in milliseconds")
     # Note: scale_factor not used by ShotConfig, removed
     omit_background: Optional[bool] = Field(False, description="Omit background for transparency")
-    skip_cloudflare_check: Optional[bool] = Field(False, description="Skip Cloudflare challenge detection")
+    skip_challenge_page_check: Optional[bool] = Field(False, description="Skip challenge page detection (Cloudflare, SiteGround, etc.)")
     skip_wait_for_load: Optional[bool] = Field(False, description="Skip waiting for page load")
     trigger_lazy_load: Optional[bool] = Field(False, description="Trigger lazy loading of images")
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
@@ -351,7 +351,7 @@ async def shot(request: ShotRequest):
             "wait_for": request.wait_for,
             "timeout": request.timeout // 1000 if request.timeout else 30,  # Convert to seconds
             "omit_background": request.omit_background,
-            "skip_cloudflare_check": request.skip_cloudflare_check,
+            "skip_challenge_page_check": request.skip_challenge_page_check,
             "skip_wait_for_load": request.skip_wait_for_load,
             "trigger_lazy_load": request.trigger_lazy_load,
             "silent": True
