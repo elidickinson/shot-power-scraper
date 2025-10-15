@@ -5,11 +5,14 @@ Screenshot API Server
 A FastAPI server that provides REST endpoints for taking screenshots using shot-power-scraper.
 
 Usage:
-    python api_server.py [--browser-arg ARG ...]
+    python api_server.py [--browser-arg ARG ...] [--ad-block] [--popup-block] [--paywall-block]
 
 Example server startup:
     # Start server with custom browser arguments
     python api_server.py --browser-arg --window-size=1920,1080 --browser-arg --disable-dev-shm-usage
+
+    # Start server with blocking features
+    python api_server.py --ad-block --popup-block --paywall-block
 
     # Start server with proxy settings
     python api_server.py --browser-arg "--proxy-server=http://localhost:8888"
@@ -80,7 +83,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 from shot_power_scraper.browser import create_browser_context, Config, setup_blocking_extensions
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.shot_config import ShotConfig
-from shot_power_scraper.cli import simple_browser_options
 from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
 
 # Global browser instance for reuse
@@ -104,8 +106,7 @@ async def lifespan(app: FastAPI):
     global browser_instance
     if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
         browser_args = getattr(app.state, 'browser_args', [])
-        browser_type = getattr(app.state, 'browser', 'chromium')
-        await get_browser(browser_type, browser_args)
+        await get_browser(browser_args=browser_args)
 
     yield
 
@@ -214,14 +215,17 @@ class HtmlRequest(BaseRequest):
         }
 
 
-async def get_browser(browser="chromium", browser_args=None):
+async def get_browser(browser_args=None):
     """Get or create a shared browser instance"""
     global browser_instance
     if browser_instance is None:
         Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
         Config.silent = not Config.verbose
+        
+        # Set global Config values from app state
+        Config.enable_gpu = getattr(app.state, 'enable_gpu', False)
 
-        # Get blocking options from app state
+        # Get blocking options and other settings from app state
         blocking_options = {
             'ad_block': getattr(app.state, 'ad_block', False),
             'popup_block': getattr(app.state, 'popup_block', False),
@@ -229,11 +233,17 @@ async def get_browser(browser="chromium", browser_args=None):
         }
 
         # Create a ShotConfig object with the browser settings
-        shot_config = ShotConfig({
-            "browser": browser,
+        config_dict = {
             "browser_args": browser_args or [],
+            "reduced_motion": getattr(app.state, 'reduced_motion', False),
             **blocking_options,
-        })
+        }
+        
+        # Only set user_agent if provided on command line, otherwise let ShotConfig handle config file fallback
+        if hasattr(app.state, 'user_agent') and app.state.user_agent is not None:
+            config_dict["user_agent"] = app.state.user_agent
+            
+        shot_config = ShotConfig(config_dict)
 
         # Debug logging
         if browser_args:
@@ -322,7 +332,7 @@ async def shot(request: ShotRequest):
     """Take a screenshot and return the image"""
     try:
         # Get browser instance
-        browser = await get_browser(browser="chromium")
+        browser = await get_browser()
 
         # Build shot configuration
         shot_config = ShotConfig({
@@ -345,9 +355,6 @@ async def shot(request: ShotRequest):
             "trigger_lazy_load": request.trigger_lazy_load,
             "silent": True
         })
-
-        # Get browser instance
-        browser = await get_browser(browser="chromium")
 
         # Create a tab context using the browser object
         from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
@@ -387,7 +394,7 @@ async def html(request: HtmlRequest):
     try:
         # Use create_tab_context + navigate_to_url for consistent page setup including Cloudflare detection
         # Get browser instance
-        browser = await get_browser(browser="chromium")
+        browser = await get_browser()
 
         # Use create_tab_context + navigate_to_url for consistent page setup including Cloudflare detection
         shot_config = ShotConfig({
@@ -423,7 +430,11 @@ async def html(request: HtmlRequest):
 
 
 @click.command()
-@simple_browser_options
+@click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")
+@click.option("--user-agent", help="User-Agent header to use")
+@click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration (GPU is disabled by default)")
+@click.option("browser_args", "--browser-arg", multiple=True,
+            help="Additional arguments to pass to the browser")
 @click.option("--ad-block/--no-ad-block", default=False, help="Enable ad blocking using built-in filter lists")
 @click.option("--popup-block/--no-popup-block", default=False, help="Enable popup blocking (cookie notices, etc.)")
 @click.option("--paywall-block/--no-paywall-block", default=False, help="Enable paywall bypass using Bypass Paywalls Clean extension")
@@ -444,14 +455,16 @@ async def html(request: HtmlRequest):
     default=lambda: os.getenv("RELOAD", "false").lower() in ("true", "1", "yes"),
     help="Enable auto-reload (default: false, can be overridden with RELOAD env var)"
 )
-def main(browser_args, host, port, reload, browser, user_agent, enable_gpu, reduced_motion,
+def main(browser_args, host, port, reload, user_agent, enable_gpu, reduced_motion,
          ad_block, popup_block, paywall_block):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
 
-    # Store browser args and browser type in app state for lifespan to access
+    # Store browser args and blocking options in app state for lifespan to access
     app.state.browser_args = list(browser_args)
-    app.state.browser = browser
+    app.state.user_agent = user_agent
+    app.state.enable_gpu = enable_gpu
+    app.state.reduced_motion = reduced_motion
     app.state.ad_block = ad_block
     app.state.popup_block = popup_block
     app.state.paywall_block = paywall_block
