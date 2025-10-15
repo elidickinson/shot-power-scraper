@@ -157,9 +157,9 @@ class BaseRequest(BaseModel):
     
     @validator('url')
     def validate_url(cls, v):
-        """Validate that URL is HTTP or HTTPS"""
+        """Auto-add https:// if URL has no schema"""
         if not re.match(r'^https?://', v):
-            raise ValueError('URL must start with http:// or https://')
+            v = f'https://{v}'
         return v
 
 
