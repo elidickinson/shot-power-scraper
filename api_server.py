@@ -84,6 +84,7 @@ from shot_power_scraper.browser import create_browser_context, Config, setup_blo
 from shot_power_scraper.screenshot import take_shot
 from shot_power_scraper.shot_config import ShotConfig
 from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
+from shot_power_scraper.utils import filename_for_url
 
 # Global browser instance for reuse
 browser_instance = None
@@ -375,12 +376,16 @@ async def shot(request: ShotRequest):
         else:
             content_type = "image/png"
 
+        # Generate filename based on URL
+        ext = "jpg" if request.quality else "png"
+        filename = filename_for_url(request.url, ext=ext)
+        
         # Return the image
         return Response(
             content=screenshot_bytes,
             media_type=content_type,
             headers={
-                "Content-Disposition": f"inline; filename=screenshot.{'jpg' if request.quality else 'png'}"
+                "Content-Disposition": f"inline; filename={filename}"
             }
         )
 
