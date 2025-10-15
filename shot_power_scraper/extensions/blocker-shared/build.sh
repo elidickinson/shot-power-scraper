@@ -14,8 +14,8 @@ custom-ad-block-filters:local:custom-ad-block-filters.txt
 "
 
 POPUP_BLOCK_FILTERS="
+adguard-annoyances-optimized:https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt
 adguard-popups-full:https://filters.adtidy.org/windows/filters/19.txt
-i-dont-care-about-cookies:https://www.i-dont-care-about-cookies.eu/abp/
 easylist-newsletters-ubo:https://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt
 anti-adblock-killer:https://raw.githubusercontent.com/reek/anti-adblock-killer/master/anti-adblock-killer-filters.txt
 custom-popup-block-filters:local:custom-popup-block-filters.txt
@@ -221,8 +221,8 @@ main() {
 
     # Build extensions
     echo "Building extensions..."
-    build_extension "ad" "Shot Scraper Ad Blocker" "Ad blocker for shot-scraper" "shot-scraper-ad-blocker" "ad-block-rules.json" "cosmetic-ad-block-rules.json"
-    build_extension "popup" "Shot Scraper Popup Blocker" "Popup and cookie notice blocker for shot-scraper" "shot-scraper-popup-blocker" "popup-block-rules.json" "cosmetic-popup-block-rules.json"
+    build_extension "ad" "Shot Power Scraper Ad Blocker" "Ad blocker for shot-power-scraper" "shot-power-scraper-ad-blocker" "ad-block-rules.json" "cosmetic-ad-block-rules.json"
+    build_extension "popup" "Shot Power Scraper Popup Blocker" "Popup and cookie notice blocker for shot-power-scraper" "shot-power-scraper-popup-blocker" "popup-block-rules.json" "cosmetic-popup-block-rules.json"
 
     # Cleanup
     echo "Cleaning up temporary files..."
