@@ -123,6 +123,7 @@ def common_shot_options(fn):
     click.option("--wait", type=int, help="Wait this many milliseconds before taking the screenshot (default: 250)")(fn)
 
     # Browser options
+    click.option("--headful", "--no-headless", is_flag=True, help="Run with visible browser (non-headless mode)")(fn)
     click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")(fn)
     click.option("--user-agent", help="User-Agent header to use")(fn)
     click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration (GPU is disabled by default)")(fn)
@@ -201,7 +202,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
          interactive, devtools, log_requests, save_html,
          verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
          wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
-         auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+         auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
     """
     Take a single screenshot of a page or portion of a page.
@@ -304,7 +305,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
          leave_server, har, har_zip, har_file,
          verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
          wait, wait_for, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
-         auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+         auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
     """
     Take multiple screenshots or PDFs, defined by a YAML file
@@ -442,7 +443,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 def accessibility(url, output, javascript,
                  verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
                  wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
-                 auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+                 auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
                  auth_username, auth_password, enable_gpu):
     """
     (NOT IMPLEMENTED) Dump the Chromium accessibility tree for the specifed page
@@ -467,7 +468,7 @@ def accessibility(url, output, javascript,
 def har(url, zip_, output, javascript, no_response_bodies,
        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
        wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
-       auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+       auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
        auth_username, auth_password, enable_gpu):
     """
     Record a HAR file for the specified page
@@ -565,7 +566,7 @@ def har(url, zip_, output, javascript, no_response_bodies,
 def javascript(url, javascript, input, output, raw,
               verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
               wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
-              auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+              auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
               auth_username, auth_password, enable_gpu):
     """
     Execute JavaScript against the page and return the result as JSON
@@ -641,7 +642,7 @@ def javascript(url, javascript, input, output, raw,
 def pdf(url, output, javascript, media_screen, landscape, scale, print_background, pdf_css,
        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
        wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
-       auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+       auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
        auth_username, auth_password, enable_gpu):
     """
     Create a PDF of the specified page
@@ -710,7 +711,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 def html(url, output, javascript, selector,
         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
         wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
-        auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+        auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
         auth_username, auth_password, enable_gpu):
     """
     Output the final HTML of the specified page
@@ -766,7 +767,7 @@ def html(url, output, javascript, selector,
 def mhtml(url, output, javascript,
          verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
          wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
-         auth, browser, browser_args, user_agent, reduced_motion, bypass_csp,
+         auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
     """
     Create an MHTML archive of the specified page

@@ -96,6 +96,7 @@ class ShotConfig:
         # Browser options
         self.auth = shot.get("auth")
         self.interactive = shot.get("interactive", False)
+        self.headful = shot.get("headful", False)
         self.devtools = shot.get("devtools", False)
         self.browser = shot.get("browser", "chromium")
         self.browser_args = shot.get("browser_args")

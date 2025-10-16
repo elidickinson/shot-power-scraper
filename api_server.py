@@ -237,14 +237,15 @@ async def get_browser(browser_args=None):
         # Create a ShotConfig object with the browser settings
         config_dict = {
             "browser_args": browser_args or [],
+            "headful": getattr(app.state, 'headful', False),
             "reduced_motion": getattr(app.state, 'reduced_motion', False),
             **blocking_options,
         }
-        
+
         # Only set user_agent if provided on command line, otherwise let ShotConfig handle config file fallback
         if hasattr(app.state, 'user_agent') and app.state.user_agent is not None:
             config_dict["user_agent"] = app.state.user_agent
-            
+
         shot_config = ShotConfig(config_dict)
 
         # Debug logging
@@ -643,6 +644,7 @@ async def html(request: HtmlRequest):
 
 
 @click.command()
+@click.option("--headful", "--no-headless", is_flag=True, help="Run with visible browser (non-headless mode)")
 @click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")
 @click.option("--user-agent", help="User-Agent header to use")
 @click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration (GPU is disabled by default)")
@@ -668,7 +670,7 @@ async def html(request: HtmlRequest):
     default=lambda: os.getenv("RELOAD", "false").lower() in ("true", "1", "yes"),
     help="Enable auto-reload (default: false, can be overridden with RELOAD env var)"
 )
-def main(browser_args, host, port, reload, user_agent, enable_gpu, reduced_motion,
+def main(browser_args, host, port, reload, user_agent, enable_gpu, headful, reduced_motion,
          ad_block, popup_block, paywall_block):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
@@ -677,6 +679,7 @@ def main(browser_args, host, port, reload, user_agent, enable_gpu, reduced_motio
     app.state.browser_args = list(browser_args)
     app.state.user_agent = user_agent
     app.state.enable_gpu = enable_gpu
+    app.state.headful = headful
     app.state.reduced_motion = reduced_motion
     app.state.ad_block = ad_block
     app.state.popup_block = popup_block

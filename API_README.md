@@ -34,12 +34,34 @@ uv pip install -r requirements-api.txt
 # Basic usage
 python api_server.py
 
+# With blocking features enabled
+python api_server.py --ad-block --popup-block
+
+# Run with visible browser (headful mode)
+python api_server.py --headful
+
 # With environment variables
 HOST=0.0.0.0 PORT=8080 VERBOSE=true python api_server.py
 
 # With uvicorn directly
 uvicorn api_server:app --host 0.0.0.0 --port 8000 --reload
 ```
+
+### Server Options
+
+The API server supports the following command-line options:
+
+- `--headful` / `--no-headless`: Run with visible browser (non-headless mode)
+- `--ad-block` / `--no-ad-block`: Enable ad blocking using built-in filter lists
+- `--popup-block` / `--no-popup-block`: Enable popup blocking (cookie notices, etc.)
+- `--paywall-block` / `--no-paywall-block`: Enable paywall bypass
+- `--user-agent`: Set custom User-Agent header
+- `--enable-gpu`: Enable GPU acceleration
+- `--reduced-motion`: Emulate 'prefers-reduced-motion' media feature
+- `--browser-arg`: Additional arguments to pass to the browser (can be repeated)
+- `--host`: Host to bind to (default: 127.0.0.1)
+- `--port`: Port to bind to (default: 8123)
+- `--reload`: Enable auto-reload for development
 
 ### Environment Variables
 
@@ -67,12 +89,34 @@ Take a screenshot with various options.
   "width": 1280,
   "height": 720,
   "wait": 2000,
-  "selector": "#main-content",
+  "selectors": ["#main-content"],
   "padding": 20,
   "quality": 80,
   "javascript": "document.body.style.backgroundColor = 'red';"
 }
 ```
+
+**Available Parameters:**
+- `url` (required): URL to capture
+- `width`: Viewport width in pixels
+- `height`: Viewport height in pixels
+- `selectors`: Array of CSS selectors for elements to screenshot
+- `selectors_all`: Array of CSS selectors for all matching elements
+- `js_selectors`: Array of JavaScript selector expressions
+- `js_selectors_all`: Array of JavaScript selectors for all matches
+- `padding`: Padding around selected elements in pixels
+- `javascript`: JavaScript to execute before screenshot
+- `quality`: JPEG quality (1-100)
+- `wait`: Wait time in milliseconds before screenshot
+- `wait_for`: JavaScript expression to wait for
+- `timeout`: Timeout in milliseconds (default: 30000)
+- `omit_background`: Omit background for transparency
+- `skip_challenge_page_check`: Skip challenge page detection (Cloudflare, etc.)
+- `skip_wait_for_load`: Skip waiting for page load
+- `trigger_lazy_load`: Trigger lazy loading of images
+- `user_agent`: Custom User-Agent header
+
+**Note:** Browser visibility (`--headful`) is configured at server startup, not per-request.
 
 **Response:** Binary image data (PNG or JPEG)
 
@@ -108,7 +152,7 @@ curl -X POST http://localhost:8000/shot \
   -H "Content-Type: application/json" \
   -d '{
     "url": "https://example.com",
-    "selector": "#header",
+    "selectors": ["#header"],
     "padding": 20
   }' \
   -o header.png
@@ -133,6 +177,11 @@ response = requests.post(
 # Save the image
 with open("screenshot.png", "wb") as f:
     f.write(response.content)
+```
+
+**Note:** To run the server with a visible browser, start it with the `--headful` flag:
+```bash
+python api_server.py --headful
 ```
 
 ### Using the Example Client

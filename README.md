@@ -71,6 +71,19 @@ For stealth features to work when running in headless mode (the default) you mus
 
     shot-power-scraper install
 
+### Headless vs Headful Mode
+
+By default, shot-power-scraper runs in headless mode (browser is invisible). You can run with a visible browser using:
+
+```bash
+# Run with visible browser (no interaction pause)
+shot-power-scraper --headful https://example.com
+
+# Or use the alias
+shot-power-scraper --no-headless https://example.com
+```
+
+This is different from `-i/--interactive` mode which shows the browser AND pauses for manual interaction before taking the screenshot.
 
 ### Ad and Popup Blocking
 
@@ -198,7 +211,7 @@ The architecture is fully async-based using nodriver for enhanced stealth capabi
 ### Feature Interaction Notes
 
 - **Dual Viewport Approach**:
-  - **Window Size** (`set_window_size`) - Controls physical browser window dimensions (important for `--interactive` and `--devtools` modes)
+  - **Window Size** (`set_window_size`) - Controls physical browser window dimensions (important for `--interactive`, `--headful`, and `--devtools` modes)
   - **Viewport Metrics** (`set_device_metrics_override`) - Controls page layout dimensions for rendering and screenshot capture
 - **Viewport Timing**: Viewport metrics are set immediately after navigation (step 5) if width/height explicitly specified (not full page), aiding lazy loading of images
 - **Extension Effects**: Ad/popup blocking may require viewport expansion to fix intersection observer behavior (step 11)
