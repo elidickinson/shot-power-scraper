@@ -65,17 +65,19 @@ Example API calls:
         | jq '.html'
 """
 
-from fastapi import FastAPI, HTTPException, Response, Request
-from pydantic import BaseModel, Field, validator
-from typing import Optional, List
-from contextlib import asynccontextmanager
-import os
-import sys
-from pathlib import Path
-import click
 import logging
-from datetime import datetime
+import os
 import re
+import sys
+from contextlib import asynccontextmanager
+from datetime import datetime
+from pathlib import Path
+from typing import Optional, List
+
+import click
+from fastapi import FastAPI, HTTPException, Response, Request
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel, Field, validator
 
 # Add parent directory to path to import shot_power_scraper
 sys.path.insert(0, str(Path(__file__).parent))
@@ -177,7 +179,6 @@ class ShotRequest(BaseRequest):
     wait: Optional[int] = Field(None, description="Wait time in milliseconds before screenshot")
     wait_for: Optional[str] = Field(None, description="JavaScript expression to wait for")
     timeout: Optional[int] = Field(30000, description="Timeout in milliseconds")
-    # Note: scale_factor not used by ShotConfig, removed
     omit_background: Optional[bool] = Field(False, description="Omit background for transparency")
     skip_challenge_page_check: Optional[bool] = Field(False, description="Skip challenge page detection (Cloudflare, SiteGround, etc.)")
     skip_wait_for_load: Optional[bool] = Field(False, description="Skip waiting for page load")
@@ -297,16 +298,24 @@ async def log_requests(request: Request, call_next):
         raise
 
 
-@app.get("/", tags=["utility"], summary="API Information")
-async def root():
-    """API documentation"""
+@app.get("/api", tags=["utility"], summary="API Information")
+async def api_info():
+    """API information and server settings"""
+    blocking_features = []
+    if getattr(app.state, 'ad_block', False):
+        blocking_features.append("ad_block")
+    if getattr(app.state, 'popup_block', False):
+        blocking_features.append("popup_block")
+    if getattr(app.state, 'paywall_block', False):
+        blocking_features.append("paywall_block")
+
     return {
         "message": "Shot Power Scraper API Server",
         "version": "1.0.0",
         "endpoints": {
             "/shot": "POST - Take a screenshot",
             "/html": "POST - Extract HTML content",
-            "/health": "GET - Health check"
+            "/api": "GET - API information"
         },
         "documentation": {
             "swagger": "/docs",
@@ -318,14 +327,213 @@ async def root():
             "JavaScript execution before capture",
             "Cloudflare bypass support",
             "Full page screenshots"
-        ]
+        ],
+        "server_settings": {
+            "blocking_features": blocking_features,
+            "user_agent": getattr(app.state, 'user_agent', None),
+            "enable_gpu": getattr(app.state, 'enable_gpu', False),
+            "reduced_motion": getattr(app.state, 'reduced_motion', False)
+        }
     }
 
 
-@app.get("/health", tags=["utility"], summary="Health Check")
-async def health():
-    """Health check endpoint"""
-    return {"status": "healthy"}
+@app.get("/", response_class=HTMLResponse, tags=["utility"], summary="Web Client")
+async def web_client():
+    """Web client for taking screenshots"""
+    return """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shot Power Scraper</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { background: white; padding: 20px 30px; border-radius: 12px 12px 0 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.header h1 { font-size: 24px; color: #667eea; margin-bottom: 8px; }
+.server-info { font-size: 14px; color: #666; }
+.badge { display: inline-block; background: #10b981; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 8px; font-weight: 500; }
+.form-container { background: white; padding: 24px; border-radius: 0 0 12px 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #444; font-size: 14px; }
+.form-group input[type="text"], .form-group input[type="number"], .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; transition: border-color 0.2s; }
+.form-group input[type="text"]:focus, .form-group input[type="number"]:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
+.form-group textarea { resize: vertical; min-height: 80px; font-family: monospace; }
+.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+.checkbox-group { display: flex; align-items: center; gap: 8px; }
+.checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+.checkbox-group label { margin: 0; cursor: pointer; font-weight: normal; }
+.advanced-toggle { background: #f9fafb; padding: 10px 16px; border-radius: 8px; cursor: pointer; user-select: none; margin-bottom: 12px; font-weight: 500; color: #667eea; border: 1px solid #e5e7eb; }
+.advanced-toggle:hover { background: #f3f4f6; }
+.advanced-options { display: none; background: #f9fafb; padding: 16px; border-radius: 8px; margin-top: 12px; margin-bottom: 16px; }
+.advanced-options.visible { display: block; }
+.btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 28px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+.btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #ffffff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.result-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: none; }
+.result-container.visible { display: block; }
+.result-actions { display: flex; gap: 12px; margin-bottom: 20px; }
+.btn-secondary { background: white; color: #667eea; border: 2px solid #667eea; flex: 1; }
+.btn-secondary:hover { background: #667eea; color: white; }
+.screenshot-preview { border: 2px solid #e5e7eb; border-radius: 8px; overflow: auto; max-height: 600px; background: #f9fafb; }
+.screenshot-preview img { display: block; max-width: 100%; height: auto; }
+.error { background: #fee2e2; color: #991b1b; padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #dc2626; }
+.error-title { font-weight: 600; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📸 Shot Power Scraper</h1>
+    <div class="server-info"><span id="server-badges"></span></div>
+  </div>
+  <div class="form-container">
+    <form id="screenshot-form">
+      <div class="form-group">
+        <label for="url">URL</label>
+        <input type="text" id="url" name="url" placeholder="example.com" autofocus required>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label for="width">Width (px)</label><input type="number" id="width" name="width" placeholder="Full Page"></div>
+        <div class="form-group"><label for="height">Height (px)</label><input type="number" id="height" name="height" placeholder="Full Page"></div>
+        <div class="form-group"><label for="wait">Wait (ms)</label><input type="number" id="wait" name="wait" placeholder="0" min="0" step="100"></div>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="trigger_lazy_load" name="trigger_lazy_load">
+        <label for="trigger_lazy_load">Trigger Lazy Load</label>
+      </div>
+      <div class="advanced-toggle" onclick="toggleAdvanced()">⚙️ Advanced Options</div>
+      <div id="advanced-options" class="advanced-options">
+        <div class="form-group"><label for="selector">CSS Selector</label><input type="text" id="selector" name="selector" placeholder=".main-content"></div>
+        <div class="form-group"><label for="javascript">JavaScript to Execute</label><textarea id="javascript" name="javascript" placeholder="document.querySelector('.ads').remove()"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label for="padding">Selector Padding (px)</label><input type="number" id="padding" name="padding" placeholder="0" min="0"></div>
+          <div class="form-group"><label for="quality">JPEG Quality (1-100)</label><input type="number" id="quality" name="quality" placeholder="PNG" min="1" max="100"></div>
+          <div class="form-group"><label for="timeout">Timeout (ms)</label><input type="number" id="timeout" name="timeout" placeholder="30000" min="1000"></div>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="omit_background" name="omit_background">
+          <label for="omit_background">Transparent Background</label>
+        </div>
+      </div>
+      <button type="submit" class="btn" id="submit-btn">📸 Capture Screenshot</button>
+    </form>
+  </div>
+  <div id="result-container" class="result-container">
+    <div class="result-actions">
+      <button class="btn btn-secondary" onclick="downloadScreenshot()">⬇️ Download</button>
+      <button class="btn btn-secondary" onclick="resetForm()">🔄 New Screenshot</button>
+    </div>
+    <div class="screenshot-preview"><img id="screenshot-img" alt="Screenshot"></div>
+  </div>
+</div>
+<script>
+let screenshotBlob = null;
+let currentFilename = 'screenshot.png';
+
+async function loadServerSettings() {
+    try {
+        const {server_settings} = await fetch('/api').then(r => r.json());
+        if (server_settings?.blocking_features?.length) {
+            const labels = {ad_block: 'Ad Block', popup_block: 'Popup Block', paywall_block: 'Paywall Bypass'};
+            server_settings.blocking_features.forEach(f => {
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.textContent = labels[f] || f;
+                document.getElementById('server-badges').appendChild(badge);
+            });
+        }
+    } catch (e) {}
+}
+
+function toggleAdvanced() {
+    document.getElementById('advanced-options').classList.toggle('visible');
+}
+
+function showError(message) {
+    document.querySelector('.error')?.remove();
+    const err = document.createElement('div');
+    err.className = 'error';
+    err.innerHTML = `<div class="error-title">Error</div><div>${message}</div>`;
+    document.querySelector('.form-container').prepend(err);
+}
+
+async function captureScreenshot(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const data = new FormData(e.target);
+    const body = {url: data.get('url')};
+
+    ['width', 'height', 'wait', 'quality', 'padding', 'timeout'].forEach(f => {
+        const v = data.get(f);
+        if (v) body[f] = parseInt(v);
+    });
+
+    if (data.get('selector')) body.selectors = [data.get('selector')];
+    if (data.get('javascript')) body.javascript = data.get('javascript');
+    body.trigger_lazy_load = data.get('trigger_lazy_load') === 'on';
+    body.omit_background = data.get('omit_background') === 'on';
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Capturing...';
+    document.querySelector('.error')?.remove();
+
+    try {
+        const res = await fetch('/shot', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) throw new Error((await res.json()).detail || 'Screenshot failed');
+
+        const cd = res.headers.get('Content-Disposition');
+        if (cd) {
+            const match = cd.match(/filename=(.+)/);
+            if (match) currentFilename = match[1];
+        }
+
+        screenshotBlob = await res.blob();
+        document.getElementById('screenshot-img').src = URL.createObjectURL(screenshotBlob);
+        document.getElementById('result-container').classList.add('visible');
+        document.getElementById('result-container').scrollIntoView({behavior: 'smooth'});
+    } catch (error) {
+        showError(error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '📸 Capture Screenshot';
+    }
+}
+
+function downloadScreenshot() {
+    if (!screenshotBlob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(screenshotBlob);
+    a.download = currentFilename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+function resetForm() {
+    document.getElementById('screenshot-form').reset();
+    document.getElementById('result-container').classList.remove('visible');
+    document.getElementById('url').focus();
+    screenshotBlob = null;
+}
+
+document.getElementById('screenshot-form').addEventListener('submit', captureScreenshot);
+loadServerSettings();
+</script>
+</body>
+</html>
+    """
 
 
 @app.post("/shot", tags=["screenshots"], summary="Capture Screenshot")
