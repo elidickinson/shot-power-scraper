@@ -22,3 +22,5 @@
 ! cnn
 cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-width: 100%; min-height: 100%; inset: 0px; z-index: 999999;"]
 https://www.cnn.com/wbdotp/scripttemplates/otSDKStub.js
+/wp-content/plugins/pressidium-cookie-consent/
+##.elementor-popup-modal
