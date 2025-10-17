@@ -156,7 +156,7 @@ app = FastAPI(
 class BaseRequest(BaseModel):
     """Base request model with shared validation"""
     url: str = Field(..., description="URL to process")
-    
+
     @validator('url')
     def validate_url(cls, v):
         """Auto-add https:// if URL has no schema"""
@@ -223,7 +223,7 @@ async def get_browser(browser_args=None):
     if browser_instance is None:
         Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
         Config.silent = not Config.verbose
-        
+
         # Set global Config values from app state
         Config.enable_gpu = getattr(app.state, 'enable_gpu', False)
 
@@ -588,7 +588,7 @@ async def shot(request: ShotRequest):
         # Generate filename based on URL
         ext = "jpg" if request.quality else "png"
         filename = filename_for_url(request.url, ext=ext)
-        
+
         # Return the image
         return Response(
             content=screenshot_bytes,
@@ -603,7 +603,7 @@ async def shot(request: ShotRequest):
 
 
 @app.post("/html", tags=["content"], summary="Extract HTML Content")
-async def html(request: HtmlRequest):
+async def html(request: HtmlRequest) -> HTMLResponse:
     """Extract HTML content from a page"""
     try:
         # Use create_tab_context + navigate_to_url for consistent page setup including Cloudflare detection
@@ -632,12 +632,7 @@ async def html(request: HtmlRequest):
         else:
             html_content = await page.get_content()
 
-        return {
-            "url": request.url,
-            "html": html_content,
-            "selector": request.selector,
-            "timestamp": datetime.now().timestamp()
-        }
+        return HTMLResponse(content=html_content, status_code=200)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
