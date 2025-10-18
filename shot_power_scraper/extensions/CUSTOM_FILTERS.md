@@ -1,10 +1,10 @@
 # Adding Custom Filter Rules to uBlock Lite
 
-## Quick Method: Add Rules to custom-rules.txt
+## Quick Method: Add Rules to ad-block-custom-rules.txt
 
 1. **Edit the custom rules file:**
    ```bash
-   vim shot_power_scraper/extensions/custom-rules.txt
+   vim shot_power_scraper/extensions/ad-block-custom-rules.txt
    ```
 
 2. **Add your filter rules** using uBlock filter syntax:
@@ -63,7 +63,7 @@ Change `"enabled": false` to `"enabled": true` for lists like:
    This rebuilds from uBlock source with latest filters + your custom rules.
 
 2. **Just add custom rules:**
-   - Edit `custom-rules.txt`
+   - Edit `ad-block-custom-rules.txt`
    - Run update script
    - Your rules get compiled in
 
@@ -75,7 +75,7 @@ Change `"enabled": false` to `"enabled": true` for lists like:
 
 ## How It Works
 
-- Build script operates on `/tmp/uBlock` source
-- Your `custom-rules.txt` gets injected into the build
+- Build script operates on `extensions/uBlock/` source
+- Your `ad-block-custom-rules.txt` gets injected into the build
 - Build compiles all filter lists (including yours) to DNR JSON
 - Output copied to `ublock-lite-custom/`

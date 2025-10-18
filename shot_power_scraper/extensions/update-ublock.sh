@@ -3,7 +3,7 @@ set -e
 
 EXTENSIONS_DIR="$(cd "$(dirname "$0")" && pwd)"
 BUILD_DIR="$EXTENSIONS_DIR/uBlock"
-CUSTOM_RULES="$EXTENSIONS_DIR/custom-rules.txt"
+CUSTOM_RULES="$EXTENSIONS_DIR/ad-block-custom-rules.txt"
 
 echo "Updating uBlock Lite with latest filter lists..."
 
@@ -83,5 +83,5 @@ NEW_VERSION=$(grep '"version"' "$EXTENSIONS_DIR/ublock-lite-custom/manifest.json
 echo "✓ Updated to version $NEW_VERSION with latest filter lists"
 
 if [ -f "$CUSTOM_RULES" ] && [ -s "$CUSTOM_RULES" ]; then
-    echo "✓ Custom rules from custom-rules.txt included"
+    echo "✓ Custom rules from ad-block-custom-rules.txt included"
 fi

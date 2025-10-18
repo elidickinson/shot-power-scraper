@@ -12,7 +12,7 @@ extensions/
 ├── shot-power-scraper-ad-blocker/   # Old ad blocker (deprecated)
 ├── shot-power-scraper-popup-blocker/# Popup/cookie notice blocker
 ├── bypass-paywalls-chrome-clean-master/ # Paywall bypass
-├── custom-rules.txt                 # Your custom filter rules
+├── ad-block-custom-rules.txt        # Your custom filter rules
 ├── update-ublock.sh                 # Rebuild script
 └── CUSTOM_FILTERS.md                # Documentation
 ```
@@ -54,13 +54,13 @@ Loads `bypass-paywalls-chrome-clean-master/` - Paywall bypass extension
 ./update-ublock.sh
 
 # Add custom rules before rebuilding
-vim custom-rules.txt
+vim ad-block-custom-rules.txt
 ./update-ublock.sh
 ```
 
 The script:
 1. Updates `uBlock/` source from GitHub
-2. Injects your `custom-rules.txt` (if present)
+2. Injects your `ad-block-custom-rules.txt` (if present)
 3. Compiles filter lists to Declarative Net Request format
 4. Backs up current `ublock-lite-custom/`
 5. Installs newly built extension
