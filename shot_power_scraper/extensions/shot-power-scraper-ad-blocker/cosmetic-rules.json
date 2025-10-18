@@ -112131,5 +112131,3107 @@
     ],
     "selector": "li.d-md-block > a[rel]",
     "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock_screen",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock_message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblockInfo",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock_floating_message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock_msg",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ads-block-warning",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".deadblocker-header-bar",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".detected-block-modal",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".no-ad-reminder",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "kimo.ma"
+    ],
+    "selector": ".adb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "azrotv.com"
+    ],
+    "selector": ".adbn-wrap",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "freestore.app"
+    ],
+    "selector": ".adbn2-wrap2",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "4algeria.com"
+    ],
+    "selector": "#exposeMask",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ak.sv"
+    ],
+    "selector": "#ignielAdBlock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "chahid4u.tk"
+    ],
+    "selector": "#unblocker",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "okanime.tv"
+    ],
+    "selector": ".jconfirm",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "fctvhd.com"
+    ],
+    "selector": ".mw-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "4algeria.com"
+    ],
+    "selector": ".xenOverlay",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "azrotv.com"
+    ],
+    "selector": "div[id^=\"laoad_Adb\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "shahid4u.club"
+    ],
+    "selector": ".adsBox",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "bouweenpc.nl"
+    ],
+    "selector": "#header-banner",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "rtlxl.nl"
+    ],
+    "selector": ".adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "spele.nl"
+    ],
+    "selector": ".adblocker",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "koolhydraatarmerecepten.info"
+    ],
+    "selector": "body > [style^=\"z-index: 1000000; \"]",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-blocker-warning",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".main_adbalert",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".pane-emediate",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "mediafire.com"
+    ],
+    "selector": "#abnotify",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "codebeautify.org"
+    ],
+    "selector": "#adBlockerShare",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "llifle.com"
+    ],
+    "selector": "#ad_blocker_found",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "flightradar24.com"
+    ],
+    "selector": "#bottomRightPanel",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "audiotag.info"
+    ],
+    "selector": "#dclaim",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "videofun.me"
+    ],
+    "selector": "#flowplayer > div[class][style]:first-child",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "abc-fonts.me"
+    ],
+    "selector": "#galepro-core-adb-enabled",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "yocast.tv"
+    ],
+    "selector": "#ra9e",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "flightradar24.com"
+    ],
+    "selector": "#responsiveBottomPanel",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "techonthenet.com"
+    ],
+    "selector": "#sabl",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "outlook.live.com"
+    ],
+    "selector": ".N3k7EN5vRGTrONWBPg250",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "myanimelist.net"
+    ],
+    "selector": "._unit",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-blocker-warning",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "photofilters.com"
+    ],
+    "selector": ".adBlocked",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "biggestplayer.me"
+    ],
+    "selector": ".adblock + *",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "nexusmods.com"
+    ],
+    "selector": ".areplacer",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "hearthhead.com",
+      "wowhead.com"
+    ],
+    "selector": ".block-bg",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "wowhead.com"
+    ],
+    "selector": ".block-bgimg",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "audiotag.info"
+    ],
+    "selector": ".dialog-fog",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "euroiphone.eu"
+    ],
+    "selector": ".div-download-h",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "euroiphone.eu"
+    ],
+    "selector": ".div-download-v",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "findretros.com"
+    ],
+    "selector": ".fuck-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "technologypep.com"
+    ],
+    "selector": ".main-container-wrap > div[class$=\"-bg\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "technologypep.com"
+    ],
+    "selector": ".main-container-wrap > div[id][class][style*=\"opacity\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "biggestplayer.me"
+    ],
+    "selector": ".masr",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "rediafile.com"
+    ],
+    "selector": ".protection:not(body)",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "videobug.net",
+      "videofun.me",
+      "vidzur.com"
+    ],
+    "selector": ".randid",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "toolslib.net"
+    ],
+    "selector": ".row > .col-md-7 > .panel-default",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "codeshare.io"
+    ],
+    "selector": ".sad-face",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "hearthhead.com",
+      "thottbot.com",
+      "wowhead.com"
+    ],
+    "selector": ".sidebar-bg",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "biggestplayer.me"
+    ],
+    "selector": ".soret",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "spanishdict.com"
+    ],
+    "selector": ".whitelist",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ftuapps.dev"
+    ],
+    "selector": "[style*=\"cursor: no-drop;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "play44.net",
+      "videobug.net",
+      "videofun.me",
+      "vidzur.com",
+      "yucache.net"
+    ],
+    "selector": "[style^=\"position: absolute; width: 100%;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "pkmods.com"
+    ],
+    "selector": "body > div[style*=\"z-index\"][style*=\"background\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "leechyscripts.com"
+    ],
+    "selector": "div[class^=\"chp_ads_block_modal\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "freelogovectors.net"
+    ],
+    "selector": "div[class^=\"popup\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "nslookup.io"
+    ],
+    "selector": "div[id$=\"-fallback\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "financerites.com"
+    ],
+    "selector": "div[id^=\"__vliadb\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "strikeout.co",
+      "vipbox.sx",
+      "vipleague.co",
+      "vipleague.is"
+    ],
+    "selector": "div[style=\"display: block;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "nexusmods.com"
+    ],
+    "selector": "div[style=\"float: left; width: 728px; height: 90px; background: #313131;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "efootballdb.com"
+    ],
+    "selector": "div[style=\"position: fixed; top: 0px; left: 0px; background-color: rgba(0, 0, 0, 0.8); width: 100vw; height: 100vh; z-index: 9999999;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "playonlinux.com"
+    ],
+    "selector": "div[style=\"text-align:center;  border-radius:7px; width:160px;  border:1px solid #666666;  margin-left:5px;padding-right:5px;color:#FFF;  background-color:#666;font-family:Maven Pro,century gothic, arial, helvetica, sans serif;padding-top:94px;  height:600px;  padding-left:5px; font-size:18px; \"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "byzoo.org",
+      "videobug.net"
+    ],
+    "selector": "div[style^=\"position: absolute; width: 300px;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "homerun.re",
+      "strikeout.co",
+      "vipbox.sx",
+      "vipleague.ch",
+      "vipleague.co",
+      "vipleague.is",
+      "vipleague.me"
+    ],
+    "selector": "span[id][style] > div[id]:first-child:last-child",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "redtube.com"
+    ],
+    "selector": "#as_131",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "redtube.com"
+    ],
+    "selector": "#slidePanelContainerAB",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "redtube.com"
+    ],
+    "selector": ".qb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "shadbase.com"
+    ],
+    "selector": "img[alt=\"adblock\"]",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#AdBlockDialog",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#aabl-container",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#abp-killer",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adBlockAlert",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adBlockAlertWrap",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adBlockDetect",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adBlockerModal",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#ad_blocker",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adb-actived",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adb-enabled",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adb-enabled3",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adb-warning",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adbWarnContainer",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adbcontainer-popup",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock-alert",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock-box",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock-honeypot",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock-modal",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock-msg",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock-notice",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock-overlay",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock-warning",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblockDetect",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblockWrap",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock_detected",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock_msg",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblock_tooltip",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblockerModal",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblocker_announce",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblocker_message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblocker_modal_overlay",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblockinfo",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblockpopup",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adbpopup",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#ads-blocked",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adsblocker_detected",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#advertisementjsalert",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#anti_adblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#box-adblocker-wrap",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#checkadblockernow",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#content_adblock_message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#detection-block",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#detection-block-overlay",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#detectAdblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#detectadblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#fnAdblockingOverlay",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#fondAdblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#gothamadblock_msg",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#gothamadblock_overlayh_n",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#js-popup-blocker",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#mdp-deblocker-ads",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#mdp-deblocker-js-disabled",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#message_adblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#modal-adblocker",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#notify-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#tie-popup-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#wrapperBlocker",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".AdblockBanner",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".AdblockMessage",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".AdblockMessage_msg",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".BrokenAd",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ab-detected",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ab-detector-wrap",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-alert-message-text",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-alert-wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-block-detected",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-block-enabled",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-block-message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-block__overlay",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-blocked",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-blocked-container",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-blocked-wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-blocker-warning",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad-blocking-advisor-wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad_block_detected",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad_block_off",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ad_blocker",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adBlock-banner",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adBlockDetectModal",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adBlockDetectedSign",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adBlockNotification",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adBlockNotificationOverlay",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adBlockWarning",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adace-popup-detector",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adb-detect.simple-alert-boxes",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adb-enabled",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adbd-background",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adbd-message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adbd-wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-modal",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-modal-content",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-notification-wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-player",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-stop",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-warning-partial-component",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-warning-teaser",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblockOverlay",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock_detector",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock_enabled",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock_floating_message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblockalert",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblocker-message",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblocker-root",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblocker-wrap",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".ads-block-warning",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adsblocked",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".blockingAd",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".counterAdblocks",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".deadblocker-header-bar",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".deadblocker-header-bar-inner",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".detectBlockBox",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".dispositifAdblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".dispositifAdblockContent",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".dispositifAdblockMessageBox",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".fuckYouAdBlock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".fuckYouAdBlock2",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".header-blocked-ad",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".js-ad-whitelist-notice",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".js-checkad-warning",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".kill-adblock-container",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".modal__body-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".msg-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".noadblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".remove-adblock-msg",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".svg-adblock-full",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".svg-adblock-full--box",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".test-adblock-overlay",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".top-bar-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".wp_adblock_detect",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "[class][data-sitename][data-header-version] > div[id^=\"detection-block\"]",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "adblock-detect",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "adblock-modal-component",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "adblocker",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "cowcotland.com",
+      "wamiz.com"
+    ],
+    "selector": "#adblocker",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "jaitoutcompris.com"
+    ],
+    "selector": "#antiBlock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "nautiljon.com"
+    ],
+    "selector": "#cmsg",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "wikihow.com"
+    ],
+    "selector": "#contribute_footer",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "iphonesoft.fr",
+      "iphonetweak.fr"
+    ],
+    "selector": "#msgUser",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "retinaboys.com"
+    ],
+    "selector": "#screen_block",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "lagrosseradio.com"
+    ],
+    "selector": "#warn",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "monacomatin.mc",
+      "nicematin.com",
+      "varmatin.com"
+    ],
+    "selector": ".RhooBg",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "scantrad.net"
+    ],
+    "selector": ".adbon",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "trackr.fr"
+    ],
+    "selector": ".alert-dashed",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "journaldugeek.com"
+    ],
+    "selector": ".banner__content",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "closermag.fr",
+      "grazia.fr",
+      "topsante.com"
+    ],
+    "selector": ".dfp-slot",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "soonnight.com"
+    ],
+    "selector": ".display_natural",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ceesty.com",
+      "clkme.me",
+      "clkmein.com",
+      "cllkme.com",
+      "corneey.com",
+      "destyy.com",
+      "festyy.com",
+      "gestyy.com",
+      "jigbig.tk",
+      "newsfortrump.ga",
+      "sh.st",
+      "shorte.st",
+      "skiip.me",
+      "skipp.io",
+      "viid.me",
+      "wiid.me"
+    ],
+    "selector": ".information-container",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "dzfoot.com"
+    ],
+    "selector": ".messageB",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "monacomatin.mc",
+      "nicematin.com",
+      "varmatin.com"
+    ],
+    "selector": ".modalRhoo",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "multiup.io"
+    ],
+    "selector": ".mfp-bg, .mfp-wrap",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "etr.fr"
+    ],
+    "selector": ".no_block",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "radiox.com"
+    ],
+    "selector": ".notifyjs-corner",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "malekal.com"
+    ],
+    "selector": ".topad",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "malekal.com"
+    ],
+    "selector": ".Here",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "papergeek.fr"
+    ],
+    "selector": "[id^=\"padb_widget_\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "forumdz.com"
+    ],
+    "selector": "body .breadcrumb + center > [color=\"red\"] > b",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "forum.pcastuces.com"
+    ],
+    "selector": "div > [src] + [id] + [class][style^=\"display: block;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "closermag.fr"
+    ],
+    "selector": "div[id^=\"detection-block\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "forum-xiaomi.com"
+    ],
+    "selector": "div[style=\"background: rgba(0, 0, 0, 0.9); display: block;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "bd-sanctuary.com",
+      "cine-sanctuary.com",
+      "comics-sanctuary.com",
+      "manga-sanctuary.com"
+    ],
+    "selector": "div[style^=\"background:#444;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "pausecafein.fr"
+    ],
+    "selector": "#adb-pop",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "#@"
+    ],
+    "selector": "adblocktest",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "#adblocktest",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "dbz-fantasy.com#@"
+    ],
+    "selector": "adTeaser",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "dbz-fantasy.com"
+    ],
+    "selector": "#adTeaser",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "fstore.biz#@"
+    ],
+    "selector": "adblockinfo",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "fstore.biz"
+    ],
+    "selector": "#adblockinfo",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "dz-android.com",
+      "freeiphone.fr",
+      "hommedumatch.fr",
+      "jetetroll.com",
+      "testious.com#@"
+    ],
+    "selector": "adsense",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "dz-android.com",
+      "freeiphone.fr",
+      "hommedumatch.fr",
+      "jetetroll.com",
+      "testious.com"
+    ],
+    "selector": "#adsense",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "debrideurstream.fr#@"
+    ],
+    "selector": "pubdirecte",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "debrideurstream.fr"
+    ],
+    "selector": "#pubdirecte",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "ot-boutique.fr#@"
+    ],
+    "selector": "publicite",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ot-boutique.fr"
+    ],
+    "selector": "#publicite",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "iwin.com#@"
+    ],
+    "selector": "sponsorText",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "iwin.com"
+    ],
+    "selector": "#sponsorText",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "fairytailmx.com#@"
+    ],
+    "selector": "sponsored-ad",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "fairytailmx.com"
+    ],
+    "selector": "#sponsored-ad",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "hypebeast.com",
+      "hypebeast.kr"
+    ],
+    "selector": ".ad-blocked",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "forum.virtualdjing.com"
+    ],
+    "selector": ".adFrame",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "japscan.lol"
+    ],
+    "selector": ".ad_slot",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "gamaniak.com"
+    ],
+    "selector": ".adsbygoogle",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "dealerdunet.fr"
+    ],
+    "selector": ".text_ads",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "comptoir-info.com"
+    ],
+    "selector": ".textad",
+    "type": "unhide"
+  },
+  {
+    "domains": null,
+    "selector": ".diysdk_webServices_banners1und1MainContent",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "usgang.ch"
+    ],
+    "selector": "#rectangle-wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "minimultik.ru"
+    ],
+    "selector": "#abDetected",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "patrioty.org.ua"
+    ],
+    "selector": "#ad_pu_modal",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "i.factor.ua"
+    ],
+    "selector": "#adb-info",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "sanstv.ru"
+    ],
+    "selector": "#adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "dressupmix.ru",
+      "teensgames.ru"
+    ],
+    "selector": "#adblock_popup",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "vesti-ukr.com"
+    ],
+    "selector": "#adblockpopup",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "wotactions.com"
+    ],
+    "selector": "#ads_warning",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "polska-ie.com#@"
+    ],
+    "selector": "adsense",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "polska-ie.com"
+    ],
+    "selector": "#adsense",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "novostroy-m.ru"
+    ],
+    "selector": "#advert_result",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "cxem.net"
+    ],
+    "selector": "#antiAdBlock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "e.mail.ru",
+      "octavius.mail.ru#@"
+    ],
+    "selector": "app-canvas .layout__overflow-container > .advert-column",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "e.mail.ru",
+      "octavius.mail.ru"
+    ],
+    "selector": "#app-canvas .layout__overflow-container > .advert-column",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "e.mail.ru",
+      "octavius.mail.ru#@"
+    ],
+    "selector": "app-canvas .layout__overflow-container > .slot",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "e.mail.ru",
+      "octavius.mail.ru"
+    ],
+    "selector": "#app-canvas .layout__overflow-container > .slot",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "elhow.ru"
+    ],
+    "selector": "#b-info-wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "piratia.su"
+    ],
+    "selector": "#block-warning",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ma.by"
+    ],
+    "selector": "#bodysubcont > div[style^=\"padding\"]:not([id]):not([class])",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ucoin.net"
+    ],
+    "selector": "#bottom-notice",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "pln-pskov.ru"
+    ],
+    "selector": "#check_ad_block",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "chipinfo.pro"
+    ],
+    "selector": "#content-container > div[style^=\"position: fixed;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "rusnext.ru"
+    ],
+    "selector": "#detectAdblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "sd-company.su"
+    ],
+    "selector": "#dom_adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "myshared.ru"
+    ],
+    "selector": "#download_form > .uk-margin-top[style]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "forum.bestflowers.ru"
+    ],
+    "selector": "#exposeMask",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "internet-law.ru"
+    ],
+    "selector": "#fab-enabled",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "frkp.lol"
+    ],
+    "selector": "#film > #content > span[style=\"color:#ff6a00;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "gk-stalker.xyz"
+    ],
+    "selector": "#gkadblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "pastenow.ru"
+    ],
+    "selector": "#google-block",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "gamesubject.com"
+    ],
+    "selector": "#headb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "provinceinfo.ru"
+    ],
+    "selector": "#header > .container > a[href=\"/menu\"] ~ h2",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "info-mage.ru"
+    ],
+    "selector": "#helpme[style=\"display: block;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "poncy.ru"
+    ],
+    "selector": "#hide-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "artfile.me"
+    ],
+    "selector": "#jadb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "kissvk.com"
+    ],
+    "selector": "#madBlockModal,.modal-backdrop",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "aratta-ukraine.com",
+      "drawnstories.ru",
+      "gisclub.tv",
+      "kinda.media",
+      "teremok.org.ua",
+      "webos-forums.ru"
+    ],
+    "selector": "#mdl_adb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "asn.in.ua",
+      "beadeath.dclans.ru"
+    ],
+    "selector": "#mdl_ctnr",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "photolessons.org"
+    ],
+    "selector": "#modal-adbmon-div",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ostroh.info"
+    ],
+    "selector": "#modal.modal-bg",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "mover.uz"
+    ],
+    "selector": "#oframeplayer > [class][style^=\"display: block\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "md4u.ru"
+    ],
+    "selector": "#pagecontent > div[style*=\"background-color\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "alensat.org",
+      "forummikrotik.ru"
+    ],
+    "selector": "#phpbb-ads-ab",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "forum.flprog.ru"
+    ],
+    "selector": "#phpbb_announcement",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "sostav.ru"
+    ],
+    "selector": "#rek_blocker",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "math-prosto.ru"
+    ],
+    "selector": "#requestShutOfBlocker",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "mnogoto4ka.ru"
+    ],
+    "selector": "#sb-site > div[class][style*=\"z-index\"][style*=\"999999\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "zx-pk.ru"
+    ],
+    "selector": "#stickymsg",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "professorweb.ru"
+    ],
+    "selector": "#submain > div[class^=\"a\"][style]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "kaermorhen.ru"
+    ],
+    "selector": "#top-line-container",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "numberempire.com"
+    ],
+    "selector": "#toplink > h3[style=\"color: red\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ganoderma-mushrooms.com",
+      "korrektor.name",
+      "varicream.org"
+    ],
+    "selector": "#turn_advert.adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "vsaduidoma.com"
+    ],
+    "selector": ".ABD_display_wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "eurabota.com"
+    ],
+    "selector": ".abtop",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "sprashivalka.com"
+    ],
+    "selector": ".ad",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "topcraft.ru"
+    ],
+    "selector": ".ad-info",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "bycard.by",
+      "goodfon.ru",
+      "old-games.ru",
+      "satsis.info",
+      "swordmaster.org"
+    ],
+    "selector": ".adb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "vsadu.ru"
+    ],
+    "selector": ".adb-block",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "andevice.ru",
+      "dietdo.ru"
+    ],
+    "selector": ".adb-def",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "telesputnik.ru"
+    ],
+    "selector": ".adbPopup",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "tuchkatv.ru"
+    ],
+    "selector": ".adb_m",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "brazzers-hdx.club"
+    ],
+    "selector": ".adblck",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "forum.qrz.ru",
+      "life.ru",
+      "mastergrad.com",
+      "wallpapershome.ru"
+    ],
+    "selector": ".adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "nevasport.ru"
+    ],
+    "selector": ".adblock-notify",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "exler.ru"
+    ],
+    "selector": ".adblock-pls",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": ".adblock-stop",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "zakon.kz"
+    ],
+    "selector": ".adblock_alert",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "tassbiz.ru"
+    ],
+    "selector": ".adblock_notif",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "kubik3.ru"
+    ],
+    "selector": ".adbs",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ideya-biznesa.ru"
+    ],
+    "selector": ".admania_adblock_detector",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "cofp.ru"
+    ],
+    "selector": ".admitad-checker-popup",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "24video.xxx"
+    ],
+    "selector": ".adt",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "nonameno.com",
+      "rusrek.com"
+    ],
+    "selector": ".alert",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "vk.barkov.net"
+    ],
+    "selector": ".alert-danger",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "2ip.me",
+      "2ip.ua"
+    ],
+    "selector": ".alert-mess > .row",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ria.ru"
+    ],
+    "selector": ".antiblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "fotoshop-online.org"
+    ],
+    "selector": ".aslot",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "mel.fm"
+    ],
+    "selector": ".b-ad-space__placeholder",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "irk.ru"
+    ],
+    "selector": ".b-adblock-message",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "d3.ru"
+    ],
+    "selector": ".b-promo__placeholder",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "cs-amba.ru"
+    ],
+    "selector": ".banka",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "medical-club.net"
+    ],
+    "selector": ".blocker-notice,.blocker-overlay",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "electric-house.ru"
+    ],
+    "selector": ".blok_forum > div[style]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "audio-hi-fi.ru",
+      "electro-sila.ru"
+    ],
+    "selector": ".blok_new > div[style]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "015.by",
+      "0312.ua",
+      "032.ua",
+      "0332.ua",
+      "0342.ua",
+      "0352.ua",
+      "0362.ua",
+      "0372.ua",
+      "0382.ua",
+      "0412.ua",
+      "04141.com.ua",
+      "0432.ua",
+      "04563.com.ua",
+      "04596.com.ua",
+      "04597.com.ua",
+      "04598.com.ua",
+      "0462.ua",
+      "0472.ua",
+      "048.ua",
+      "04868.com.ua",
+      "0512.com.ua",
+      "05136.com.ua",
+      "05161.com.ua",
+      "0522.ua",
+      "0532.ua",
+      "05366.com.ua",
+      "0542.ua",
+      "05447.com.ua",
+      "0552.ua",
+      "056.ua",
+      "0564.ua",
+      "0566.com.ua",
+      "0569.com.ua",
+      "057.ua",
+      "061.ua",
+      "06153.com.ua",
+      "0619.com.ua",
+      "0623.com.ua",
+      "06236.com.ua",
+      "06237.com.ua",
+      "06239.com.ua",
+      "06242.ua",
+      "06252.com.ua",
+      "06267.com.ua",
+      "06272.com.ua",
+      "06274.com.ua",
+      "06277.com.ua",
+      "0629.com.ua",
+      "0642.ua",
+      "06452.com.ua",
+      "0652.ua",
+      "0692.ua",
+      "1rnd.ru",
+      "3652.ru",
+      "3654.ru",
+      "3849.com.ua",
+      "44.ua",
+      "4594.com.ua",
+      "5692.com.ua",
+      "62.ua",
+      "6262.com.ua",
+      "6264.com.ua",
+      "65.media",
+      "7232.kz",
+      "8422city.ru",
+      "anapa.life",
+      "angarsk38.ru",
+      "bazhopol.ru",
+      "city01.am",
+      "city41.ru",
+      "comores24.com",
+      "go01.ru",
+      "go11.kz",
+      "go212.by",
+      "go216.by",
+      "go26.ru",
+      "go31.ru",
+      "go61.ru",
+      "go7812.ru",
+      "godublin.info",
+      "golondon.info",
+      "goriga.info",
+      "gorod3466.ru",
+      "gorodarmavir.ru",
+      "goroddomodedovo.ru",
+      "goshymkent.kz",
+      "inaktau.kz",
+      "inalmaty.kz",
+      "inastana.kz",
+      "inatyrau.kz",
+      "infolyubertsy.ru",
+      "inform69.ru",
+      "vilniuje.info",
+      "yocity12.ru"
+    ],
+    "selector": ".bung-container",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "kanobu.ru"
+    ],
+    "selector": ".c-moneyPlace_empty",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "tvcook.ru"
+    ],
+    "selector": ".cat",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "rusopen.com"
+    ],
+    "selector": ".classblsi.addshr",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ppc.world"
+    ],
+    "selector": ".detected-block-modal",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "smotrisport.tv"
+    ],
+    "selector": ".dont-add-our-site-pls",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ixbt.com"
+    ],
+    "selector": ".fc-ab-root",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "goha.ru"
+    ],
+    "selector": ".goha_ads",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "goha.ru"
+    ],
+    "selector": ".goha_ads_acceptable",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "reshu.by",
+      "reshuent.kz",
+      "sdamgia.ru"
+    ],
+    "selector": ".googlead",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "the-village.com.ua"
+    ],
+    "selector": ".infoA",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "dropmefiles.com.ua",
+      "dropmefiles.net"
+    ],
+    "selector": ".intro",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "winzoro.net"
+    ],
+    "selector": ".isadNotif",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ivi.ru"
+    ],
+    "selector": ".ivi-footer ~ div[class] > style + div[class]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "doctorrouter.ru"
+    ],
+    "selector": ".jgcabd-container",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ppc.world"
+    ],
+    "selector": ".js-detected-block",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "dtf.ru",
+      "vc.ru"
+    ],
+    "selector": ".layout__right-column > div[class*=\" \"][style] > div[class*=\" \"] > div:only-child",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "e.mail.ru",
+      "octavius.mail.ru"
+    ],
+    "selector": ".letter-list-item-adv",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "space.utema.ru"
+    ],
+    "selector": ".main-content-padding > div[class]:not([itemprop])",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "shuba.life"
+    ],
+    "selector": ".md\\:u-block",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "peers.tv"
+    ],
+    "selector": ".moanerwrap",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "megatest.online"
+    ],
+    "selector": ".msg-AdBlock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ykt.ru"
+    ],
+    "selector": ".n-banner--adblocked",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "animeland.su",
+      "itcats.ru",
+      "nekto.me",
+      "noadsradio.ru",
+      "sharkgame.ru",
+      "studies.in.ua",
+      "w10.jeanzzz.ru"
+    ],
+    "selector": ".no-adb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "yarik-sat.com"
+    ],
+    "selector": ".noadb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "mail.rambler.ru"
+    ],
+    "selector": ".notification-warning",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "delfi.lv"
+    ],
+    "selector": ".notification-widget",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "radio.yandex.by",
+      "radio.yandex.kz",
+      "radio.yandex.ru"
+    ],
+    "selector": ".notify",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "alexfilm.cc"
+    ],
+    "selector": ".panel-primary",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "izmailov.tv"
+    ],
+    "selector": ".popupBlock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "newnavitel.blogspot.com"
+    ],
+    "selector": ".post-body > div[dir] > div[dir] > h1#result",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "animedub.ru"
+    ],
+    "selector": ".poverh",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "pythonworld.ru"
+    ],
+    "selector": ".pythonworld-contributor",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "veseloeradio.ru"
+    ],
+    "selector": ".racy_sidebar",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "fanfics.me"
+    ],
+    "selector": ".red.nodata",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "webofcomics.ru"
+    ],
+    "selector": ".reklandvipinfo",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "sdamgia.ru"
+    ],
+    "selector": ".S29e4f5cdae",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "101.ru"
+    ],
+    "selector": ".showMessageAdBlock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "playunturned.ru"
+    ],
+    "selector": ".side_left > center",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "playunturned.ru"
+    ],
+    "selector": ".side_right > center",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "qaru.site"
+    ],
+    "selector": ".similar.a[style]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "slivap.ru"
+    ],
+    "selector": ".svg-adblock",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "l-a-w.ru",
+      "mhelp.kz"
+    ],
+    "selector": ".swal2-container",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "objavlenija.respublika.cz"
+    ],
+    "selector": ".sweet-alert,.sweet-overlay",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "kinoafisha.ua"
+    ],
+    "selector": ".turn-off-add-block-text",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "stalkerportaal.ru"
+    ],
+    "selector": ".video_adsense",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "bookskeeper.ru",
+      "e-xecutive.ru"
+    ],
+    "selector": ".warning",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "cyberscore.live"
+    ],
+    "selector": ".wrapper-partner-rb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "forum.bestflowers.ru"
+    ],
+    "selector": ".xenOverlay",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "i.factor.ua"
+    ],
+    "selector": "[data-place-block]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "auto62rus.ru",
+      "eset-key.ru",
+      "mycrib.ru",
+      "piggy-bank.online",
+      "politonline.ru",
+      "showmehow.ru"
+    ],
+    "selector": "[data-type=\"anti-abp\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "megogo.net"
+    ],
+    "selector": "[data-widget*=\"adblockOverlayEnabled\"] .notifications",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "lr-club.com"
+    ],
+    "selector": "a[href=\"https://adblockplus.org/ru/faq_basics#disable\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "drive2.ru"
+    ],
+    "selector": "a[href][target=\"_blank\"] > img[src][style^=\"width: 100%; height: auto;\"][style*=\"vertical-align: middle; max-width: 240px;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "pic4you.ru",
+      "pic5you.ru"
+    ],
+    "selector": "body > #bb",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "forum.vip-cxema.org"
+    ],
+    "selector": "body > #document_modal.modal,#some_ad_block_key_popup",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "it-enginer.ru"
+    ],
+    "selector": "body > #modal[style*=\"blur\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "dominus.kiev.ua"
+    ],
+    "selector": "body > #myModal",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "newkaliningrad.ru"
+    ],
+    "selector": "body > .soclinks + script + div[class]:not([id])",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "swaego.ru"
+    ],
+    "selector": "body > .special-message-wrapper",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ukr.net"
+    ],
+    "selector": "body > .yellow-die",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "poznamka.ru"
+    ],
+    "selector": "body > [id]:not([class])[style^=\"z-index\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "in-trend.biz"
+    ],
+    "selector": "body > [id][style^=\"z-index\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "fightnews.info"
+    ],
+    "selector": "body > blockquote",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "torrnado.win"
+    ],
+    "selector": "body > div > .a-overlay",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "finget.ru",
+      "katalog-aktsii.ru",
+      "rp5.by",
+      "rp5.kz",
+      "rp5.ru",
+      "sms24.info",
+      "sms24.me",
+      "vikings-warofclans.ru"
+    ],
+    "selector": "body > div:not([id]):not([class])[style^=\"position\"][style*=\"background\"][style*=\"z-index\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "just-for-fun.ru"
+    ],
+    "selector": "body > div[class*=\"-container\"][class*=\"-hide\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "anticollector.biz.ua",
+      "cnc3018.ru",
+      "factorio.su"
+    ],
+    "selector": "body > div[class][style*=\"background\"][style*=\"display: block\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "gdekluet.ru"
+    ],
+    "selector": "body > div[class^=\"stop-block\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "admin.rainbow-online.ru",
+      "gitjournal.tech",
+      "logist.uxxo.ru",
+      "meteoservice.ru",
+      "pawno-info.ru"
+    ],
+    "selector": "body > div[id]:not([class])[style=\"display: block;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "factorio.su"
+    ],
+    "selector": "body > div[id][class][style*=\"background\"][style*=\"visible\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "gta.com.ua"
+    ],
+    "selector": "body > div[id][style*=\"background\"][style*=\"visible\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "daz3d.ru",
+      "portfel.info"
+    ],
+    "selector": "body > div[id][style=\"display: block;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "painart.ru"
+    ],
+    "selector": "body > div[id][style^=\"display: block\"][style*=\"background: red\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "igorchernomoretz.com"
+    ],
+    "selector": "body > div[id^=\"ab\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "igorchernomoretz.com"
+    ],
+    "selector": "body > div[id^=\"ab\"] + div[style*=\"cursor\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "gisher.org"
+    ],
+    "selector": "body > div[id^=\"ban\"][style]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "natural-cosmetology.ru"
+    ],
+    "selector": "body > div[style*=\"background-color:#ff0000;color:#ffffff;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "tut.by"
+    ],
+    "selector": "body > div[style*=\"position: fixed;\"][style*=\"right: 0;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "1snau.ru",
+      "bychico.net",
+      "dyrik.ru",
+      "ecosounds.net",
+      "in-drive.ru",
+      "inforpost.com",
+      "musecube.org",
+      "obozrevatel.com",
+      "oknotivi.ru",
+      "pogodnik.com",
+      "sandero.ru",
+      "turbominer.ru"
+    ],
+    "selector": "body > div[style*=\"z-index\"][style*=\"9999\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "budport.com.ua"
+    ],
+    "selector": "body > div[style^=\"position:fixed;\"][style*=\"z-index\"][style*=\"background\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "blackdesert-info.ru"
+    ],
+    "selector": "div[class][style*=\"z-index\"][style*=\"999999;\"][style*=\"background\"][style*=\"rgb\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "imgrutor.com"
+    ],
+    "selector": "div[class^=\"adblock-warning\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "game2day.ru"
+    ],
+    "selector": "div[class^=\"adblock_\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "lostfilm.tv"
+    ],
+    "selector": "div[class^=\"alarm\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "rutab.net"
+    ],
+    "selector": "div[class^=\"ggmodale\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "gismeteo.by",
+      "gismeteo.ru"
+    ],
+    "selector": "div[class^=\"stopblock\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "finfront.ru"
+    ],
+    "selector": "div[class^=\"swal2\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "pr-cy.ru"
+    ],
+    "selector": "div[id^=\"aabb\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "savevideo.me"
+    ],
+    "selector": "div[id^=\"ads_notice_\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "liga.net"
+    ],
+    "selector": "div[id^=\"div-gpt-ad\"]",
+    "type": "unhide"
+  },
+  {
+    "domains": [
+      "acomics.ru"
+    ],
+    "selector": "div[style*=\"/design/common/pic/please\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "abc-people.com"
+    ],
+    "selector": "div[style*=\"background-color\"][style*=\"position\"][style*=\"z-index\"]",
+    "type": "hide"
+  },
+  {
+    "domains": null,
+    "selector": "div[style*=\"box-shadow: rgb(136, 136, 136) 0px 0px 12px; color: \"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "zx-pk.ru"
+    ],
+    "selector": "div[style=\"background-color: yellow; border-width: 2px; border-style: dashed; border-color: red;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "pvcalc.ru"
+    ],
+    "selector": "div[style^=\"position:fixed; top:0px; left:0px; opacity: 0.9;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ph4.ru"
+    ],
+    "selector": "div[style^=\"width: 728px; height: 90px;\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "bdmbase.ru"
+    ],
+    "selector": "html > .q1",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "7sim.net"
+    ],
+    "selector": "html > body ~ div",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "shuba.life"
+    ],
+    "selector": "img[height][src^=\"https://shuba.life/static/banners/placeholders/\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "nv.ua"
+    ],
+    "selector": "img[src=\"/images/dis_blocker_big.jpg\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "drive2.ru"
+    ],
+    "selector": "img[src^=\"https://avatars.mds.yandex.net/get-adfox-content/\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "sdamgia.ru"
+    ],
+    "selector": "main > div[class*=\" \"]:nth-child(-n+2) > div ~ div",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "fotoshop-online.org"
+    ],
+    "selector": "section > .col-full + script + center[class]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "d3.ru"
+    ],
+    "selector": "section[data-uid=\"ad\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "d3.ru"
+    ],
+    "selector": "section[data-uid=\"extraAd\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "ph4.ru"
+    ],
+    "selector": "table[width][height=\"90\"][style]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "savevideo.me"
+    ],
+    "selector": "td > div[class]:not([id])[style*=\"important\"]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "bigpuzzle.ru"
+    ],
+    "selector": "td[valign=\"top\"][width=\"200px\"][height=\"600\"] > div[style]",
+    "type": "hide"
+  },
+  {
+    "domains": [
+      "bigpuzzle.ru"
+    ],
+    "selector": "td[valign=\"top\"][width=\"240px\"][height=\"600\"]",
+    "type": "hide"
   }
 ]

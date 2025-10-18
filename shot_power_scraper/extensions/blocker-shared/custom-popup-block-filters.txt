@@ -24,3 +24,6 @@ cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-w
 https://www.cnn.com/wbdotp/scripttemplates/otSDKStub.js
 /wp-content/plugins/pressidium-cookie-consent/
 ##.elementor-popup-modal
+https://cdn.wisepops.com/shared/wisepops/
+##div.newspack-popup-container
+##.CampaignType--popup

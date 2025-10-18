@@ -10,14 +10,13 @@ PATCH_PAYWALL_EXTENSION=true
 # Filter lists
 AD_BLOCK_FILTERS="
 adguard-base-optimized:https://filters.adtidy.org/extension/chromium/filters/2_optimized.txt
+easylist-antiadblock:https://easylist-downloads.adblockplus.org/antiadblockfilters.txt
 custom-ad-block-filters:local:custom-ad-block-filters.txt
 "
 
 POPUP_BLOCK_FILTERS="
-adguard-annoyances-optimized:https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt
-adguard-popups-full:https://filters.adtidy.org/windows/filters/19.txt
+adguard-annoyances-full:https://filters.adtidy.org/extension/ublock/filters/14.txt
 easylist-newsletters-ubo:https://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt
-anti-adblock-killer:https://raw.githubusercontent.com/reek/anti-adblock-killer/master/anti-adblock-killer-filters.txt
 custom-popup-block-filters:local:custom-popup-block-filters.txt
 "
 

@@ -102357,6 +102357,2063 @@
 {
 	"priority": 1000,
 	"condition": {
+		"urlFilter": "/adb-watch.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8156
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adb_script/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8157
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/deadblocker/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8158
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/mod_ablockdetector/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8159
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/npsblocker/js/ads.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8160
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "/adsbygoogle.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"arabiaweather.com"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8161
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||imasdk.googleapis.com/js/sdkloader/ima3.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"shahid.mbc.net"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8162
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"shed4u1.com",
+			"elktob.online"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8163
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||play.bokracdn.run/v2/adsjs/ads.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8164
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||securepubads.g.doubleclick.net/tag/js/gpt.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"shahid.mbc.net"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8165
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||al-aqsanews.com"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8166
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock-alerter/js/adblock_alerter.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8167
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock-img.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8168
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adsmatcher-anti-adblock/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8169
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/arlinablock.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8170
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||4k.video/b.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8171
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||amazonaws.com^*/abb-msg.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"hardocp.com"
+		]
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8172
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||baeldung.com/*/library/dist/js/pro-recovery.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8173
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||baeldung.com/*/library/dist/js/recovery.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8174
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||ffmovies.lol/jss/dectector-2025.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8175
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||freeiptvplayer.net/wp-content/uploads/",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8176
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||full.video/btn.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8177
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||rockradio.com^*/blockadblock-",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"rockradio.com"
+		]
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8178
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||samfw.com/js/script.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8179
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||static.game-state.com/images/main/alert/replacement/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8180
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||tritoshi.com/libs/check.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8181
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||tristoshink.online/libs/check.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8182
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||venea.net/web/ab_message?",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8183
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||wheregoes.com/c/uploads/",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8184
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||www.google.*/ajax/pi/phd?abd=0",
+		"resourceTypes": [
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8185
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "outlook.live.com._6tqjfb_hmyqup_npe6dhc",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8186
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||ankrzkz.sbs/js/boxad.js?",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8187
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||download.megaup.net/openads.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8188
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||alwingulla.com/88/tag.min.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"darkino.online"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8189
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"exe-urls.com",
+			"fileink.com",
+			"phoneky.com",
+			"rockmods.net"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8190
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "-adblock-notice-",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8191
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "-adblock-notice/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8192
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/160x600adblock.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8193
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/728x90adblock.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8194
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/abb-msg.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8195
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/ad-blocking-advisor/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8196
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adbdetect.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8197
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adbdetect/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8198
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adbclk2.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8199
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adbl_dtct.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8200
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adbl_dtct1.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8201
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock-detect/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8202
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock-modal.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8203
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock-modal-",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8204
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock-notice-",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8205
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock-notify-by-bweb/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8206
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock-warning-teaser/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8207
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock_alerter.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8208
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock_alerter/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8209
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock_erreur.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8210
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock_gate/images/animated.gif?",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8211
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblock_notify.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8212
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblocker-detected.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8213
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblocker-feature?",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8214
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblocker/modal.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8215
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblocker_message_",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8216
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblockdetector.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8217
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/adblockmessage.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8218
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/antiadblockmsg.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8219
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/bloackdas.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8220
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/blockandinf.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8221
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/blockadblock.",
+		"resourceTypes": [
+			"script",
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8222
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/blockblock.jquery.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8223
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/dh-anti-adblocker/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8224
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/disable-adblock.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8225
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/google-adblock.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8226
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/inc/antiblock.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8227
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/levelmaxblock.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8228
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/nonadblock/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8229
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/popup/adblocker",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8230
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/testab.bundle.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8231
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/wdbloogablock.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8232
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/wp-content/plugins/ad-block-defender/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8233
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/wp-content/plugins/adunblocker/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8234
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/wp-content/plugins/deadblocker/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8235
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/wp-content/plugins/deblocker/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8236
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/wp-content/uploads/an-temp/",
+		"resourceTypes": [
+			"script",
+			"stylesheet"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8237
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/wutime_adblock/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8238
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "/svgadblockdetected/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8239
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "_adblocker_detected",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8240
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "_adblock_killer.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8241
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||bdgest.com/js/site.js?",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8242
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||bleachmx.fr/wp-content/plugins/yeptmixnsykgrb/bjns-fcknj.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8243
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||cmath.fr/images/fond2.gif",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8244
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||cmath.fr/images/fondsticky.gif",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8245
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||developpez.com/template/*.jpg",
+		"resourceTypes": [
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8246
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||developpez.net/template/*.jpg",
+		"resourceTypes": [
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8247
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||ed-protect.org/cdn-cgi/apps/head/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8248
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||gameblog.fr/images/ablock/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8249
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||nextinpact.com/assets/images/autopromo-adblock-1280.jpg",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8250
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||nikopik.com/wp-content/themes/*/js/nikopik.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8251
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||nordpresse.be/wp-content/uploads/",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8252
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||nrj.fr/nrj?page=/rg.fake&",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8253
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||sdefx.cloud/js/acheck.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8254
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||skyrock.net/img/*/adblock/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8255
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "/ads.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty",
+		"initiatorDomains": [
+			"abcbourse.com",
+			"action-sociale.org",
+			"anime-vf.fr",
+			"impactmangas.fr",
+			"presse-algerie.net",
+			"primfx.com",
+			"undernews.fr"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8256
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "/advertisement.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty",
+		"initiatorDomains": [
+			"fun-animes.fr",
+			"macupload.net",
+			"majorgeeks.com",
+			"upload.ac"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8257
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "/noadblock-nice-message/assets/js/ads.js?",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8258
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||animedigitalnetwork.fr/templates/*/js/advertising.min.js?",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8259
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||ausujet.com/skins/common/ads.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8260
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||cdncontent.wakanim.tv/scripts/dist/ads.js",
+		"resourceTypes": [
+			"script",
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8261
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||cyberdean.fr/js/advertisement.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8262
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||dbz-fantasy.com/ads.css",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8263
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||forums.macg.co/js/audentio/funbox/advertisement.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8264
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||frandroid.com/ads.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8265
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||free-reseau.fr/css/publicite.css|",
+		"resourceTypes": [
+			"stylesheet"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8266
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||fusacq.com/javascript/advertising.js|",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8267
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||gamaniak.com/js/check_adsense.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8268
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||grattable.com/blogads.css",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8269
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||hdnumerique.com/tpl/jscript/advert.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8270
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||item-voyage.fr/ads.css",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8271
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||jeux-geographiques.com/js/adblock_detector.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8272
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||jeuxvideo-live.com/js/ads.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8273
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||ktu.sv2.biz/sv3/advertisement.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8274
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||larvf.com/js/ads.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8275
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||manga-news.com/js/advert.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8276
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||nouvelle-fiat500.fr/ad-pub.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8277
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||numerama.com/ads.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8278
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"empire-anime.com",
+			"empire-streaming.app",
+			"empire-streamz.fr"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8279
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||pagerank.fr/js*/advert.js?",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8280
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||ams.cdn.arkadiumhosted.com/assets/arena-4/arena/heap/advertisements.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"jeux.lemonde.fr"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8281
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||penducado.com/styles/ads.css",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8282
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||proxy.ads.canalplus-bo.net/web/undefined/v1/adserver/info/?asset=*&channel=",
+		"resourceTypes": [
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"www.mycanal.fr"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8283
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||ps3-infos.fr/adsense/openads/ads/ads.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8284
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||pstream.net/js/prebid35.js",
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8285
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||ptitchef.com/js/ads.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8286
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||static.admysports.com/hb/site/als/hb_allosurf.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"allosurf.net"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8287
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||static.adsafeprotected.com/favicon.ico",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"tf1info.fr"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8288
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||static.koreus.com/js/advert.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8289
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||cdn4.tennistemple.com/js/advert.js|",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"domainType": "firstParty"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8290
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||universfreebox.com/js/advertisement.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8291
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||peimg.fr/js/ads.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"pubeco.fr"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8292
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||v.fwmrm.net/ad/g/1?",
+		"resourceTypes": [
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"www.mycanal.fr"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8293
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||wamiz.com/css/ads.css",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8294
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||zagaz.com/img/blogads.css",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8295
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||jappy.tv/i/wrbng/abb.png",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8296
+},
+{
+	"priority": 2000,
+	"condition": {
+		"regexFilter": "^https?:\\/\\/pikabu\\.ru\\/ajax\\/[a-za-z0-9]+\\?[a-za-z0-9]+=[0-9a-z-]+[0-9a-z]$",
+		"resourceTypes": [
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"pikabu.ru"
+		]
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8297
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "/cookie_check.min.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"acetv.me"
+		]
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8298
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "/gogl_detector",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"meddaily.ru",
+			"newsru.com"
+		]
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8299
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||anidub.com/ads.js|",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"anidub.com"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8300
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||goha.ru/app/video/adblock.teaser.js|",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"goha.ru"
+		]
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8301
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||sports.ru^*/adfox.",
+		"resourceTypes": [
+			"xmlhttprequest"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8302
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||allnorilsk.ru/js/adb.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8303
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||anivisual.net/mim*.js|",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"anivisual.net"
+		]
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8304
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||avito.ru^*/some-pretty-script.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8305
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||buhgalter.com.ua^*/blocker.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8306
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||buhgalter911.com^*/blocker.",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8307
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||code.piano.io/api/tinypass.min.js",
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"delfi.lv"
+		]
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8308
+},
+{
+	"priority": 2000,
+	"condition": {
+		"urlFilter": "||fainaidea.com/wp-content/uploads/*/*?ver=",
+		"resourceTypes": [
+			"script",
+			"stylesheet"
+		],
+		"isUrlFilterCaseSensitive": false,
+		"initiatorDomains": [
+			"fainaidea.com"
+		]
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8309
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||fairtop.in/template/js/fdetect.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8310
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||gamemag.ru/assets/*/js.cookie.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8311
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||i140.ru/js/etxm*.js|",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8312
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||ipprof.ru/wp-content/plugins/ad-blocking-advisor/",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8313
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||kontrolnaya-rabota.ru^*/fuckadblock.",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8314
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||kontrolnaya-rabota.ru^*/toastr.",
+		"resourceTypes": [
+			"script",
+			"stylesheet"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8315
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||mobzon.ru/adbp/adbp.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8316
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||nnm-club.ws/forum/docs/requests.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8317
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||pwnews.net/des/antiblock.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8318
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||rockstargame.su/adb_script",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8319
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||rusnext.ru/advar.js",
+		"resourceTypes": [
+			"script"
+		],
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8320
+},
+{
+	"priority": 1000,
+	"condition": {
+		"urlFilter": "||vazhno.ru/cdn-cgi/apps/head/*.js",
+		"isUrlFilterCaseSensitive": false
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8321
+},
+{
+	"priority": 1000,
+	"condition": {
 		"requestDomains": [
 			"tjskjndukyk.com",
 			"arrasinutile.com",
@@ -123342,13 +125399,14 @@
 			"www8.upload-pics.com",
 			"x.xxxbp.tv",
 			"x.xxxbule.com",
-			"xis.vipergirls.to"
+			"xis.vipergirls.to",
+			"fundingchoicesmessages.google.com"
 		]
 	},
 	"action": {
 		"type": "block"
 	},
-	"id": 8156
+	"id": 8322
 },
 {
 	"priority": 1000,
@@ -123952,13 +126010,1310 @@
 			"player.avplayer.com",
 			"player.ex.co",
 			"playoncenter.com",
-			"vidora.com"
+			"vidora.com",
+			"content-settings.com",
+			"site-config.com",
+			"2znp09oa.com",
+			"4jnzhl0d0.com",
+			"5mcwl.pw",
+			"6ldu6qa.com",
+			"82o9v830.com",
+			"abilityscale.com",
+			"abjectattempt.com",
+			"aboardamusement.com",
+			"aboardlevel.com",
+			"abovechat.com",
+			"abruptroad.com",
+			"absentairport.com",
+			"absorbingband.com",
+			"absorbingprison.com",
+			"abstractedamount.com",
+			"abstractedauthority.com",
+			"absurdapple.com",
+			"abundantcoin.com",
+			"accountsdoor.com",
+			"accurateanimal.com",
+			"accuratecoal.com",
+			"achieverknee.com",
+			"acidicstraw.com",
+			"acidpigs.com",
+			"acridangle.com",
+			"acridtwist.com",
+			"actuallysheep.com",
+			"actuallysnake.com",
+			"actuallything.com",
+			"adamantsnail.com",
+			"addictedattention.com",
+			"admiral.pub",
+			"adorableanger.com",
+			"adorableattention.com",
+			"adventurousamount.com",
+			"afraidlanguage.com",
+			"agilebreeze.com",
+			"agileformer.com",
+			"agreeablearch.com",
+			"agreeabletouch.com",
+			"aheadday.com",
+			"aheadmachine.com",
+			"ak0gsh40.com",
+			"aliasanvil.com",
+			"alikeaddition.com",
+			"aliveachiever.com",
+			"alleythecat.com",
+			"alluringbucket.com",
+			"alohamiles.com",
+			"aloofmetal.com",
+			"aloofvest.com",
+			"alpineactor.com",
+			"alwaysahorse.com",
+			"ambientdusk.com",
+			"ambientlagoon.com",
+			"ambiguousafternoon.com",
+			"ambiguousanger.com",
+			"ambiguousdinosaurs.com",
+			"ambiguousincome.com",
+			"ambrosialsummit.com",
+			"amethystzenith.com",
+			"amuckafternoon.com",
+			"amusedbucket.com",
+			"analogwonder.com",
+			"analyzecorona.com",
+			"ancientact.com",
+			"annoyedairport.com",
+			"annoyingacoustics.com",
+			"annoyingclover.com",
+			"anxiousapples.com",
+			"applyless.com",
+			"aquaticowl.com",
+			"ar1nvz5.com",
+			"archswimming.com",
+			"aromamirror.com",
+			"arrivegrowth.com",
+			"artthevoid.com",
+			"aspiringapples.com",
+			"aspiringattempt.com",
+			"aspiringtoy.com",
+			"astonishingfood.com",
+			"astrallullaby.com",
+			"attendchase.com",
+			"attractionbanana.com",
+			"attractivecap.com",
+			"audioarctic.com",
+			"automaticside.com",
+			"automaticturkey.com",
+			"availablerest.com",
+			"avalonalbum.com",
+			"averageactivity.com",
+			"awarealley.com",
+			"awzbijw.com",
+			"axiomaticalley.com",
+			"axiomaticanger.com",
+			"azuremystique.com",
+			"azurestealth.com",
+			"badgeboat.com",
+			"badgerabbit.com",
+			"badgevolcano.com",
+			"bagbeam.com",
+			"baitbaseball.com",
+			"balloonbelieve.com",
+			"ballsbanana.com",
+			"bananabarrel.com",
+			"bandborder.com",
+			"barbarousbase.com",
+			"basilfish.com",
+			"basketballbelieve.com",
+			"baskettexture.com",
+			"bawdybalance.com",
+			"bawdybeast.com",
+			"beamvolcano.com",
+			"beancontrol.com",
+			"bedsberry.com",
+			"beginnerpancake.com",
+			"berserkhydrant.com",
+			"bespokesandals.com",
+			"bestboundary.com",
+			"betazebra.com",
+			"bewilderedbattle.com",
+			"bewilderedblade.com",
+			"bhcumsc.com",
+			"bikepaws.com",
+			"bikesboard.com",
+			"bikinginspire.com",
+			"bilingualgeek.com",
+			"billowybead.com",
+			"billowybelief.com",
+			"binarycrest.com",
+			"binspiredtees.com",
+			"birthdaybelief.com",
+			"blackbrake.com",
+			"bleachbubble.com",
+			"bleachscarecrow.com",
+			"bleedlight.com",
+			"blesspizzas.com",
+			"blisscalendar.com",
+			"blissfulcrescendo.com",
+			"blissfullagoon.com",
+			"blockdial.com",
+			"blueeyedblow.com",
+			"bluevinebooks.com",
+			"blushingbeast.com",
+			"blushingbread.com",
+			"boatsvest.com",
+			"boiledegglabs.com",
+			"boilingbeetle.com",
+			"boilingcredit.com",
+			"boldbars.com",
+			"boostbehavior.com",
+			"boredcrown.com",
+			"bouncyproperty.com",
+			"boundarybusiness.com",
+			"boundlessargument.com",
+			"boundlessbrake.com",
+			"boundlessveil.com",
+			"brainybasin.com",
+			"brainynut.com",
+			"branchborder.com",
+			"brandsfive.com",
+			"brandybison.com",
+			"bravebone.com",
+			"breadbalance.com",
+			"breakableinsurance.com",
+			"breakfastboat.com",
+			"breezygrove.com",
+			"brianwould.com",
+			"brighttoe.com",
+			"briskstorm.com",
+			"broadborder.com",
+			"broadboundary.com",
+			"broadcastbed.com",
+			"broaddoor.com",
+			"brotherslocket.com",
+			"bruisebaseball.com",
+			"brunchforher.com",
+			"buildingknife.com",
+			"bulbbait.com",
+			"bumpermash.com",
+			"burgersalt.com",
+			"burlywhistle.com",
+			"burnbubble.com",
+			"bushesbag.com",
+			"bustlingbook.com",
+			"butterbulb.com",
+			"butterburst.com",
+			"buttonladybug.com",
+			"cakesdrum.com",
+			"calculatingcircle.com",
+			"calculatingtoothbrush.com",
+			"calculatorstatement.com",
+			"callousbrake.com",
+			"calmcactus.com",
+			"calypsocapsule.com",
+			"cannonchange.com",
+			"canvasandsocks.com",
+			"capablecup.com",
+			"capriciouscorn.com",
+			"captivatingcanyon.com",
+			"captivatingillusion.com",
+			"captivatingpanorama.com",
+			"captivatingperformance.com",
+			"carefuldolls.com",
+			"caringcast.com",
+			"caringzinc.com",
+			"carloforward.com",
+			"carpentercomparison.com",
+			"carscannon.com",
+			"cartkitten.com",
+			"carvecakes.com",
+			"casualphysics.com",
+			"catalogcake.com",
+			"catschickens.com",
+			"cattlecommittee.com",
+			"causecherry.com",
+			"cautiouscamera.com",
+			"cautiouscherries.com",
+			"cautiouscrate.com",
+			"cautiouscredit.com",
+			"cavecurtain.com",
+			"ceciliavenus.com",
+			"celestialeuphony.com",
+			"celestialquasar.com",
+			"celestialspectra.com",
+			"chademocharge.com",
+			"chaireggnog.com",
+			"chairscrack.com",
+			"chairsdonkey.com",
+			"chalkoil.com",
+			"changeablecats.com",
+			"channelcamp.com",
+			"chargecracker.com",
+			"charmingplate.com",
+			"charscroll.com",
+			"cheerycraze.com",
+			"cherriescare.com",
+			"chessbranch.com",
+			"chesscolor.com",
+			"chesscrowd.com",
+			"chessquery.com",
+			"chickensstation.com",
+			"childlikecrowd.com",
+			"childlikeexample.com",
+			"childlikeform.com",
+			"chilledliquid.com",
+			"chingovernment.com",
+			"chinsnakes.com",
+			"chipperisle.com",
+			"chivalrouscord.com",
+			"chubbycreature.com",
+			"chunkycactus.com",
+			"cicdserver.com",
+			"ciderfeast.com",
+			"cinemabonus.com",
+			"circlelevel.com",
+			"clammychicken.com",
+			"cleanhaircut.com",
+			"cloisteredcurve.com",
+			"closedcows.com",
+			"closefriction.com",
+			"cloudhustles.com",
+			"cloudjumbo.com",
+			"clumsycar.com",
+			"coalkitchen.com",
+			"coatfood.com",
+			"cobaltoverture.com",
+			"coffeesidehustle.com",
+			"coldbalance.com",
+			"coldcallpro.com",
+			"coldcreatives.com",
+			"colorfulafterthought.com",
+			"colossalclouds.com",
+			"colossalcoat.com",
+			"colossalcry.com",
+			"combativecar.com",
+			"combativedetail.com",
+			"combbit.com",
+			"combcattle.com",
+			"combcompetition.com",
+			"comfortablecheese.com",
+			"comparereaction.com",
+			"compiledoctor.com",
+			"concernedchickens.com",
+			"condemnedcomb.com",
+			"conditionchange.com",
+			"conditioncrush.com",
+			"confesschairs.com",
+			"configchain.com",
+			"confirmglobal.com",
+			"confusedcart.com",
+			"connectashelf.com",
+			"consciouschairs.com",
+			"consciouscheese.com",
+			"consultantchow.com",
+			"consumerknowhow.com",
+			"consumerzero.com",
+			"controlcola.com",
+			"controlhall.com",
+			"convertbatch.com",
+			"cooingcoal.com",
+			"coolestcatcare.com",
+			"coordinatedbedroom.com",
+			"coordinatedcoat.com",
+			"copycarpenter.com",
+			"copyrightaccesscontrols.com",
+			"coralreverie.com",
+			"corgibeachday.com",
+			"cosmicsculptor.com",
+			"cosmosjackson.com",
+			"costwinner.com",
+			"courageousbaby.com",
+			"cozydusk.com",
+			"cozyhillside.com",
+			"cozytryst.com",
+			"crabbychin.com",
+			"crackedsafe.com",
+			"crafthenry.com",
+			"crashchance.com",
+			"cratecamera.com",
+			"craterbox.com",
+			"creatorcherry.com",
+			"creatorpassenger.com",
+			"creaturecabbage.com",
+			"crimsonmeadow.com",
+			"critictruck.com",
+			"crookedcreature.com",
+			"crowdedmass.com",
+			"cryptvalue.com",
+			"crystalboulevard.com",
+			"cubchannel.com",
+			"cubepins.com",
+			"cuddlycake.com",
+			"cuddlylunchroom.com",
+			"culturedcamera.com",
+			"culturedfeather.com",
+			"cumbersomecar.com",
+			"cumbersomecarpenter.com",
+			"curbminers.com",
+			"curiouschalk.com",
+			"curioussuccess.com",
+			"curlycannon.com",
+			"currentcollar.com",
+			"curtaincows.com",
+			"curvedhoney.com",
+			"curvycord.com",
+			"curvycry.com",
+			"cushiondrum.com",
+			"cushionpig.com",
+			"cutechin.com",
+			"cyclopsdial.com",
+			"dailydivision.com",
+			"damagedadvice.com",
+			"damageddistance.com",
+			"damdoor.com",
+			"dampdock.com",
+			"dancemistake.com",
+			"dandydune.com",
+			"dandyglow.com",
+			"dapperdiscussion.com",
+			"datastoried.com",
+			"daughterstone.com",
+			"daymodern.com",
+			"dazzlingbook.com",
+			"deafeningdock.com",
+			"deafeningdowntown.com",
+			"debonairdust.com",
+			"debonairtree.com",
+			"debugentity.com",
+			"decidedrum.com",
+			"decisivebase.com",
+			"decisivedrawer.com",
+			"decisiveducks.com",
+			"decoycreation.com",
+			"deeptack.com",
+			"deerbeginner.com",
+			"defeatedbadge.com",
+			"defensevest.com",
+			"degreechariot.com",
+			"delegatediscussion.com",
+			"delicatecascade.com",
+			"deliciousducks.com",
+			"deltafault.com",
+			"deluxecrate.com",
+			"dependenttrip.com",
+			"deployinput.com",
+			"designsgrid.com",
+			"desirebucket.com",
+			"desiredirt.com",
+			"detailedgovernment.com",
+			"detailedkitten.com",
+			"detectdinner.com",
+			"detectdiscovery.com",
+			"detourgame.com",
+			"deviceseal.com",
+			"deviceworkshop.com",
+			"devilishdinner.com",
+			"dewdroplagoon.com",
+			"difficultfog.com",
+			"digestiondrawer.com",
+			"digithalo.com",
+			"dinnerquartz.com",
+			"diplomahawaii.com",
+			"direfuldesk.com",
+			"disagreeabledrop.com",
+			"discreetfield.com",
+			"discreetquarter.com",
+			"distributionneck.com",
+			"distributionpocket.com",
+			"distributiontomatoes.com",
+			"disturbedquiet.com",
+			"divehope.com",
+			"dk4ywix.com",
+			"dockdigestion.com",
+			"dogsonclouds.com",
+			"dollardelta.com",
+			"doubledefend.com",
+			"doubtdrawer.com",
+			"dq95d35.com",
+			"drainpaste.com",
+			"dramaticdirection.com",
+			"dreamsdome.com",
+			"driftingchef.com",
+			"driftpizza.com",
+			"drollwharf.com",
+			"drydrum.com",
+			"dustydime.com",
+			"dustyhammer.com",
+			"dyecloud.com",
+			"eagereden.com",
+			"eagerflame.com",
+			"eagerknight.com",
+			"earnbaht.com",
+			"earthyfarm.com",
+			"eatablesquare.com",
+			"echoinghaven.com",
+			"educrated.com",
+			"effervescentcoral.com",
+			"effervescentvista.com",
+			"effulgentnook.com",
+			"effulgenttempest.com",
+			"ejyymghi.com",
+			"elasticchange.com",
+			"elderlybean.com",
+			"elderlytown.com",
+			"elephantqueue.com",
+			"eloquenceeye.com",
+			"elusivebreeze.com",
+			"elusivecascade.com",
+			"elysiantraverse.com",
+			"embellishedmeadow.com",
+			"embermosaic.com",
+			"emberwhisper.com",
+			"eminentbubble.com",
+			"eminentend.com",
+			"emptyescort.com",
+			"enchantedskyline.com",
+			"enchantingdiscovery.com",
+			"enchantingenchantment.com",
+			"enchantingmystique.com",
+			"enchantingtundra.com",
+			"enchantingvalley.com",
+			"encourageshock.com",
+			"encouragingthread.com",
+			"endlesstrust.com",
+			"endurablebulb.com",
+			"energeticexample.com",
+			"energeticladybug.com",
+			"engineergrape.com",
+			"engineertrick.com",
+			"enigmaprint.com",
+			"enigmaticblossom.com",
+			"enigmaticcanyon.com",
+			"enigmaticvoyage.com",
+			"enormousearth.com",
+			"enormousfoot.com",
+			"enterdrama.com",
+			"entertainskin.com",
+			"enthusiastictemper.com",
+			"enviousshape.com",
+			"enviousthread.com",
+			"epicoldschool.com",
+			"equablekettle.com",
+			"etherealbamboo.com",
+			"ethereallagoon.com",
+			"etherealpinnacle.com",
+			"etherealquasar.com",
+			"etherealripple.com",
+			"evanescentedge.com",
+			"evasivejar.com",
+			"eventexistence.com",
+			"eventsmall.com",
+			"exampleshake.com",
+			"excitingtub.com",
+			"exclusivebrass.com",
+			"executeknowledge.com",
+			"exhibitsneeze.com",
+			"expansioneggnog.com",
+			"exquisiteartisanship.com",
+			"extractobservation.com",
+			"extralocker.com",
+			"extramonies.com",
+			"exuberantedge.com",
+			"facilitatebreakfast.com",
+			"fadechildren.com",
+			"fadedsnow.com",
+			"fairfeeling.com",
+			"fairiesbranch.com",
+			"fairygaze.com",
+			"fairytaleflame.com",
+			"faithrowold.com",
+			"fallaciousfifth.com",
+			"falseframe.com",
+			"falsesight.com",
+			"familiarrod.com",
+			"fancyactivity.com",
+			"fancydune.com",
+			"fancygrove.com",
+			"fangfeeling.com",
+			"fantastictone.com",
+			"farethief.com",
+			"farmergoldfish.com",
+			"farshake.com",
+			"farsnails.com",
+			"fastenfather.com",
+			"fasterfineart.com",
+			"fasterjson.com",
+			"fatcoil.com",
+			"faucetfoot.com",
+			"faultycanvas.com",
+			"fearfulfish.com",
+			"fearfulmint.com",
+			"fearlessfaucet.com",
+			"fearlessfeast.com",
+			"fearlesstramp.com",
+			"featherstage.com",
+			"feeblestamp.com",
+			"feedten.com",
+			"feignedfaucet.com",
+			"fewjuice.com",
+			"fewkittens.com",
+			"finalizeforce.com",
+			"financefear.com",
+			"finestpiece.com",
+			"finitecube.com",
+			"firecatfilms.com",
+			"fireworkcamp.com",
+			"firstendpoint.com",
+			"firstfrogs.com",
+			"firsttexture.com",
+			"fishersfinds.com",
+			"fitnessmapper.com",
+			"fivesidedsquare.com",
+			"fixedfold.com",
+			"flakyfeast.com",
+			"flameuncle.com",
+			"flimsycircle.com",
+			"flimsythought.com",
+			"flippedfunnel.com",
+			"floodprincipal.com",
+			"flourishingcollaboration.com",
+			"flourishingendeavor.com",
+			"flourishinginnovation.com",
+			"flourishingpartnership.com",
+			"flowersornament.com",
+			"flowerstreatment.com",
+			"flowerycreature.com",
+			"floweryfact.com",
+			"floweryflavor.com",
+			"floweryoperation.com",
+			"flushingbeast.com",
+			"flutteringfireman.com",
+			"foambench.com",
+			"followborder.com",
+			"foodfunfestivals.com",
+			"forecasttiger.com",
+			"foretellfifth.com",
+			"forevergears.com",
+			"forgetfulflowers.com",
+			"forgetfulsnail.com",
+			"fortunatemark.com",
+			"fourpawsahead.com",
+			"fractalcoast.com",
+			"frailfruit.com",
+			"framebanana.com",
+			"franticroof.com",
+			"frazzleart.com",
+			"freezingbuilding.com",
+			"frequentflesh.com",
+			"friedone.com",
+			"friendlycrayon.com",
+			"friendlyfold.com",
+			"frightenedpotato.com",
+			"frogtray.com",
+			"fronttoad.com",
+			"frugalfiestas.com",
+			"fumblingform.com",
+			"functionalcrown.com",
+			"functionalfeather.com",
+			"funoverbored.com",
+			"funoverflow.com",
+			"furryfork.com",
+			"furryhorses.com",
+			"fusedcontent.com",
+			"futuristicapparatus.com",
+			"futuristicfairies.com",
+			"futuristicfifth.com",
+			"futuristicframe.com",
+			"fuzzyaudio.com",
+			"fuzzybasketball.com",
+			"fuzzyerror.com",
+			"fvl1f.pw",
+			"gammamaximum.com",
+			"gardenovens.com",
+			"gaudyairplane.com",
+			"geekactive.com",
+			"geekbackyard.com",
+			"generalprose.com",
+			"generateoffice.com",
+			"ghostgenie.com",
+			"gianthypes.com",
+			"giantsvessel.com",
+			"giddycoat.com",
+			"gigkarma.com",
+			"giraffepiano.com",
+			"gitcrumbs.com",
+			"givevacation.com",
+			"gladglen.com",
+			"gladysway.com",
+			"glamhawk.com",
+			"gleamingcow.com",
+			"gleaminghaven.com",
+			"glisteningguide.com",
+			"glisteningsign.com",
+			"glitteringbrook.com",
+			"gloriousbeef.com",
+			"glowingmeadow.com",
+			"gluedpixel.com",
+			"godseedband.com",
+			"goldfishgrowth.com",
+			"gondolagnome.com",
+			"goodbark.com",
+			"gorgeousedge.com",
+			"gossamerwing.com",
+			"gracefulmilk.com",
+			"grainmass.com",
+			"grandfatherguitar.com",
+			"granlite.com",
+			"gravitykick.com",
+			"grayoranges.com",
+			"grayreceipt.com",
+			"greasysquare.com",
+			"greyinstrument.com",
+			"gridbelow.com",
+			"gripcorn.com",
+			"groovyornament.com",
+			"grouchybrothers.com",
+			"grouchypush.com",
+			"grumpydime.com",
+			"grumpydrawer.com",
+			"guardeddirection.com",
+			"guardedschool.com",
+			"guessdetail.com",
+			"guidecent.com",
+			"guildalpha.com",
+			"guiltlessbasketball.com",
+			"gulliblegrip.com",
+			"gustocooking.com",
+			"gustygrandmother.com",
+			"h78xb.pw",
+			"habitualhumor.com",
+			"halcyoncanyon.com",
+			"halcyonsculpture.com",
+			"hallowedinvention.com",
+			"haltingbadge.com",
+			"haltingdivision.com",
+			"hammerhearing.com",
+			"handleteeth.com",
+			"handnorth.com",
+			"handsomehose.com",
+			"handsomeindustry.com",
+			"handsomelyhealth.com",
+			"handsomelythumb.com",
+			"handsomeyam.com",
+			"handyfireman.com",
+			"handyincrease.com",
+			"haplesshydrant.com",
+			"haplessland.com",
+			"happysponge.com",
+			"harborcaption.com",
+			"harborcub.com",
+			"headydegree.com",
+			"headyhook.com",
+			"healflowers.com",
+			"hearinglizards.com",
+			"heartbreakingmind.com",
+			"heavyplayground.com",
+			"helpcollar.com",
+			"hfc195b.com",
+			"highfalutinbox.com",
+			"highfalutinhoney.com",
+			"hilariouszinc.com",
+			"historicalbeam.com",
+			"hocgeese.com",
+			"hollowafterthought.com",
+			"homelycrown.com",
+			"honeybulb.com",
+			"honorablehydrant.com",
+			"honorableland.com",
+			"hookconference.com",
+			"hospitablehall.com",
+			"hurtgrape.com",
+			"hypnoticwound.com",
+			"hystericalcloth.com",
+			"hystericalfinger.com",
+			"i9w8p.pw",
+			"illinvention.com",
+			"illustriousoatmeal.com",
+			"immensehoney.com",
+			"imminentshake.com",
+			"importedincrease.com",
+			"importedinsect.com",
+			"importlocate.com",
+			"impossibleexpansion.com",
+			"impossiblemove.com",
+			"impulsejewel.com",
+			"incompetentjoke.com",
+			"inconclusiveaction.com",
+			"infamousstream.com",
+			"innocentwax.com",
+			"inputicicle.com",
+			"inquisitiveice.com",
+			"inquisitiveinvention.com",
+			"intelligentscissors.com",
+			"internalcondition.com",
+			"internalsink.com",
+			"ivykiosk.com",
+			"j93557g.com",
+			"jadeitite.com",
+			"jaderooster.com",
+			"jailbulb.com",
+			"joblessdrum.com",
+			"joyoussurprise.com",
+			"jubilantcanyon.com",
+			"jubilantcascade.com",
+			"justicejudo.com",
+			"k54nw.pw",
+			"kindhush.com",
+			"kitesquirrel.com",
+			"knitstamp.com",
+			"lameletters.com",
+			"lamplow.com",
+			"leaplunchroom.com",
+			"leftliquid.com",
+			"liftedknowledge.com",
+			"livelumber.com",
+			"livelylaugh.com",
+			"livelyreward.com",
+			"livingsleet.com",
+			"lizardslaugh.com",
+			"llamavoice.com",
+			"loadsurprise.com",
+			"looseloaf.com",
+			"lorenzourban.com",
+			"losslace.com",
+			"loudlunch.com",
+			"lovelydrum.com",
+			"loveseashore.com",
+			"lp3tdqle.com",
+			"ludicrousarch.com",
+			"lumberamount.com",
+			"luminousboulevard.com",
+			"lumpylumber.com",
+			"lunchroomlock.com",
+			"maddeningpowder.com",
+			"magicaljoin.com",
+			"magicminibox.com",
+			"magiczenith.com",
+			"magnetairport.com",
+			"majesticmountainrange.com",
+			"maliciousmusic.com",
+			"marblediscussion.com",
+			"markedmeasure.com",
+			"marketspiders.com",
+			"marriedbelief.com",
+			"massivemark.com",
+			"materialmilk.com",
+			"materialparcel.com",
+			"meadowlullaby.com",
+			"meatydime.com",
+			"melodiouscomposition.com",
+			"memopilot.com",
+			"memorizematch.com",
+			"memorizeneck.com",
+			"meremark.com",
+			"merequartz.com",
+			"messagenovice.com",
+			"messyoranges.com",
+			"mightyspiders.com",
+			"mimosamajor.com",
+			"miscreantmoon.com",
+			"mistyhorizon.com",
+			"mittencattle.com",
+			"mixedreading.com",
+			"modularmental.com",
+			"motionlessbelief.com",
+			"motionlessmeeting.com",
+			"movemeal.com",
+			"mowgoats.com",
+			"muddledaftermath.com",
+			"muddledmemory.com",
+			"mundanenail.com",
+			"mundanepollution.com",
+			"muteknife.com",
+			"mysticalagoon.com",
+			"nappyattack.com",
+			"nappyneck.com",
+			"neatshade.com",
+			"nebulacrescent.com",
+			"nebulajubilee.com",
+			"nebulousamusement.com",
+			"needyneedle.com",
+			"neighborlywatch.com",
+			"nervoussummer.com",
+			"niftyhospital.com",
+			"niftyjelly.com",
+			"nightwound.com",
+			"nodethisweek.com",
+			"noiselessplough.com",
+			"nonchalantnerve.com",
+			"nondescriptcrowd.com",
+			"nondescriptnote.com",
+			"nondescriptstocking.com",
+			"nostalgicknot.com",
+			"nostalgicneed.com",
+			"novaseekers.com",
+			"nullnorth.com",
+			"numerousnest.com",
+			"nutritiousbean.com",
+			"oafishchance.com",
+			"oafishobservation.com",
+			"obscenesidewalk.com",
+			"observantice.com",
+			"offshorecyclone.com",
+			"oldfashionedoffer.com",
+			"omniscientfeeling.com",
+			"onedropocean.com",
+			"onlywoofs.com",
+			"operationchicken.com",
+			"operationnail.com",
+			"oppositeoperation.com",
+			"optimallimit.com",
+			"orionember.com",
+			"overconfidentfood.com",
+			"overratedchalk.com",
+			"owlsr.us",
+			"pailcrime.com",
+			"pailpatch.com",
+			"painstakingpickle.com",
+			"paintpear.com",
+			"paleleaf.com",
+			"pamelarandom.com",
+			"panickypancake.com",
+			"parallelbulb.com",
+			"parchedsofa.com",
+			"pardonpopular.com",
+			"parsimoniouspolice.com",
+			"partplanes.com",
+			"passivepolo.com",
+			"pastoralroad.com",
+			"pedropanther.com",
+			"perceivequarter.com",
+			"petiteumbrella.com",
+			"photographpan.com",
+			"piquantmeadow.com",
+			"piquantpigs.com",
+			"piquantprice.com",
+			"piquantvortex.com",
+			"pixelvariety.com",
+			"pizzasnut.com",
+			"placeframe.com",
+			"placidactivity.com",
+			"placidperson.com",
+			"planebasin.com",
+			"pleasantpump.com",
+			"plotparent.com",
+			"plotrabbit.com",
+			"pluckypocket.com",
+			"pluckyzone.com",
+			"pocketfaucet.com",
+			"poeticpackage.com",
+			"pointdigestion.com",
+			"pointlesshour.com",
+			"pointlesspocket.com",
+			"pointlessrifle.com",
+			"polarismagnet.com",
+			"politeplanes.com",
+			"popplantation.com",
+			"possibleboats.com",
+			"prefixpatriot.com",
+			"prepareplanes.com",
+			"presetrabbits.com",
+			"previousplayground.com",
+			"pricklydebt.com",
+			"pricklypollution.com",
+			"probablepartner.com",
+			"processplantation.com",
+			"profitrumour.com",
+			"profusesupport.com",
+			"propertypotato.com",
+			"psychedelicarithmetic.com",
+			"psychedelicchess.com",
+			"publicsofa.com",
+			"puffyloss.com",
+			"puffypaste.com",
+			"puffypull.com",
+			"puffypurpose.com",
+			"pumpedpancake.com",
+			"pumpedpurpose.com",
+			"punyplant.com",
+			"purposepipe.com",
+			"quaintcan.com",
+			"quietknowledge.com",
+			"quillkick.com",
+			"quirkysugar.com",
+			"quizzicalpartner.com",
+			"quizzicalzephyr.com",
+			"rabbitbreath.com",
+			"rabbitrifle.com",
+			"radiantlullaby.com",
+			"railwayrainstorm.com",
+			"railwayreason.com",
+			"raintwig.com",
+			"rainyhand.com",
+			"rainyrule.com",
+			"rangecake.com",
+			"rangeplayground.com",
+			"raresummer.com",
+			"readingguilt.com",
+			"readymoon.com",
+			"readysnails.com",
+			"realizedoor.com",
+			"realizerecess.com",
+			"rebelhen.com",
+			"receptiveink.com",
+			"receptivereaction.com",
+			"recessrain.com",
+			"reconditeprison.com",
+			"reconditerake.com",
+			"reconditerespect.com",
+			"regularplants.com",
+			"regulatesleet.com",
+			"rehabilitatereason.com",
+			"relationrest.com",
+			"rememberdiscussion.com",
+			"repeatsweater.com",
+			"replaceroute.com",
+			"resonantbrush.com",
+			"resonantrock.com",
+			"respectrain.com",
+			"resplendentecho.com",
+			"restrainstorm.com",
+			"restructureinvention.com",
+			"retrievemint.com",
+			"rhetoricalactivity.com",
+			"rhetoricalloss.com",
+			"rhetoricalveil.com",
+			"rhymezebra.com",
+			"rhythmrule.com",
+			"richstring.com",
+			"righteouscrayon.com",
+			"rightfulfall.com",
+			"rigidrobin.com",
+			"rigidveil.com",
+			"ringplant.com",
+			"ringsrecord.com",
+			"ritzykey.com",
+			"ritzyrepresentative.com",
+			"ritzyveil.com",
+			"rollconnection.com",
+			"roseincome.com",
+			"rottenray.com",
+			"ruralrobin.com",
+			"rusticprice.com",
+			"ruthlessdegree.com",
+			"ruthlessmilk.com",
+			"sablesmile.com",
+			"sablesong.com",
+			"sadloaf.com",
+			"saffronrefuge.com",
+			"samestretch.com",
+			"satisfycork.com",
+			"savoryorange.com",
+			"scarcecard.com",
+			"scarcesign.com",
+			"scarcesurprise.com",
+			"scaredcomfort.com",
+			"scaredsidewalk.com",
+			"scaredsnake.com",
+			"scaredsnakes.com",
+			"scaredswing.com",
+			"scarfsmash.com",
+			"scatteredheat.com",
+			"scatteredstream.com",
+			"scientificshirt.com",
+			"scintillatingscissors.com",
+			"scintillatingsilver.com",
+			"scrapcranes.com",
+			"scratchsofa.com",
+			"screechingfurniture.com",
+			"screechingstove.com",
+			"scribblestring.com",
+			"scrollservice.com",
+			"scrubswim.com",
+			"seatsmoke.com",
+			"secondhandfall.com",
+			"secretivesheep.com",
+			"secretspiders.com",
+			"secretturtle.com",
+			"seedscissors.com",
+			"selectivesummer.com",
+			"selfishsea.com",
+			"selfishsnake.com",
+			"sensorsmile.com",
+			"seraphichorizon.com",
+			"serendipityecho.com",
+			"serenecascade.com",
+			"serenezephyr.com",
+			"serioussuit.com",
+			"serpentshampoo.com",
+			"settleshoes.com",
+			"shaggytank.com",
+			"shakegoldfish.com",
+			"shakyseat.com",
+			"shakysurprise.com",
+			"shakytaste.com",
+			"shallowblade.com",
+			"shesubscriptions.com",
+			"shirtsidewalk.com",
+			"shiveringspot.com",
+			"shiverscissors.com",
+			"shockinggrass.com",
+			"shockingship.com",
+			"shrillspoon.com",
+			"shylibrary.com",
+			"sicksmash.com",
+			"siliconslow.com",
+			"sillyscrew.com",
+			"simplesidewalk.com",
+			"sincerebuffalo.com",
+			"sinceresubstance.com",
+			"singroot.com",
+			"sixauthority.com",
+			"sixscissors.com",
+			"skillfuldrop.com",
+			"skisofa.com",
+			"skullmagnets.com",
+			"slaysweater.com",
+			"slimyscarf.com",
+			"slinksuggestion.com",
+			"slopesoap.com",
+			"smashshoe.com",
+			"smashsurprise.com",
+			"smilewound.com",
+			"smilingcattle.com",
+			"smilingswim.com",
+			"smilingwaves.com",
+			"smoggysnakes.com",
+			"smoggystation.com",
+			"snakemineral.com",
+			"sneakwind.com",
+			"sneakystew.com",
+			"snoresmile.com",
+			"soggysponge.com",
+			"soggyzoo.com",
+			"solarislabyrinth.com",
+			"somberscarecrow.com",
+			"sombersea.com",
+			"sombersquirrel.com",
+			"sombersticks.com",
+			"sombersurprise.com",
+			"soothingglade.com",
+			"sophisticatedstove.com",
+			"soresneeze.com",
+			"sorethunder.com",
+			"soretrain.com",
+			"sortsummer.com",
+			"sowlettuce.com",
+			"sparklingshelf.com",
+			"specialscissors.com",
+			"spectacularstamp.com",
+			"spellsalsa.com",
+			"spiffymachine.com",
+			"spirebaboon.com",
+			"spookyexchange.com",
+			"spookyskate.com",
+			"spookysleet.com",
+			"spookystitch.com",
+			"spoonsilk.com",
+			"spotlessstamp.com",
+			"spottednoise.com",
+			"springolive.com",
+			"springsister.com",
+			"springsnails.com",
+			"sprydelta.com",
+			"spuriousair.com",
+			"spuriousbase.com",
+			"spuriousstranger.com",
+			"spysubstance.com",
+			"squalidscrew.com",
+			"squeakzinc.com",
+			"squealingturn.com",
+			"stakingbasket.com",
+			"stakingshock.com",
+			"stakingsmile.com",
+			"staleshow.com",
+			"stalesummer.com",
+			"stayaction.com",
+			"steadfastseat.com",
+			"steadfastsound.com",
+			"steadfastsystem.com",
+			"steadycopper.com",
+			"steepsister.com",
+			"steepsquirrel.com",
+			"stepcattle.com",
+			"stereoproxy.com",
+			"stereotypedsugar.com",
+			"stiffgame.com",
+			"stiffstem.com",
+			"stimulatingsneeze.com",
+			"stingsquirrel.com",
+			"stingyspoon.com",
+			"stockingsleet.com",
+			"stockingsneeze.com",
+			"stopstomach.com",
+			"stormyachiever.com",
+			"straightnest.com",
+			"strangeclocks.com",
+			"strangesink.com",
+			"stretchsister.com",
+			"stretchsneeze.com",
+			"stretchsquirrel.com",
+			"stripedbat.com",
+			"strivesidewalk.com",
+			"strivesquirrel.com",
+			"stupendoussleet.com",
+			"stupendoussnow.com",
+			"stupidscene.com",
+			"subletyoke.com",
+			"subsequentswim.com",
+			"substantialcarpenter.com",
+			"substantialgrade.com",
+			"successfulscent.com",
+			"suddensidewalk.com",
+			"suddensoda.com",
+			"sulkycook.com",
+			"summerobject.com",
+			"superchichair.com",
+			"superficialeyes.com",
+			"superficialspring.com",
+			"superficialsquare.com",
+			"swankysquare.com",
+			"swellstocking.com",
+			"swingslip.com",
+			"swirlstop.com",
+			"swordgoose.com",
+			"tangibleteam.com",
+			"tangyamount.com",
+			"tangycover.com",
+			"tastelesstrees.com",
+			"tastesnake.com",
+			"tawdryson.com",
+			"tdzvm.pw",
+			"tealjewel.com",
+			"tearfulglass.com",
+			"tediousbear.com",
+			"tediousticket.com",
+			"tedioustooth.com",
+			"teenytinycellar.com",
+			"teenytinyshirt.com",
+			"teenytinytongue.com",
+			"telephoneapparatus.com",
+			"tempertrick.com",
+			"tempttalk.com",
+			"temptteam.com",
+			"tendertest.com",
+			"tenhourweek.com",
+			"terriblethumb.com",
+			"testadmiral.com",
+			"texturetrick.com",
+			"therapeuticcars.com",
+			"thickticket.com",
+			"thicktrucks.com",
+			"thingsafterthought.com",
+			"thingstaste.com",
+			"thinkitten.com",
+			"thirdrespect.com",
+			"thirstytwig.com",
+			"thomastorch.com",
+			"threetruck.com",
+			"ticketaunt.com",
+			"ticklesign.com",
+			"tinyswans.com",
+			"tinytendency.com",
+			"tiredthroat.com",
+			"tireinside.com",
+			"tiresomethunder.com",
+			"torpidtongue.com",
+			"tradetooth.com",
+			"tranquilplume.com",
+			"tranquilside.com",
+			"trappush.com",
+			"treadbun.com",
+			"tremendousearthquake.com",
+			"tremendousplastic.com",
+			"tremendoustime.com",
+			"tritebadge.com",
+			"tritethunder.com",
+			"troubleshade.com",
+			"truckstomatoes.com",
+			"truculentrate.com",
+			"tumbleicicle.com",
+			"typicalairplane.com",
+			"typicalteeth.com",
+			"tzwaw.pw",
+			"ubiquitousyard.com",
+			"ultraoranges.com",
+			"unablehope.com",
+			"unaccountablepie.com",
+			"unarmedindustry.com",
+			"unbecominghall.com",
+			"unbecominglamp.com",
+			"uncoveredexpert.com",
+			"understoodocean.com",
+			"unequalbrake.com",
+			"uninterestedquarter.com",
+			"unknowncrate.com",
+			"unknowntray.com",
+			"untidyquestion.com",
+			"untidyrice.com",
+			"unusedstone.com",
+			"unusualtitle.com",
+			"unwieldyhealth.com",
+			"unwieldyplastic.com",
+			"uppitytime.com",
+			"uselesslumber.com",
+			"vanfireworks.com",
+			"vanishmemory.com",
+			"vengefulgrass.com",
+			"venomousvessel.com",
+			"venusgloria.com",
+			"verdantanswer.com",
+			"verseballs.com",
+			"vibrantgale.com",
+			"vibrantsundown.com",
+			"virtualvincent.com",
+			"vividplume.com",
+			"volatileprofit.com",
+			"voraciousgrip.com",
+			"vq1qi.pw",
+			"wantingwindow.com",
+			"warmafterthought.com",
+			"warmquiver.com",
+			"warnwing.com",
+			"washbanana.com",
+			"wateryvan.com",
+			"waterywave.com",
+			"wellgroomedapparel.com",
+			"wellgroomedhydrant.com",
+			"wellmadefrog.com",
+			"whineattempt.com",
+			"whirlwealth.com",
+			"whiskyqueue.com",
+			"whisperingcrib.com",
+			"whisperingsummit.com",
+			"whispermeeting.com",
+			"whymaze.com",
+			"wildcommittee.com",
+			"wirecomic.com",
+			"wirypaste.com",
+			"wittypopcorn.com",
+			"wizardbuck.com",
+			"workoperation.com",
+			"worriednumber.com",
+			"worriedwine.com",
+			"wrongpotato.com",
+			"wtaccesscontrol.com",
+			"xovq5nemr.com",
+			"yieldingwoman.com",
+			"zbwp6ghm.com",
+			"zephyrlabyrinth.com",
+			"zestycrime.com",
+			"zlp6s.pw",
+			"adscat.ru",
+			"shellcat.ru"
 		]
 	},
 	"action": {
 		"type": "block"
 	},
-	"id": 8157
+	"id": 8323
 },
 {
 	"priority": 1000,
@@ -123977,7 +127332,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8158
+	"id": 8324
 },
 {
 	"priority": 1000,
@@ -123990,7 +127345,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8159
+	"id": 8325
 },
 {
 	"priority": 2000,
@@ -124003,7 +127358,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8160
+	"id": 8326
 },
 {
 	"priority": 2000,
@@ -124021,7 +127376,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8161
+	"id": 8327
 },
 {
 	"priority": 2000,
@@ -124034,7 +127389,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8162
+	"id": 8328
 },
 {
 	"priority": 2000,
@@ -124047,7 +127402,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8163
+	"id": 8329
 },
 {
 	"priority": 2000,
@@ -124063,7 +127418,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8164
+	"id": 8330
 },
 {
 	"priority": 2000,
@@ -124079,7 +127434,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8165
+	"id": 8331
 },
 {
 	"action": {
@@ -124099,7 +127454,7 @@
 		]
 	},
 	"priority": 2000,
-	"id": 8166
+	"id": 8332
 },
 {
 	"priority": 2000,
@@ -124116,7 +127471,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8167
+	"id": 8333
 },
 {
 	"priority": 2000,
@@ -124132,7 +127487,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8168
+	"id": 8334
 },
 {
 	"priority": 2000,
@@ -124148,7 +127503,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8169
+	"id": 8335
 },
 {
 	"priority": 2000,
@@ -124165,7 +127520,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8170
+	"id": 8336
 },
 {
 	"priority": 2000,
@@ -124191,7 +127546,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8171
+	"id": 8337
 },
 {
 	"priority": 2000,
@@ -124215,7 +127570,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8172
+	"id": 8338
 },
 {
 	"priority": 2000,
@@ -124238,7 +127593,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8173
+	"id": 8339
 },
 {
 	"priority": 2000,
@@ -124251,7 +127606,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8174
+	"id": 8340
 },
 {
 	"priority": 2000,
@@ -124264,7 +127619,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8175
+	"id": 8341
 },
 {
 	"priority": 2000,
@@ -124277,7 +127632,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8176
+	"id": 8342
 },
 {
 	"priority": 2000,
@@ -124294,7 +127649,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8177
+	"id": 8343
 },
 {
 	"priority": 2000,
@@ -124307,7 +127662,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8178
+	"id": 8344
 },
 {
 	"priority": 2000,
@@ -124324,7 +127679,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8179
+	"id": 8345
 },
 {
 	"priority": 2000,
@@ -124337,7 +127692,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8180
+	"id": 8346
 },
 {
 	"priority": 2000,
@@ -124353,7 +127708,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8181
+	"id": 8347
 },
 {
 	"priority": 2000,
@@ -124369,7 +127724,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8182
+	"id": 8348
 },
 {
 	"priority": 2000,
@@ -124386,7 +127741,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8183
+	"id": 8349
 },
 {
 	"priority": 2000,
@@ -124399,7 +127754,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8184
+	"id": 8350
 },
 {
 	"priority": 2000,
@@ -124417,7 +127772,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8185
+	"id": 8351
 },
 {
 	"priority": 2000,
@@ -124430,7 +127785,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8186
+	"id": 8352
 },
 {
 	"priority": 2000,
@@ -124443,7 +127798,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8187
+	"id": 8353
 },
 {
 	"priority": 2000,
@@ -124456,7 +127811,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8188
+	"id": 8354
 },
 {
 	"priority": 2000,
@@ -124469,7 +127824,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8189
+	"id": 8355
 },
 {
 	"priority": 2000,
@@ -124482,7 +127837,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8190
+	"id": 8356
 },
 {
 	"priority": 2000,
@@ -124495,7 +127850,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8191
+	"id": 8357
 },
 {
 	"priority": 2000,
@@ -124511,7 +127866,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8192
+	"id": 8358
 },
 {
 	"priority": 2000,
@@ -124527,7 +127882,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8193
+	"id": 8359
 },
 {
 	"priority": 2000,
@@ -124543,7 +127898,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8194
+	"id": 8360
 },
 {
 	"priority": 2000,
@@ -124556,7 +127911,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8195
+	"id": 8361
 },
 {
 	"priority": 2000,
@@ -124569,7 +127924,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8196
+	"id": 8362
 },
 {
 	"priority": 1000,
@@ -124590,7 +127945,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8197
+	"id": 8363
 },
 {
 	"priority": 2000,
@@ -124603,7 +127958,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8198
+	"id": 8364
 },
 {
 	"priority": 2000,
@@ -124616,7 +127971,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8199
+	"id": 8365
 },
 {
 	"priority": 2000,
@@ -124629,7 +127984,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8200
+	"id": 8366
 },
 {
 	"priority": 2000,
@@ -124642,7 +127997,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8201
+	"id": 8367
 },
 {
 	"priority": 2000,
@@ -124658,7 +128013,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8202
+	"id": 8368
 },
 {
 	"priority": 2000,
@@ -124671,7 +128026,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8203
+	"id": 8369
 },
 {
 	"priority": 2000,
@@ -124684,7 +128039,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8204
+	"id": 8370
 },
 {
 	"priority": 2000,
@@ -124697,7 +128052,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8205
+	"id": 8371
 },
 {
 	"priority": 2000,
@@ -124713,7 +128068,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8206
+	"id": 8372
 },
 {
 	"priority": 1000,
@@ -124729,7 +128084,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8207
+	"id": 8373
 },
 {
 	"priority": 2000,
@@ -124743,7 +128098,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8208
+	"id": 8374
 },
 {
 	"priority": 1000,
@@ -124759,7 +128114,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8209
+	"id": 8375
 },
 {
 	"priority": 2000,
@@ -124772,7 +128127,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8210
+	"id": 8376
 },
 {
 	"priority": 2000,
@@ -124785,7 +128140,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8211
+	"id": 8377
 },
 {
 	"priority": 2000,
@@ -124798,7 +128153,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8212
+	"id": 8378
 },
 {
 	"priority": 2000,
@@ -124814,7 +128169,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8213
+	"id": 8379
 },
 {
 	"priority": 2000,
@@ -124827,7 +128182,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8214
+	"id": 8380
 },
 {
 	"priority": 2000,
@@ -124840,7 +128195,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8215
+	"id": 8381
 },
 {
 	"priority": 2000,
@@ -124857,7 +128212,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8216
+	"id": 8382
 },
 {
 	"priority": 2000,
@@ -124931,7 +128286,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8217
+	"id": 8383
 },
 {
 	"priority": 2000,
@@ -124944,7 +128299,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8218
+	"id": 8384
 },
 {
 	"priority": 2000,
@@ -124957,7 +128312,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8219
+	"id": 8385
 },
 {
 	"priority": 2000,
@@ -124970,7 +128325,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8220
+	"id": 8386
 },
 {
 	"priority": 2000,
@@ -124986,7 +128341,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8221
+	"id": 8387
 },
 {
 	"priority": 2000,
@@ -124999,7 +128354,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8222
+	"id": 8388
 },
 {
 	"priority": 1001,
@@ -125013,7 +128368,7 @@
 	"action": {
 		"type": "allowAllRequests"
 	},
-	"id": 8223
+	"id": 8389
 },
 {
 	"priority": 2000,
@@ -125026,7 +128381,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8224
+	"id": 8390
 },
 {
 	"priority": 2000,
@@ -125040,7 +128395,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8225
+	"id": 8391
 },
 {
 	"priority": 2001,
@@ -125078,7 +128433,7 @@
 	"action": {
 		"type": "allowAllRequests"
 	},
-	"id": 8226
+	"id": 8392
 },
 {
 	"priority": 2000,
@@ -125091,7 +128446,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8227
+	"id": 8393
 },
 {
 	"priority": 2000,
@@ -125105,7 +128460,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8228
+	"id": 8394
 },
 {
 	"priority": 2000,
@@ -125118,7 +128473,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8229
+	"id": 8395
 },
 {
 	"priority": 2000,
@@ -125133,7 +128488,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8230
+	"id": 8396
 },
 {
 	"priority": 2000,
@@ -125146,7 +128501,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8231
+	"id": 8397
 },
 {
 	"priority": 2000,
@@ -125159,7 +128514,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8232
+	"id": 8398
 },
 {
 	"priority": 2000,
@@ -125172,7 +128527,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8233
+	"id": 8399
 },
 {
 	"priority": 2000,
@@ -125185,7 +128540,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8234
+	"id": 8400
 },
 {
 	"priority": 2000,
@@ -125201,7 +128556,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8235
+	"id": 8401
 },
 {
 	"priority": 2000,
@@ -125214,7 +128569,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8236
+	"id": 8402
 },
 {
 	"priority": 2000,
@@ -125235,7 +128590,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8237
+	"id": 8403
 },
 {
 	"priority": 2000,
@@ -125248,7 +128603,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8238
+	"id": 8404
 },
 {
 	"priority": 2000,
@@ -125261,7 +128616,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8239
+	"id": 8405
 },
 {
 	"priority": 2000,
@@ -125274,7 +128629,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8240
+	"id": 8406
 },
 {
 	"priority": 2000,
@@ -125287,7 +128642,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8241
+	"id": 8407
 },
 {
 	"priority": 2000,
@@ -125300,7 +128655,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8242
+	"id": 8408
 },
 {
 	"priority": 2000,
@@ -125317,7 +128672,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8243
+	"id": 8409
 },
 {
 	"priority": 2000,
@@ -125333,7 +128688,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8244
+	"id": 8410
 },
 {
 	"priority": 2000,
@@ -125349,7 +128704,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8245
+	"id": 8411
 },
 {
 	"priority": 2000,
@@ -125362,7 +128717,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8246
+	"id": 8412
 },
 {
 	"priority": 2000,
@@ -125383,7 +128738,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8247
+	"id": 8413
 },
 {
 	"priority": 2000,
@@ -125399,7 +128754,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8248
+	"id": 8414
 },
 {
 	"action": {
@@ -125414,7 +128769,7 @@
 		"urlFilter": "||chicksonright.com^"
 	},
 	"priority": 2000,
-	"id": 8249
+	"id": 8415
 },
 {
 	"priority": 2000,
@@ -125427,7 +128782,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8250
+	"id": 8416
 },
 {
 	"priority": 2000,
@@ -125440,7 +128795,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8251
+	"id": 8417
 },
 {
 	"priority": 2000,
@@ -125453,7 +128808,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8252
+	"id": 8418
 },
 {
 	"priority": 2000,
@@ -125466,7 +128821,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8253
+	"id": 8419
 },
 {
 	"priority": 2000,
@@ -125486,7 +128841,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8254
+	"id": 8420
 },
 {
 	"priority": 2001,
@@ -125501,7 +128856,7 @@
 	"action": {
 		"type": "allowAllRequests"
 	},
-	"id": 8255
+	"id": 8421
 },
 {
 	"priority": 2000,
@@ -125517,7 +128872,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8256
+	"id": 8422
 },
 {
 	"priority": 2000,
@@ -125530,7 +128885,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8257
+	"id": 8423
 },
 {
 	"priority": 2000,
@@ -125543,7 +128898,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8258
+	"id": 8424
 },
 {
 	"priority": 2000,
@@ -125556,7 +128911,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8259
+	"id": 8425
 },
 {
 	"priority": 2000,
@@ -125569,7 +128924,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8260
+	"id": 8426
 },
 {
 	"priority": 2000,
@@ -125586,7 +128941,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8261
+	"id": 8427
 },
 {
 	"priority": 2000,
@@ -125602,7 +128957,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8262
+	"id": 8428
 },
 {
 	"priority": 2000,
@@ -125616,7 +128971,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8263
+	"id": 8429
 },
 {
 	"priority": 2000,
@@ -125629,7 +128984,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8264
+	"id": 8430
 },
 {
 	"priority": 2000,
@@ -125664,7 +129019,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8265
+	"id": 8431
 },
 {
 	"priority": 2000,
@@ -125677,7 +129032,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8266
+	"id": 8432
 },
 {
 	"priority": 2000,
@@ -125690,7 +129045,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8267
+	"id": 8433
 },
 {
 	"priority": 2000,
@@ -125703,7 +129058,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8268
+	"id": 8434
 },
 {
 	"priority": 2000,
@@ -125716,7 +129071,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8269
+	"id": 8435
 },
 {
 	"priority": 2000,
@@ -125729,7 +129084,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8270
+	"id": 8436
 },
 {
 	"priority": 2000,
@@ -125795,7 +129150,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8271
+	"id": 8437
 },
 {
 	"priority": 1000,
@@ -125822,7 +129177,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8272
+	"id": 8438
 },
 {
 	"priority": 1000,
@@ -125836,7 +129191,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8273
+	"id": 8439
 },
 {
 	"priority": 1000,
@@ -125853,7 +129208,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8274
+	"id": 8440
 },
 {
 	"priority": 1000,
@@ -125869,7 +129224,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8275
+	"id": 8441
 },
 {
 	"priority": 1000,
@@ -125883,7 +129238,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8276
+	"id": 8442
 },
 {
 	"priority": 1000,
@@ -125897,7 +129252,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8277
+	"id": 8443
 },
 {
 	"priority": 1000,
@@ -125911,7 +129266,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8278
+	"id": 8444
 },
 {
 	"priority": 1000,
@@ -125938,7 +129293,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8279
+	"id": 8445
 },
 {
 	"priority": 1000,
@@ -125961,7 +129316,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8280
+	"id": 8446
 },
 {
 	"priority": 1000,
@@ -125974,7 +129329,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8281
+	"id": 8447
 },
 {
 	"priority": 1000,
@@ -125997,7 +129352,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8282
+	"id": 8448
 },
 {
 	"priority": 1000,
@@ -126012,7 +129367,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8283
+	"id": 8449
 },
 {
 	"priority": 2000,
@@ -126028,7 +129383,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8284
+	"id": 8450
 },
 {
 	"priority": 1000,
@@ -126043,7 +129398,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8285
+	"id": 8451
 },
 {
 	"priority": 1000,
@@ -126058,7 +129413,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8286
+	"id": 8452
 },
 {
 	"priority": 1000,
@@ -126072,7 +129427,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8287
+	"id": 8453
 },
 {
 	"priority": 2000,
@@ -126085,7 +129440,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8288
+	"id": 8454
 },
 {
 	"priority": 1000,
@@ -126104,7 +129459,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8289
+	"id": 8455
 },
 {
 	"priority": 1000,
@@ -126118,7 +129473,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8290
+	"id": 8456
 },
 {
 	"priority": 2000,
@@ -126136,7 +129491,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8291
+	"id": 8457
 },
 {
 	"priority": 2000,
@@ -126152,7 +129507,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8292
+	"id": 8458
 },
 {
 	"priority": 2000,
@@ -126165,7 +129520,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8293
+	"id": 8459
 },
 {
 	"priority": 2000,
@@ -126179,7 +129534,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8294
+	"id": 8460
 },
 {
 	"priority": 2000,
@@ -126192,7 +129547,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8295
+	"id": 8461
 },
 {
 	"priority": 1000,
@@ -126205,7 +129560,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8296
+	"id": 8462
 },
 {
 	"priority": 2000,
@@ -126219,7 +129574,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8297
+	"id": 8463
 },
 {
 	"priority": 2000,
@@ -126232,7 +129587,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8298
+	"id": 8464
 },
 {
 	"priority": 2000,
@@ -126245,7 +129600,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8299
+	"id": 8465
 },
 {
 	"priority": 2000,
@@ -126261,7 +129616,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8300
+	"id": 8466
 },
 {
 	"priority": 2000,
@@ -126280,7 +129635,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8301
+	"id": 8467
 },
 {
 	"priority": 2000,
@@ -126293,7 +129648,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8302
+	"id": 8468
 },
 {
 	"priority": 2000,
@@ -126308,7 +129663,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8303
+	"id": 8469
 },
 {
 	"priority": 2000,
@@ -126321,7 +129676,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8304
+	"id": 8470
 },
 {
 	"priority": 2000,
@@ -126334,7 +129689,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8305
+	"id": 8471
 },
 {
 	"priority": 1000,
@@ -126357,7 +129712,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8306
+	"id": 8472
 },
 {
 	"priority": 2000,
@@ -126387,7 +129742,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8307
+	"id": 8473
 },
 {
 	"priority": 1000,
@@ -126412,7 +129767,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8308
+	"id": 8474
 },
 {
 	"priority": 1000,
@@ -126426,7 +129781,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8309
+	"id": 8475
 },
 {
 	"priority": 2000,
@@ -126442,7 +129797,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8310
+	"id": 8476
 },
 {
 	"priority": 1000,
@@ -126460,7 +129815,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8311
+	"id": 8477
 },
 {
 	"priority": 2000,
@@ -126478,7 +129833,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8312
+	"id": 8478
 },
 {
 	"priority": 2000,
@@ -126505,7 +129860,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8313
+	"id": 8479
 },
 {
 	"priority": 1000,
@@ -126527,7 +129882,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8314
+	"id": 8480
 },
 {
 	"priority": 1000,
@@ -126541,7 +129896,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8315
+	"id": 8481
 },
 {
 	"priority": 2000,
@@ -126559,7 +129914,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8316
+	"id": 8482
 },
 {
 	"priority": 2000,
@@ -126575,7 +129930,7 @@
 	"action": {
 		"type": "block"
 	},
-	"id": 8317
+	"id": 8483
 },
 {
 	"priority": 2000,
@@ -126591,7 +129946,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8318
+	"id": 8484
 },
 {
 	"priority": 2000,
@@ -126604,7 +129959,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8319
+	"id": 8485
 },
 {
 	"priority": 2000,
@@ -126620,7 +129975,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8320
+	"id": 8486
 },
 {
 	"priority": 2000,
@@ -126636,7 +129991,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8321
+	"id": 8487
 },
 {
 	"priority": 2000,
@@ -126654,7 +130009,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8322
+	"id": 8488
 },
 {
 	"priority": 2000,
@@ -126674,7 +130029,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8323
+	"id": 8489
 },
 {
 	"priority": 2000,
@@ -126688,7 +130043,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8324
+	"id": 8490
 },
 {
 	"priority": 2000,
@@ -126704,7 +130059,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8325
+	"id": 8491
 },
 {
 	"priority": 2000,
@@ -126720,7 +130075,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8326
+	"id": 8492
 },
 {
 	"priority": 2000,
@@ -126735,7 +130090,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8327
+	"id": 8493
 },
 {
 	"priority": 2000,
@@ -126749,7 +130104,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8328
+	"id": 8494
 },
 {
 	"priority": 2000,
@@ -126765,7 +130120,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8329
+	"id": 8495
 },
 {
 	"priority": 2000,
@@ -126787,7 +130142,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8330
+	"id": 8496
 },
 {
 	"priority": 2000,
@@ -126803,7 +130158,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8331
+	"id": 8497
 },
 {
 	"priority": 2000,
@@ -126820,7 +130175,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8332
+	"id": 8498
 },
 {
 	"priority": 2000,
@@ -126836,7 +130191,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8333
+	"id": 8499
 },
 {
 	"priority": 2000,
@@ -126849,7 +130204,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8334
+	"id": 8500
 },
 {
 	"priority": 2000,
@@ -126865,7 +130220,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8335
+	"id": 8501
 },
 {
 	"priority": 2000,
@@ -126881,7 +130236,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8336
+	"id": 8502
 },
 {
 	"priority": 2000,
@@ -126897,7 +130252,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8337
+	"id": 8503
 },
 {
 	"priority": 2000,
@@ -126913,7 +130268,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8338
+	"id": 8504
 },
 {
 	"priority": 2000,
@@ -126929,7 +130284,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8339
+	"id": 8505
 },
 {
 	"priority": 2000,
@@ -126945,7 +130300,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8340
+	"id": 8506
 },
 {
 	"priority": 2000,
@@ -126961,7 +130316,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8341
+	"id": 8507
 },
 {
 	"priority": 2000,
@@ -126974,7 +130329,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8342
+	"id": 8508
 },
 {
 	"priority": 2000,
@@ -126991,7 +130346,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8343
+	"id": 8509
 },
 {
 	"priority": 2000,
@@ -127035,7 +130390,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8344
+	"id": 8510
 },
 {
 	"priority": 2000,
@@ -127053,7 +130408,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8345
+	"id": 8511
 },
 {
 	"priority": 2000,
@@ -127066,7 +130421,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8346
+	"id": 8512
 },
 {
 	"priority": 2000,
@@ -127082,7 +130437,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8347
+	"id": 8513
 },
 {
 	"priority": 2000,
@@ -127096,7 +130451,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8348
+	"id": 8514
 },
 {
 	"priority": 2000,
@@ -127109,7 +130464,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8349
+	"id": 8515
 },
 {
 	"priority": 2000,
@@ -127122,7 +130477,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8350
+	"id": 8516
 },
 {
 	"priority": 2000,
@@ -127139,7 +130494,7 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8351
+	"id": 8517
 },
 {
 	"priority": 2000,
@@ -127171,6 +130526,37 @@
 	"action": {
 		"type": "allow"
 	},
-	"id": 8352
+	"id": 8518
+},
+{
+	"priority": 2000,
+	"condition": {
+		"initiatorDomains": [
+			"filerev.cc",
+			"pencurimovie.pw"
+		],
+		"urlFilter": "||corrosif.science^"
+	},
+	"action": {
+		"type": "block"
+	},
+	"id": 8519
+},
+{
+	"priority": 2000,
+	"condition": {
+		"resourceTypes": [
+			"script"
+		],
+		"initiatorDomains": [
+			"hurriyet.com.tr",
+			"milliyet.com.tr"
+		],
+		"urlFilter": "||fundingchoicesmessages.google.com^"
+	},
+	"action": {
+		"type": "allow"
+	},
+	"id": 8520
 }
 ]
