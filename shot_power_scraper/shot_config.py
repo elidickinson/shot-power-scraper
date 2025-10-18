@@ -74,6 +74,10 @@ class ShotConfig:
         self.popup_block = shot.get("popup_block", config_file_settings.get("popup_block", False))
         self.paywall_block = shot.get("paywall_block", config_file_settings.get("paywall_block", False))
         self.user_agent = shot.get("user_agent", config_file_settings.get("user_agent"))
+
+        # Parse ublock_lists from comma-separated string to list
+        ublock_lists_str = shot.get("ublock_lists")
+        self.ublock_lists = [s.strip() for s in ublock_lists_str.split(",")] if ublock_lists_str else None
         self.skip_shot = shot.get("skip_shot", False)
         self.save_html = shot.get("save_html", False)
         self.width = shot.get("width", 1280)

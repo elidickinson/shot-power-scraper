@@ -44,10 +44,20 @@ def run_browser_command(command_func, shot_config, **kwargs):
         try:
             extensions = []
             if shot_config.ad_block or shot_config.popup_block or shot_config.paywall_block:
-                await setup_blocking_extensions(extensions, shot_config.ad_block, shot_config.popup_block, shot_config.paywall_block)
+                temp_extensions = await setup_blocking_extensions(
+                    extensions,
+                    shot_config.ad_block,
+                    shot_config.popup_block,
+                    shot_config.paywall_block,
+                    shot_config.ublock_lists
+                )
 
             # Create browser with shot_config parameters
             browser_obj = await create_browser_context(shot_config, extensions)
+
+            # Store temp extensions on browser for cleanup
+            if shot_config.ad_block or shot_config.popup_block or shot_config.paywall_block:
+                browser_obj._temp_extensions = temp_extensions
 
             # Set up tab context with one-time configuration
             from shot_power_scraper.page_utils import create_tab_context
@@ -148,6 +158,7 @@ def common_shot_options(fn):
                 help="Enable/disable popup blocking (overrides config file setting)")(fn)
     click.option("--ad-block/--no-ad-block", default=None,
                 help="Enable ad blocking using built-in filter lists")(fn)
+    click.option("--ublock-lists", help="Comma-separated list of additional uBlock filter lists to enable (e.g. 'annoyances-cookies,annoyances-overlays')")(fn)
     click.option("--paywall-block/--no-paywall-block", default=None,
                 help="Enable paywall bypass using Bypass Paywalls Clean extension")(fn)
 
@@ -303,7 +314,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 @common_shot_options
 def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outputs,
          leave_server, har, har_zip, har_file,
-         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
          wait, wait_for, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
@@ -350,8 +361,13 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 
     async def run_multi():
         extensions = []
+        temp_extensions = []
         if ad_block or popup_block or paywall_block:
-            await setup_blocking_extensions(extensions, ad_block, popup_block, paywall_block)
+            # Parse ublock_lists if provided
+            ublock_lists_parsed = [s.strip() for s in ublock_lists.split(",")] if ublock_lists else None
+            temp_extensions = await setup_blocking_extensions(
+                extensions, ad_block, popup_block, paywall_block, ublock_lists_parsed
+            )
 
         # Create browser config for multi command
         record_har_path = har_file
@@ -361,6 +377,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
             raise click.ClickException(str(e))
 
         browser_obj = await create_browser_context(browser_shot_config, extensions)
+        browser_obj._temp_extensions = temp_extensions
 
         try:
             for shot in shots:

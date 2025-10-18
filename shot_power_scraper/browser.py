@@ -5,6 +5,7 @@ import nodriver as uc
 import pathlib
 import tempfile
 import shutil
+import os
 
 
 class Config:
@@ -101,22 +102,65 @@ async def create_browser_context(shot_config, extensions=None):
 
     # Store the temp directory on the browser object for later cleanup
     browser_obj._temp_user_data_dir = temp_user_data_dir
+    browser_obj._temp_extensions = []
 
     return browser_obj
 
 
-async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_block):
+def customize_ublock_extension(base_path, enable_lists):
+    """Copy uBlock extension and enable specific filter lists"""
+    temp_ext = tempfile.mkdtemp(prefix="ublock_custom_")
+
+    # Copy entire extension to temp directory
+    for item in os.listdir(base_path):
+        src = os.path.join(base_path, item)
+        dst = os.path.join(temp_ext, item)
+        if os.path.isdir(src):
+            shutil.copytree(src, dst)
+        else:
+            shutil.copy2(src, dst)
+
+    # Modify manifest.json to enable requested filter lists
+    manifest_path = os.path.join(temp_ext, 'manifest.json')
+    with open(manifest_path) as f:
+        manifest = json.load(f)
+
+    enabled_count = 0
+    for rule in manifest['declarative_net_request']['rule_resources']:
+        if rule['id'] in enable_lists:
+            rule['enabled'] = True
+            enabled_count += 1
+
+    with open(manifest_path, 'w') as f:
+        json.dump(manifest, f, indent=2)
+
+    if Config.verbose:
+        click.echo(f"Enabled {enabled_count} additional filter lists: {', '.join(enable_lists)}", err=True)
+
+    return temp_ext
+
+
+async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_block, ublock_lists=None):
     """Setup blocking extensions based on requested flags"""
     base_extensions_path = pathlib.Path(__file__).parent / 'extensions'
 
     # Load appropriate extensions
     loaded_extensions = []
+    temp_extensions = []
 
     if ad_block:
         # Use uBlock Lite (Manifest V3) for ad blocking
-        ad_extension_path = (base_extensions_path / 'ublock-lite-custom').resolve()
-        extensions.append(str(ad_extension_path))
-        loaded_extensions.append("ad blocking (uBlock Lite)")
+        ad_extension_base = (base_extensions_path / 'ublock-lite-custom').resolve()
+
+        if ublock_lists:
+            # Customize extension with specific filter lists
+            ad_extension_path = customize_ublock_extension(str(ad_extension_base), ublock_lists)
+            temp_extensions.append(ad_extension_path)
+            extensions.append(ad_extension_path)
+            loaded_extensions.append(f"ad blocking (uBlock Lite + {len(ublock_lists)} custom lists)")
+        else:
+            extensions.append(str(ad_extension_base))
+            loaded_extensions.append("ad blocking (uBlock Lite)")
 
     if popup_block:
         popup_extension_path = (base_extensions_path / 'shot-power-scraper-popup-blocker').resolve()
@@ -131,6 +175,8 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_b
     if Config.verbose:
         click.echo(f"Blocking extensions enabled: {' + '.join(loaded_extensions)}", err=True)
 
+    return temp_extensions
+
 
 async def cleanup_browser(browser_obj):
     """Clean up browser and its temporary user data directory"""
@@ -139,6 +185,13 @@ async def cleanup_browser(browser_obj):
 
     # Stop the browser first (stop() is a regular sync method, not async)
     browser_obj.stop()
+
+    # Clean up temporary extensions
+    if hasattr(browser_obj, '_temp_extensions'):
+        for temp_ext in browser_obj._temp_extensions:
+            shutil.rmtree(temp_ext, ignore_errors=True)
+            if Config.verbose:
+                click.echo(f"Cleaned up temp extension: {temp_ext}", err=True)
 
     # Clean up our temporary user data directory
     if hasattr(browser_obj, '_temp_user_data_dir'):
