@@ -35,6 +35,10 @@ shot_power_scraper/extensions/blocker-shared/*.json
 /.serena
 /CLAUDE.md
 
+# uBlock Origin source (for building uBlock Lite)
+shot_power_scraper/extensions/uBlock/
+shot_power_scraper/extensions/ublock-lite-backup/
+
 # Development and debug files
 debug_*.py
 task_log.md
