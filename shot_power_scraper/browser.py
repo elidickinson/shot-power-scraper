@@ -113,9 +113,10 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_b
     loaded_extensions = []
 
     if ad_block:
-        ad_extension_path = (base_extensions_path / 'shot-power-scraper-ad-blocker').resolve()
+        # Use uBlock Lite (Manifest V3) for ad blocking
+        ad_extension_path = (base_extensions_path / 'ublock-lite-custom').resolve()
         extensions.append(str(ad_extension_path))
-        loaded_extensions.append("ad blocking")
+        loaded_extensions.append("ad blocking (uBlock Lite)")
 
     if popup_block:
         popup_extension_path = (base_extensions_path / 'shot-power-scraper-popup-blocker').resolve()
