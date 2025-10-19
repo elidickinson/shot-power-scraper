@@ -668,7 +668,13 @@ async def html(request: HtmlRequest) -> HTMLResponse:
     default=lambda: os.getenv("RELOAD", "false").lower() in ("true", "1", "yes"),
     help="Enable auto-reload (default: false, can be overridden with RELOAD env var)"
 )
-def main(browser_args, host, port, reload, user_agent, enable_gpu, headful, reduced_motion,
+@click.option(
+    "--workers",
+    type=int,
+    default=lambda: int(os.getenv("WORKERS", "1")),
+    help="Number of worker processes (default: 1, can be overridden with WORKERS env var)"
+)
+def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, headful, reduced_motion,
          ad_block, popup_block, paywall_block):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
@@ -702,11 +708,15 @@ def main(browser_args, host, port, reload, user_agent, enable_gpu, headful, redu
 
     logger.info(f"Starting server on {host}:{port}")
 
+    if workers > 1:
+        click.echo(f"Running with {workers} worker processes")
+
     uvicorn.run(
         app,
         host=host,
         port=port,
-        reload=reload
+        reload=reload,
+        workers=workers
     )
 
 
