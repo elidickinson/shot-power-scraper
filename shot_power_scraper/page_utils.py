@@ -144,7 +144,7 @@ async def create_tab_context(browser_obj, shot_config):
         click.echo(f"Setting up tab context", err=True)
 
     # Create blank page and set window size (important for non-headless modes)
-    page = await browser_obj.get("about:blank")
+    page = await browser_obj.get("about:blank", new_tab=True)
     await page.set_window_size(shot_config.width, shot_config.height)
 
     # Configure user agent with Client Hints metadata

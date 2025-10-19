@@ -1,0 +1,26 @@
+# Post 1: Header ("Getting chilly tonight...")
+0,0,1200,180
+
+# Post 2: "Happening now" / "What’s next"
+0,180,1200,120
+
+# Post 3: "Key updates"
+0,300,1200,100
+
+# Post 4: "CWG’s detailed D.C.-area forecast"
+0,400,1200,300
+
+# Post 5: "Today’s daily digit"
+0,700,1200,150
+
+# Post 6: "Coastal low to throw rain..."
+0,850,1200,250
+
+# Post 7: "Here’s how much rain fell Tuesday night"
+0,1100,1200,200
+
+# Post 8: "A storm will form near the East Coast soon..."
+0,1300,1200,250
+
+# Post 9: "Today in weather history..."
+0,1550,1200,200

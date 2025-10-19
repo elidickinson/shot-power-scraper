@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.shotpowerscraper.api</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/admin/.local/bin/uv</string>
+        <string>run</string>
+        <string>/Users/admin/shot-power-scraper/api_server.py</string>
+        <string>--host</string>
+        <string>0.0.0.0</string>
+        <string>--port</string>
+        <string>8123</string>
+        <string>--ad-block</string>
+        <string>--popup-block</string>
+        <string>--paywall-block</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/admin/shot-power-scraper</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/admin/shot-power-scraper-api-server.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/admin/shot-power-scraper-api-server-error.log</string>
+</dict>
+</plist>

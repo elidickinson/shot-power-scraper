@@ -220,6 +220,7 @@ class HtmlRequest(BaseRequest):
 async def get_browser(browser_args=None):
     """Get or create a shared browser instance"""
     global browser_instance
+
     if browser_instance is None:
         Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
         Config.silent = not Config.verbose
@@ -540,35 +541,35 @@ loadServerSettings();
 @app.post("/shot", tags=["screenshots"], summary="Capture Screenshot")
 async def shot(request: ShotRequest):
     """Take a screenshot and return the image"""
+    browser = await get_browser()
+
+    # Build shot configuration
+    shot_config = ShotConfig({
+        "url": request.url,
+        "width": request.width,
+        "height": request.height,
+        "selectors": request.selectors,
+        "selectors_all": request.selectors_all,
+        "js_selectors": request.js_selectors,
+        "js_selectors_all": request.js_selectors_all,
+        "padding": request.padding,
+        "javascript": request.javascript,
+        "quality": request.quality,
+        "wait": request.wait,
+        "wait_for": request.wait_for,
+        "timeout": request.timeout // 1000 if request.timeout else 30,  # Convert to seconds
+        "omit_background": request.omit_background,
+        "skip_challenge_page_check": request.skip_challenge_page_check,
+        "skip_wait_for_load": request.skip_wait_for_load,
+        "trigger_lazy_load": request.trigger_lazy_load,
+        "silent": True
+    })
+
+    # Create a tab context using the browser object
+    from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
+    page = await create_tab_context(browser, shot_config)
+
     try:
-        # Get browser instance
-        browser = await get_browser()
-
-        # Build shot configuration
-        shot_config = ShotConfig({
-            "url": request.url,
-            "width": request.width,
-            "height": request.height,
-            "selectors": request.selectors,
-            "selectors_all": request.selectors_all,
-            "js_selectors": request.js_selectors,
-            "js_selectors_all": request.js_selectors_all,
-            "padding": request.padding,
-            "javascript": request.javascript,
-            "quality": request.quality,
-            "wait": request.wait,
-            "wait_for": request.wait_for,
-            "timeout": request.timeout // 1000 if request.timeout else 30,  # Convert to seconds
-            "omit_background": request.omit_background,
-            "skip_challenge_page_check": request.skip_challenge_page_check,
-            "skip_wait_for_load": request.skip_wait_for_load,
-            "trigger_lazy_load": request.trigger_lazy_load,
-            "silent": True
-        })
-
-        # Create a tab context using the browser object
-        from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
-        page = await create_tab_context(browser, shot_config)
         await navigate_to_url(page, shot_config)
 
         # Take the screenshot using the page context
@@ -600,26 +601,26 @@ async def shot(request: ShotRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        await page.close()
 
 
 @app.post("/html", tags=["content"], summary="Extract HTML Content")
 async def html(request: HtmlRequest) -> HTMLResponse:
     """Extract HTML content from a page"""
+    browser = await get_browser()
+
+    shot_config = ShotConfig({
+        "url": request.url,
+        "timeout": request.timeout // 1000,  # Convert to seconds
+        "wait": request.wait,
+        "javascript": request.javascript,
+        "silent": True
+    })
+
+    page = await create_tab_context(browser, shot_config)
+
     try:
-        # Use create_tab_context + navigate_to_url for consistent page setup including Cloudflare detection
-        # Get browser instance
-        browser = await get_browser()
-
-        # Use create_tab_context + navigate_to_url for consistent page setup including Cloudflare detection
-        shot_config = ShotConfig({
-            "url": request.url,
-            "timeout": request.timeout // 1000,  # Convert to seconds
-            "wait": request.wait,
-            "javascript": request.javascript,
-            "silent": True
-        })
-
-        page = await create_tab_context(browser, shot_config)
         await navigate_to_url(page, shot_config)
 
         # Extract HTML
@@ -636,6 +637,8 @@ async def html(request: HtmlRequest) -> HTMLResponse:
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        await page.close()
 
 
 @click.command()
