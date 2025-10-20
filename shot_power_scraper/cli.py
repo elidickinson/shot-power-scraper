@@ -211,7 +211,7 @@ def cli():
 def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_selectors_all,
          padding, javascript, retina, scale_factor, omit_background, quality,
          interactive, devtools, log_requests, save_html,
-         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
          wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
@@ -458,7 +458,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 @click.option("-j", "--javascript", help="Execute this JS prior to taking the snapshot")
 @common_shot_options
 def accessibility(url, output, javascript,
-                 verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+                 verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
                  wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
                  auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
                  auth_username, auth_password, enable_gpu):
@@ -483,7 +483,7 @@ def accessibility(url, output, javascript,
 @click.option("--no-response-bodies", is_flag=True, help="Exclude response body content from HAR file (bodies included by default)")
 @common_shot_options
 def har(url, zip_, output, javascript, no_response_bodies,
-       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
        wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
        auth_username, auth_password, enable_gpu):
@@ -581,7 +581,7 @@ def har(url, zip_, output, javascript, no_response_bodies,
 )
 @common_shot_options
 def javascript(url, javascript, input, output, raw,
-              verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+              verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
               wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
               auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
               auth_username, auth_password, enable_gpu):
@@ -657,7 +657,7 @@ def javascript(url, javascript, input, output, raw,
 @click.option("--pdf-css", help="Inject custom CSS for PDF generation")
 @common_shot_options
 def pdf(url, output, javascript, media_screen, landscape, scale, print_background, pdf_css,
-       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
        wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
        auth_username, auth_password, enable_gpu):
@@ -726,7 +726,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 )
 @common_shot_options
 def html(url, output, javascript, selector,
-        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
         wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
         auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
         auth_username, auth_password, enable_gpu):
@@ -782,7 +782,7 @@ def html(url, output, javascript, selector,
 @click.option("-j", "--javascript", help="Execute this JS prior to capturing the MHTML")
 @common_shot_options
 def mhtml(url, output, javascript,
-         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block,
+         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
          wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
