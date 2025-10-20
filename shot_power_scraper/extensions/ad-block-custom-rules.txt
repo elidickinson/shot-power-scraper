@@ -29,7 +29,7 @@ cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-w
 ||cnn.com/wbdotp/scripttemplates/otSDKStub.js^
 
 ! Block general cookie consent scripts
-*/wp-content/plugins/pressidium-cookie-consent/*
+/wp-content/plugins/pressidium-cookie-consent/*
 
 ! Block wisepops popup service
 ||cdn.wisepops.com/shared/wisepops/*

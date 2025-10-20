@@ -24,7 +24,7 @@
     "rule_resources": [
       {
         "id": "ublock-filters",
-        "enabled": false,
+        "enabled": true,
         "path": "/rulesets/main/ublock-filters.json"
       },
       {
@@ -39,7 +39,7 @@
       },
       {
         "id": "pgl",
-        "enabled": false,
+        "enabled": true,
         "path": "/rulesets/main/pgl.json"
       },
       {
@@ -59,7 +59,7 @@
       },
       {
         "id": "block-lan",
-        "enabled": true,
+        "enabled": false,
         "path": "/rulesets/main/block-lan.json"
       },
       {
@@ -74,12 +74,12 @@
       },
       {
         "id": "annoyances-cookies",
-        "enabled": true,
+        "enabled": false,
         "path": "/rulesets/main/annoyances-cookies.json"
       },
       {
         "id": "annoyances-overlays",
-        "enabled": true,
+        "enabled": false,
         "path": "/rulesets/main/annoyances-overlays.json"
       },
       {
@@ -94,12 +94,12 @@
       },
       {
         "id": "annoyances-others",
-        "enabled": true,
+        "enabled": false,
         "path": "/rulesets/main/annoyances-others.json"
       },
       {
         "id": "annoyances-notifications",
-        "enabled": true,
+        "enabled": false,
         "path": "/rulesets/main/annoyances-notifications.json"
       },
       {
@@ -326,7 +326,7 @@
   "storage": {
     "managed_schema": "managed_storage.json"
   },
-  "version": "2025.1020.1809",
+  "version": "2025.1020.1835",
   "web_accessible_resources": [
     {
       "resources": [

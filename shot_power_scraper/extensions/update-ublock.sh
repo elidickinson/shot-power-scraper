@@ -1,6 +1,23 @@
 #!/bin/bash
 set -e
 
+# Default to cleaning assets
+CLEAN_ASSETS=1
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --use-cache)
+            CLEAN_ASSETS=0
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
 EXTENSIONS_DIR="$(cd "$(dirname "$0")" && pwd)"
 BUILD_DIR="$EXTENSIONS_DIR/uBlock"
 CUSTOM_RULES="$EXTENSIONS_DIR/ad-block-custom-rules.txt"
@@ -61,8 +78,12 @@ with open('assets/assets.json', 'w') as f:
     sed -i.bak "s|file://$CUSTOM_RULES|file://$(pwd)/dist/filters/custom-rules.txt|g" assets/assets.json
 fi
 
-echo "Cleaning old cached assets to fetch latest filter lists..."
-make cleanassets
+if [ $CLEAN_ASSETS -eq 1 ]; then
+    echo "Cleaning old cached assets to fetch latest filter lists..."
+    make cleanassets
+else
+    echo "Skipping asset cleanup (--use-cache flag provided)"
+fi
 
 echo "Building uBlock Lite for Chromium (this may take 2-3 minutes)..."
 make mv3-chromium

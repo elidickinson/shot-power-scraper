@@ -1,5 +1,5 @@
-Secret: 669d68f76d21e195
-Version: 2025.1020.1809
+Secret: 38c7d16a2285ceea
+Version: 2025.1020.1835
 ============================
 Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/quick-fixes.min.txt
@@ -1881,8 +1881,8 @@ Listset for 'kor-1':
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/javascript.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/antiadblock.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/removeparam.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/allowlist.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/specific_URL.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/allowlist.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/analytics/filters-share/3rd_domains.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/analytics/filters-share/1st_domains.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/analytics/filters-share/general_elemhide.txt
@@ -1931,15 +1931,15 @@ Listset for 'kor-1':
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/specific_ELEMHIDE.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/general_url.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/general_url.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/specific_ELEMHIDE.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/specific_URL.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/specific_ELEMHIDE.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/allowlist.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/extended_css_ELEMHIDE.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/extended_css_INJECTION.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/specific_REDIRECT.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/extended_css_ELEMHIDE.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/scriptlets.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/extended_css_INJECTION.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/scriptlets.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/javascript.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/javascript.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/antiadblock.txt
@@ -1947,8 +1947,8 @@ Listset for 'kor-1':
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/allowlist.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/specific_URL.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/specific_CSS.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/specific_CSS.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/analytics/filters-share/specific_CSS.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/specific_CSS.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/analytics/filters-uBO/specific_CSS.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-share/specific_CSS.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/specific_CSS.txt
@@ -2131,8 +2131,8 @@ Listset for 'nor-0':
 	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianList.txt
 	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/AntiAdblockEntries.txt
 	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotFirefox.txt
-	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotBrave.txt
 	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/AdditionalGenericEntriesForUBO.txt
+	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotBrave.txt
 Input filter count: 3439
 	Accepted filter count: 3424
 	Rejected filter count: 0
@@ -2326,16 +2326,16 @@ Procedural-related distinct filters: 70 distinct combined selectors
 Listset for 'rus-0':
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/RuAdList-uBO.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/adservers.txt
-	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/first_level.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/general_block.txt
+	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/first_level.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/general_hide.txt
-	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/popup.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_antisocial.txt
+	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/popup.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_block.txt
-	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_special.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_hide.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/thirdparty.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/whitelist.txt
+	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_special.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/css-fixes-experimental.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/js-fixes-experimental.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/AWRL-non-sync.txt

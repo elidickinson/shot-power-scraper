@@ -230,7 +230,7 @@ def test_html(args, expected):
         (["-j", "document.body.removeChild(document.querySelector('h1'))"]),
         (["--user-agent", "test-agent"]),
         (["--ad-block"]),
-        (["--popup-block"]),
+        (["--ad-block", "--ublock-lists", "annoyances-cookies"]),
         (["--trigger-lazy-load"]),
     ),
 )
@@ -251,12 +251,12 @@ def test_mhtml(args):
     "command,flag",
     [
         ("shot", "--ad-block"),
-        ("shot", "--popup-block"),
+        ("shot", "--paywall-block"),
         ("shot", "--devtools"),
         ("multi", "--ad-block"),
-        ("multi", "--popup-block"),
+        ("multi", "--paywall-block"),
         ("mhtml", "--ad-block"),
-        ("mhtml", "--popup-block"),
+        ("mhtml", "--paywall-block"),
     ],
 )
 def test_cli_flags_no_crash(command, flag):
