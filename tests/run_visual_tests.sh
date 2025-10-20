@@ -30,13 +30,13 @@ shot-power-scraper ../pages/ad-popup-test.html \
 
 shot-power-scraper ../pages/ad-popup-test.html \
   -o "blocking-AFTER-popup-block-removes-popups.png" \
-  --popup-block -w 800 -h 600
+  --ad-block --ublock-lists annoyances-cookies,annoyances-overlays -w 800 -h 600
 
 shot-power-scraper ../pages/ad-popup-test.html \
   -o "blocking-AFTER-both-clean-content-only.png" \
-  --ad-block --popup-block -w 800 -h 600
+  --ad-block --ublock-lists annoyances-cookies,annoyances-overlays -w 800 -h 600
 
-shot-power-scraper cnn.com -o "EXTERNAL-blocking-cnn.jpg" --ad-block --popup-block --paywall-block --wait 3000
+shot-power-scraper cnn.com -o "EXTERNAL-blocking-cnn.jpg" --ad-block --ublock-lists annoyances-cookies,annoyances-overlays --paywall-block --wait 3000
 
 # =============================================================================
 # 📄 PDF GENERATION TESTS
@@ -66,7 +66,7 @@ shot-power-scraper mhtml ../pages/complex-layout.html \
 # MHTML with ad blocking
 shot-power-scraper mhtml ../pages/ad-popup-test.html \
   -o "mhtml-with-ad-blocking.mhtml" \
-  --ad-block --popup-block
+  --ad-block --ublock-lists annoyances-cookies,annoyances-overlays
 
 # MHTML with JavaScript execution
 shot-power-scraper mhtml ../pages/complex-layout.html \

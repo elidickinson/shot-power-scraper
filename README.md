@@ -87,11 +87,12 @@ This is different from `-i/--interactive` mode which shows the browser AND pause
 
 ### Ad and Popup Blocking
 
-This fork includes Chrome extensions for blocking ads and popups during screenshot capture. Use `--ad-block` to block advertisements and `--popup-block` to block modal dialogs, popups and cookie consent banners.
+This fork uses uBlock Lite for content blocking during screenshot capture. Use `--ad-block` to enable blocking, and add `--ublock-lists` to enable additional filter lists for blocking popups, cookie notices, and other annoyances.
 
-    shot-power-scraper --ad-block --popup-block https://example.com
+    shot-power-scraper --ad-block https://example.com
+    shot-power-scraper --ad-block --ublock-lists annoyances-cookies,annoyances-overlays https://example.com
 
-This can be enabled by default using the `config` command. For detailed information about the extensions, custom filter rules, and architecture, see [EXTENSIONS.md](EXTENSIONS.md).
+This can be enabled by default using the `config` command. For detailed information about available filter lists and customization, see [EXTENSIONS.md](EXTENSIONS.md).
 
 ## ⚠️ Important: Differences from Original shot-scraper
 
@@ -126,8 +127,8 @@ This fork has some important differences from the original. It only supports Chr
 
 ### Configuration Commands
 ```bash
-# Set default ad and popup blocking
-shot-power-scraper config --ad-block true --popup-block true
+# Set default ad blocking
+shot-power-scraper config --ad-block true
 
 # View current settings
 shot-power-scraper config --show
@@ -153,7 +154,7 @@ This section outlines the major code path and functions called when executing `s
 ### Entry Point and Flow
 1. **CLI Entry** (`cli.py:shot()`) - Parse arguments, create centralized `ShotConfig` object with all parameters
 2. **Browser Command** (`cli.py:run_browser_command()`) - Orchestrate browser lifecycle using `shot_config`
-3. **Extension Setup** (`browser.py:setup_blocking_extensions()`) - Configure ad/popup blocking based on `shot_config`
+3. **Extension Setup** (`browser.py:setup_blocking_extensions()`) - Configure ad blocking based on `shot_config`
 4. **Browser Context** (`browser.py:create_browser_context()`) - Initialize nodriver browser using `shot_config` parameters
 5. **Screenshot Execution** (`cli.py:execute_shot()`) - Handle interactive mode and viewport
 6. **Core Screenshot** (`screenshot.py:take_shot()`) - Main screenshot logic with `shot_config`
@@ -179,7 +180,7 @@ This section outlines the major code path and functions called when executing `s
 ### Major Operations
 - Configuration parsing, validation, and config file fallback handling
 - Browser context initialization with anti-detection features using consolidated configuration
-- Optional extension loading for ad/popup blocking
+- Optional extension loading for ad blocking (via uBlock Lite)
 - Page navigation with error detection and Cloudflare bypass
 - JavaScript execution and custom waiting conditions
 - Element selector processing (CSS/JS selectors)

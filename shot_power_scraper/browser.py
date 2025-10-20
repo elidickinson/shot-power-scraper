@@ -27,6 +27,10 @@ async def create_browser_context(shot_config, extensions=None):
     # Convert browser_args tuple to list
     browser_args_list = list(shot_config.browser_args) if shot_config.browser_args else []
 
+    # Add default window position unless user specified one
+    if not any(arg.startswith("--window-position") for arg in browser_args_list):
+        browser_args_list.append("--window-position=50,50")
+
     # Note: User agent is now set via CDP with Client Hints metadata, not browser args
 
     # Add --disable-gpu by default unless --enable-gpu is specified
@@ -140,7 +144,7 @@ def customize_ublock_extension(base_path, enable_lists):
     return temp_ext
 
 
-async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_block, ublock_lists=None):
+async def setup_blocking_extensions(extensions, ad_block, paywall_block, ublock_lists=None):
     """Setup blocking extensions based on requested flags"""
     base_extensions_path = pathlib.Path(__file__).parent / 'extensions'
 
@@ -161,11 +165,6 @@ async def setup_blocking_extensions(extensions, ad_block, popup_block, paywall_b
         else:
             extensions.append(str(ad_extension_base))
             loaded_extensions.append("ad blocking (uBlock Lite)")
-
-    if popup_block:
-        popup_extension_path = (base_extensions_path / 'shot-power-scraper-popup-blocker').resolve()
-        extensions.append(str(popup_extension_path))
-        loaded_extensions.append("popup blocking")
 
     if paywall_block:
         paywall_extension_path = (base_extensions_path / 'bypass-paywalls-chrome-clean-master').resolve()

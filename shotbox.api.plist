@@ -14,7 +14,8 @@
         <string>--port</string>
         <string>8123</string>
         <string>--ad-block</string>
-        <string>--popup-block</string>
+        <string>--ublock-lists</string>
+        <string>annoyances-cookies,annoyances-overlays</string>
         <string>--paywall-block</string>
     </array>
     <key>WorkingDirectory</key>

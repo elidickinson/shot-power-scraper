@@ -9,12 +9,11 @@ extensions/
 ├── uBlock/                          # uBlock Origin source (gitignored)
 ├── ublock-lite-custom/              # Built uBlock Lite extension (committed)
 ├── ublock-lite-backup/              # Backup from last rebuild (gitignored)
-├── shot-power-scraper-ad-blocker/   # Old ad blocker (deprecated)
-├── shot-power-scraper-popup-blocker/# Popup/cookie notice blocker
 ├── bypass-paywalls-chrome-clean-master/ # Paywall bypass
 ├── ad-block-custom-rules.txt        # Your custom filter rules
 ├── update-ublock.sh                 # Rebuild script
-└── CUSTOM_FILTERS.md                # Documentation
+├── CUSTOM_FILTERS.md                # Documentation
+└── AVAILABLE_LISTS.md               # List of all available filter lists
 ```
 
 ## uBlock/ Directory (Not in Git)
@@ -41,8 +40,10 @@ The `update-ublock.sh` script will automatically clone it on first run.
 ### Ad Blocking: `--ad-block`
 Loads `ublock-lite-custom/` - uBlock Origin Lite (Manifest V3)
 
-### Popup Blocking: `--popup-block`
-Loads `shot-power-scraper-popup-blocker/` - Cookie notices, popups
+Use `--ublock-lists` to enable additional filter lists for popup/cookie blocking:
+```bash
+shot-power-scraper --ad-block --ublock-lists annoyances-cookies,annoyances-overlays https://example.com
+```
 
 ### Paywall Bypass: `--paywall-block`
 Loads `bypass-paywalls-chrome-clean-master/` - Paywall bypass extension

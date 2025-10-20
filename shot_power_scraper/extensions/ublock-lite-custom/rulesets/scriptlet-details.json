@@ -12,24 +12,6 @@
     }
    ],
    [
-    "trusted-json-edit-fetch-request",
-    {
-     "hostnames": [
-      "www.youtube.com"
-     ],
-     "world": "MAIN"
-    }
-   ],
-   [
-    "trusted-replace-outbound-text",
-    {
-     "hostnames": [
-      "*"
-     ],
-     "world": "MAIN"
-    }
-   ],
-   [
     "adjust-setTimeout",
     {
      "hostnames": [
@@ -205,6 +187,15 @@
    ],
    [
     "trusted-set-constant",
+    {
+     "hostnames": [
+      "*"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
+    "trusted-replace-outbound-text",
     {
      "hostnames": [
       "*"
@@ -4931,6 +4922,7 @@
       "13news.co.il",
       "13tv.co.il",
       "calcalist.co.il",
+      "foodsdictionary.co.il",
       "haaretz.co.il",
       "hwzone.co.il",
       "inn.co.il",
@@ -5843,6 +5835,7 @@
      "hostnames": [
       "filmvandaag.nl",
       "goplay.be",
+      "play.tv",
       "tweakers.net",
       "vtmgo.be"
      ],
@@ -5872,7 +5865,8 @@
     "xml-prune",
     {
      "hostnames": [
-      "goplay.be"
+      "goplay.be",
+      "play.tv"
      ],
      "world": "MAIN"
     }
@@ -6756,6 +6750,7 @@
       "kinotv.ru",
       "kufar.by",
       "liga.net",
+      "lk.emias.mos.ru",
       "mp3party.net",
       "myshows.me",
       "playground.ru"
@@ -8409,8 +8404,8 @@
       "gocmod.com",
       "goctruyentranhvui17.com",
       "gotphim.com",
-      "haysexvl.life",
       "haysexvl.net",
+      "haysexvn.lat",
       "hentaivc.com",
       "hh2d.tv",
       "hh3dhay.life",
@@ -8438,7 +8433,7 @@
       "phim.haysex.asia",
       "phim18hdxx.com",
       "phimmoi.sale",
-      "phimsexhayvn35.com",
+      "phimsexhayvn36.com",
       "phimtho.cc",
       "player-cdn.com",
       "playhydrax.com",
@@ -8455,7 +8450,7 @@
       "tram3d.com",
       "tram3d.me",
       "tram3d.xyz",
-      "trumtruyen.live",
+      "trumtruyen.xyz",
       "truyen247.pro",
       "truyenqqgo.com",
       "truyenqqtto.com",
@@ -8558,12 +8553,12 @@
       "freeplayervideo.com",
       "gamek.vn",
       "genk.vn",
+      "geodb.com",
       "hayhaytv.site",
       "kenh14.vn",
       "motchillzz.site",
       "phimvuihd.org",
       "player-cdn.com",
-      "rileygainescenter.org",
       "sexdiaryx.to",
       "soha.vn",
       "tailieumoi.vn",

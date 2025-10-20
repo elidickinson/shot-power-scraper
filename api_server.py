@@ -5,14 +5,14 @@ Screenshot API Server
 A FastAPI server that provides REST endpoints for taking screenshots using shot-power-scraper.
 
 Usage:
-    python api_server.py [--browser-arg ARG ...] [--ad-block] [--popup-block] [--paywall-block]
+    python api_server.py [--browser-arg ARG ...] [--ad-block] [--paywall-block]
 
 Example server startup:
     # Start server with custom browser arguments
     python api_server.py --browser-arg --window-size=1920,1080 --browser-arg --disable-dev-shm-usage
 
     # Start server with blocking features
-    python api_server.py --ad-block --popup-block --paywall-block
+    python api_server.py --ad-block --paywall-block
 
     # Start server with proxy settings
     python api_server.py --browser-arg "--proxy-server=http://localhost:8888"
@@ -231,7 +231,6 @@ async def get_browser(browser_args=None):
         # Get blocking options and other settings from app state
         blocking_options = {
             'ad_block': getattr(app.state, 'ad_block', False),
-            'popup_block': getattr(app.state, 'popup_block', False),
             'paywall_block': getattr(app.state, 'paywall_block', False),
         }
 
@@ -256,7 +255,6 @@ async def get_browser(browser_args=None):
         blocking_features = [
             name for name, enabled in [
                 ('ad_block', blocking_options['ad_block']),
-                ('popup_block', blocking_options['popup_block']),
                 ('paywall_block', blocking_options['paywall_block'])
             ]
             if enabled
@@ -267,7 +265,7 @@ async def get_browser(browser_args=None):
         # Setup blocking extensions if needed
         extensions = []
         if any(blocking_options.values()):
-            await setup_blocking_extensions(extensions, blocking_options['ad_block'], blocking_options['popup_block'], blocking_options['paywall_block'])
+            await setup_blocking_extensions(extensions, blocking_options['ad_block'], blocking_options['paywall_block'])
 
         browser_instance = await create_browser_context(shot_config, extensions)
         logger.info("Browser instance created successfully")
@@ -306,8 +304,6 @@ async def api_info():
     blocking_features = []
     if getattr(app.state, 'ad_block', False):
         blocking_features.append("ad_block")
-    if getattr(app.state, 'popup_block', False):
-        blocking_features.append("popup_block")
     if getattr(app.state, 'paywall_block', False):
         blocking_features.append("paywall_block")
 
@@ -444,7 +440,7 @@ async function loadServerSettings() {
     try {
         const {server_settings} = await fetch('/api').then(r => r.json());
         if (server_settings?.blocking_features?.length) {
-            const labels = {ad_block: 'Ad Block', popup_block: 'Popup Block', paywall_block: 'Paywall Bypass'};
+            const labels = {ad_block: 'Ad Block', paywall_block: 'Paywall Bypass'};
             server_settings.blocking_features.forEach(f => {
                 const badge = document.createElement('span');
                 badge.className = 'badge';
@@ -649,7 +645,6 @@ async def html(request: HtmlRequest) -> HTMLResponse:
 @click.option("browser_args", "--browser-arg", multiple=True,
             help="Additional arguments to pass to the browser")
 @click.option("--ad-block/--no-ad-block", default=False, help="Enable ad blocking using built-in filter lists")
-@click.option("--popup-block/--no-popup-block", default=False, help="Enable popup blocking (cookie notices, etc.)")
 @click.option("--paywall-block/--no-paywall-block", default=False, help="Enable paywall bypass using Bypass Paywalls Clean extension")
 @click.option(
     "--host",
@@ -675,7 +670,7 @@ async def html(request: HtmlRequest) -> HTMLResponse:
     help="Number of worker processes (default: 1, can be overridden with WORKERS env var)"
 )
 def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, headful, reduced_motion,
-         ad_block, popup_block, paywall_block):
+         ad_block, paywall_block):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
 
@@ -686,19 +681,16 @@ def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, head
     app.state.headful = headful
     app.state.reduced_motion = reduced_motion
     app.state.ad_block = ad_block
-    app.state.popup_block = popup_block
     app.state.paywall_block = paywall_block
 
     click.echo(f"Starting Shot Power Scraper API Server on {host}:{port}")
     click.echo(f"API documentation available at http://{host}:{port}/docs")
 
     # Show blocking options if enabled
-    if ad_block or popup_block or paywall_block:
+    if ad_block or paywall_block:
         blocking_features = []
         if ad_block:
             blocking_features.append("ad blocking")
-        if popup_block:
-            blocking_features.append("popup blocking")
         if paywall_block:
             blocking_features.append("paywall bypass")
         click.echo(f"Blocking features enabled: {' + '.join(blocking_features)}")

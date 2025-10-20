@@ -11,8 +11,8 @@ cd tests/examples
 
 echo "🛡️  Testing blocking ..."
 shot-power-scraper ../pages/ad-popup-test.html -o "blocking-BEFORE-shows-ads-and-popups.png" -w 800 -h 600
-shot-power-scraper ../pages/ad-popup-test.html -o "blocking-AFTER-both-clean-content-only.png" --ad-block --popup-block -w 800 -h 600
-shot-power-scraper cnn.com -o "EXTERNAL-blocking-cnn.jpg" --ad-block --popup-block --paywall-block --wait 3000
+shot-power-scraper ../pages/ad-popup-test.html -o "blocking-AFTER-both-clean-content-only.png" --ad-block --ublock-lists annoyances-cookies,annoyances-overlays -w 800 -h 600
+shot-power-scraper cnn.com -o "EXTERNAL-blocking-cnn.jpg" --ad-block --ublock-lists annoyances-cookies,annoyances-overlays --paywall-block --wait 3000
 
 echo "🎯 Testing selectors..."
 shot-power-scraper ../pages/complex-layout.html -o "selector-FULL-PAGE-everything-visible.png" -w 800 -h 600

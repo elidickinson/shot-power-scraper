@@ -484,7 +484,7 @@ function safeSelf() {
 
 const scriptletGlobals = {}; // eslint-disable-line
 const argsList = [["securepubads.g.doubleclick.net"],["v.fwmrm.net"],["/a[ab]\\.tweakers\\.nl/"],["pubads.g.doubleclick.net/gampad/ads"]];
-const hostnamesMap = new Map([["filmvandaag.nl",0],["vtmgo.be",1],["tweakers.net",2],["goplay.be",3]]);
+const hostnamesMap = new Map([["filmvandaag.nl",0],["vtmgo.be",1],["tweakers.net",2],["play.tv",3],["goplay.be",3]]);
 const exceptionsMap = new Map([]);
 const hasEntities = false;
 const hasAncestors = false;

@@ -43,11 +43,10 @@ def run_browser_command(command_func, shot_config, **kwargs):
         browser_obj = None
         try:
             extensions = []
-            if shot_config.ad_block or shot_config.popup_block or shot_config.paywall_block:
+            if shot_config.ad_block or shot_config.paywall_block:
                 temp_extensions = await setup_blocking_extensions(
                     extensions,
                     shot_config.ad_block,
-                    shot_config.popup_block,
                     shot_config.paywall_block,
                     shot_config.ublock_lists
                 )
@@ -56,7 +55,7 @@ def run_browser_command(command_func, shot_config, **kwargs):
             browser_obj = await create_browser_context(shot_config, extensions)
 
             # Store temp extensions on browser for cleanup
-            if shot_config.ad_block or shot_config.popup_block or shot_config.paywall_block:
+            if shot_config.ad_block or shot_config.paywall_block:
                 browser_obj._temp_extensions = temp_extensions
 
             # Set up tab context with one-time configuration
@@ -154,8 +153,6 @@ def common_shot_options(fn):
                 help="Fail with an error code if a page returns an HTTP error")(fn)
 
     # Blocking options
-    click.option("--popup-block/--no-popup-block", "--block-popups/--no-block-popups", default=None,
-                help="Enable/disable popup blocking (overrides config file setting)")(fn)
     click.option("--ad-block/--no-ad-block", default=None,
                 help="Enable ad blocking using built-in filter lists")(fn)
     click.option("--ublock-lists", help="Comma-separated list of additional uBlock filter lists to enable (e.g. 'annoyances-cookies,annoyances-overlays')")(fn)
@@ -211,7 +208,7 @@ def cli():
 def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_selectors_all,
          padding, javascript, retina, scale_factor, omit_background, quality,
          interactive, devtools, log_requests, save_html,
-         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
+         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
          wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
@@ -314,7 +311,7 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 @common_shot_options
 def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outputs,
          leave_server, har, har_zip, har_file,
-         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
+         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
          wait, wait_for, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
@@ -362,11 +359,11 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
     async def run_multi():
         extensions = []
         temp_extensions = []
-        if ad_block or popup_block or paywall_block:
+        if ad_block or paywall_block:
             # Parse ublock_lists if provided
             ublock_lists_parsed = [s.strip() for s in ublock_lists.split(",")] if ublock_lists else None
             temp_extensions = await setup_blocking_extensions(
-                extensions, ad_block, popup_block, paywall_block, ublock_lists_parsed
+                extensions, ad_block, paywall_block, ublock_lists_parsed
             )
 
         # Create browser config for multi command
@@ -458,7 +455,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 @click.option("-j", "--javascript", help="Execute this JS prior to taking the snapshot")
 @common_shot_options
 def accessibility(url, output, javascript,
-                 verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
+                 verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
                  wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
                  auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
                  auth_username, auth_password, enable_gpu):
@@ -483,7 +480,7 @@ def accessibility(url, output, javascript,
 @click.option("--no-response-bodies", is_flag=True, help="Exclude response body content from HAR file (bodies included by default)")
 @common_shot_options
 def har(url, zip_, output, javascript, no_response_bodies,
-       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
+       verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
        wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
        auth_username, auth_password, enable_gpu):
@@ -581,7 +578,7 @@ def har(url, zip_, output, javascript, no_response_bodies,
 )
 @common_shot_options
 def javascript(url, javascript, input, output, raw,
-              verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
+              verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
               wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
               auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
               auth_username, auth_password, enable_gpu):
@@ -657,7 +654,7 @@ def javascript(url, javascript, input, output, raw,
 @click.option("--pdf-css", help="Inject custom CSS for PDF generation")
 @common_shot_options
 def pdf(url, output, javascript, media_screen, landscape, scale, print_background, pdf_css,
-       verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
+       verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
        wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
        auth_username, auth_password, enable_gpu):
@@ -726,7 +723,7 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 )
 @common_shot_options
 def html(url, output, javascript, selector,
-        verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
+        verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
         wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
         auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
         auth_username, auth_password, enable_gpu):
@@ -782,7 +779,7 @@ def html(url, output, javascript, selector,
 @click.option("-j", "--javascript", help="Execute this JS prior to capturing the MHTML")
 @common_shot_options
 def mhtml(url, output, javascript,
-         verbose, debug, silent, log_console, skip, fail, ad_block, popup_block, paywall_block, ublock_lists,
+         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
          wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
          auth_username, auth_password, enable_gpu):
@@ -882,11 +879,6 @@ def install(browser, browser_args):
     help="Set default ad blocking (true/false)"
 )
 @click.option(
-    "--popup-block",
-    type=bool,
-    help="Set default popup blocking (true/false)"
-)
-@click.option(
     "--paywall-block",
     type=bool,
     help="Set default paywall blocking (true/false)"
@@ -910,13 +902,13 @@ def install(browser, browser_args):
     is_flag=True,
     help="Show current configuration"
 )
-def config_cmd(ad_block, popup_block, paywall_block, user_agent, enable_gpu, clear, show):
+def config_cmd(ad_block, paywall_block, user_agent, enable_gpu, clear, show):
     """
     Configure default settings for shot-power-scraper
 
     Usage:
 
-        shot-power-scraper config --ad-block true --popup-block false --paywall-block true
+        shot-power-scraper config --ad-block true --paywall-block true
         shot-power-scraper config --user-agent "Mozilla/5.0 ..."
         shot-power-scraper config --enable-gpu true
         shot-power-scraper config --clear
@@ -938,7 +930,6 @@ def config_cmd(ad_block, popup_block, paywall_block, user_agent, enable_gpu, cle
         config = load_config()
         click.echo(f"Configuration file: {get_config_file()}")
         click.echo(f"ad_block: {config.get('ad_block', False)}")
-        click.echo(f"popup_block: {config.get('popup_block', False)}")
         click.echo(f"paywall_block: {config.get('paywall_block', False)}")
         click.echo(f"user_agent: {config.get('user_agent', 'None')}")
         click.echo(f"enable_gpu: {config.get('enable_gpu', False)}")
@@ -947,10 +938,6 @@ def config_cmd(ad_block, popup_block, paywall_block, user_agent, enable_gpu, cle
     if ad_block is not None:
         set_config_value('ad_block', ad_block)
         click.echo(f"Set default ad_block to: {ad_block}")
-
-    if popup_block is not None:
-        set_config_value('popup_block', popup_block)
-        click.echo(f"Set default popup_block to: {popup_block}")
 
     if paywall_block is not None:
         set_config_value('paywall_block', paywall_block)
@@ -964,9 +951,9 @@ def config_cmd(ad_block, popup_block, paywall_block, user_agent, enable_gpu, cle
         set_config_value('enable_gpu', enable_gpu)
         click.echo(f"Set default enable_gpu to: {enable_gpu}")
 
-    if ad_block is None and popup_block is None and paywall_block is None and user_agent is None and enable_gpu is None and not show and not clear:
+    if ad_block is None and paywall_block is None and user_agent is None and enable_gpu is None and not show and not clear:
         click.echo("No configuration changes specified. Use --show to view current settings.")
-        click.echo("Use --ad-block true/false, --popup-block true/false, --paywall-block true/false, --user-agent 'string', --enable-gpu true/false, or --clear to modify settings.")
+        click.echo("Use --ad-block true/false, --paywall-block true/false, --user-agent 'string', --enable-gpu true/false, or --clear to modify settings.")
 
 
 @cli.command()

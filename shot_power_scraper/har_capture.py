@@ -60,9 +60,9 @@ class HARCollector:
                         'base64Encoded': response_body_result.base64_encoded
                     }
                 except Exception as e:
-                    # Some responses may not have bodies or may be cached/failed, which is normal
-                    # Continue with other requests
-                    pass
+                    request_url = self.requests.get(request_id, {}).get('url', request_id)
+                    import click
+                    click.echo(f"WARNING: Failed to fetch response body for {request_url}: {e}", err=True)
 
         # Get page info
         from shot_power_scraper.page_utils import evaluate_js

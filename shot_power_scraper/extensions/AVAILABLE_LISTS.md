@@ -14,6 +14,15 @@ shot-power-scraper 'https://example.com' --ad-block \
   -o test.png
 ```
 
+## Core Lists
+
+- **ublock-filters** - uBlock Origin filters
+- **easylist** - Primary ad blocking list
+- **easyprivacy** - Privacy protection list
+- **pgl** - PGL (Peter Lowe's) list
+- **ublock-badware** - Badware protection
+- **urlhaus-full** - URLhaus malware list
+
 ## Annoyance Lists
 
 - **annoyances-cookies** - Block cookie consent notices
@@ -30,6 +39,8 @@ shot-power-scraper 'https://example.com' --ad-block \
 - **stevenblack-hosts** - Steven Black's curated hosts file
 - **dpollock-0** - Dan Pollock's hosts file
 - **block-lan** - Block LAN/localhost requests
+- **ublock-experimental** - Experimental filters (may cause breakage)
+- **ubol-tests** - uBOL testing rules
 
 ## Regional Lists
 
@@ -70,10 +81,6 @@ shot-power-scraper 'https://example.com' --ad-block \
 - **kor-1** - Korean
 - **tha-0** - Thai
 - **vie-1** - Vietnamese
-
-## Experimental
-
-- **ublock-experimental** - Experimental filters (may cause breakage)
 
 ## How to Find List IDs
 

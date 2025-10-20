@@ -1,5 +1,5 @@
-Secret: af1eab255da3130f
-Version: 2025.1018.340
+Secret: 669d68f76d21e195
+Version: 2025.1020.1809
 ============================
 Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/quick-fixes.min.txt
@@ -7,18 +7,18 @@ Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/filters.min.txt
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/privacy.min.txt
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/ubol-filters.txt
-Input filter count: 9340
-	Accepted filter count: 9316
+Input filter count: 9345
+	Accepted filter count: 9321
 	Rejected filter count: 1
-Output rule count: 5631
-	Static rules: 4485
+Output rule count: 5634
+	Static rules: 4488
 		Salvaged rule by ignoring 1 unsupported domain= option: erotic-beauties.com|hardsex.cc|rule34.top|sex-movies.biz|tube18.sexy|xvideos.name|booru.*
 		Salvaged rule by ignoring 1 unsupported domain= option: 8boobs.com|angelgals.com|babesexy.com|babesinporn.com|fooxybabes.com|hotbabeswanted.com|hotstunners.com|mainbabes.com|nakedbabes.club|nakedgirlsroom.com|nudebabes.sexy|pleasuregirl.net|rabbitsfun.com|sexybabes.club|sexybabesart.com|wantedbabes.com|silkengirl.*
 		Salvaged rule by ignoring 1 unsupported domain= option: web.de|gmx.*
 		Salvaged rule by ignoring 19 unsupported domain= option: colourxh.site|fullxh.com|galleryxh.site|megaxh.com|movingxh.world|seexh.com|unlockxh4.com|valuexh.life|xhaccess.com|xhadult2.com|xhadult3.com|xhadult4.com|xhadult5.com|xhamster.*|xhamster10.*|xhamster11.*|xhamster12.*|xhamster13.*|xhamster14.*|xhamster15.*|xhamster16.*|xhamster17.*|xhamster18.*|xhamster19.*|xhamster2.*|xhamster20.*|xhamster3.*|xhamster4.*|xhamster42.*|xhamster46.com|xhamster5.*|xhamster7.*|xhamster8.*|xhamsterporno.mx|xhbig.com|xhbranch5.com|xhchannel.com|xhdate.world|xhlease.world|xhmoon5.com|xhofficial.com|xhopen.com|xhplanet1.com|xhplanet2.com|xhreal2.com|xhreal3.com|xhspot.com|xhtotal.com|xhtree.com|xhvictory.com|xhwebsite.com|xhwebsite2.com|xhwebsite5.com|xhwide1.com|xhwide2.com|xhwide5.com
 		Salvaged rule by ignoring 1 unsupported domain= option: 8boobs.com|babesinporn.com|fooxybabes.com|hotstunners.com|mainbabes.com|pleasuregirl.net|rabbitsfun.com|wantedbabes.com|silkengirl.*
 		Salvaged rule by ignoring 19 unsupported domain= option: colourxh.site|fullxh.com|galleryxh.site|megaxh.com|movingxh.world|seexh.com|unlockxh4.com|valuexh.life|xhaccess.com|xhadult2.com|xhadult3.com|xhadult4.com|xhadult5.com|xhamster.*|xhamster10.*|xhamster11.*|xhamster12.*|xhamster13.*|xhamster14.*|xhamster15.*|xhamster16.*|xhamster17.*|xhamster18.*|xhamster19.*|xhamster2.*|xhamster20.*|xhamster3.*|xhamster4.*|xhamster42.*|xhamster46.com|xhamster5.*|xhamster7.*|xhamster8.*|xhamsterporno.mx|xhbig.com|xhbranch5.com|xhchannel.com|xhdate.world|xhlease.world|xhmoon5.com|xhofficial.com|xhopen.com|xhplanet1.com|xhplanet2.com|xhreal2.com|xhreal3.com|xhspot.com|xhtotal.com|xhtree.com|xhvictory.com|xhwebsite.com|xhwebsite2.com|xhwebsite5.com|xhwide1.com|xhwide2.com|xhwide5.com
-		Salvaged rule by ignoring 5 unsupported domain= option: 24sata.hr|373news.com|actugaming.net|aerotrader.com|alc.co.jp|alfa.lt|allthetests.com|animanch.com|aniroleplay.com|apkmirror.com|areaconnect.com|as-web.jp|atvtrader.com|aucfree.com|autoby.jp|autoc-one.jp|autofrage.net|automobile-catalog.com|bab.la|babla.*|baseballchannel.jp|bg-mania.jp|bien.hu|bilis.lt|blogmura.com|boredpanda.com|bunshun.jp|buzzfeed.com|buzzfeednews.com|calculatorsoup.com|cesoirtv.com|chanto.jp.net|cinetrafic.fr|cocokara-next.com|collinsdictionary.com|commercialtrucktrader.com|computerfrage.net|crosswordsolver.com|cruciverba.it|cults3d.com|culturequizz.com|cycletrader.com|daily.co.jp|dailynewshungary.com|dallashoopsjournal.com|dayspedia.com|dictionary.cambridge.org|dictionnaire.lerobert.com|dnevno.hr|dreamchance.net|dropgame.jp|drweil.com|dziennik.pl|ecranlarge.com|eigachannel.jp|equipmenttrader.com|etaplius.lt|ev-times.com|finanzfrage.net|footballchannel.jp|forsal.pl|futabanet.jp|fxstreet-id.com|fxstreet-vn.com|fxstreet.*|game8.jp|games.arkadium.com|gamewith.jp|gardeningsoul.com|gazetaprawna.pl|genialetricks.de|gesundheitsfrage.net|gifu-np.co.jp|gigafile.nu|globalrph.com|gloria.hr|golf-live.at|grapee.jp|gutefrage.net|happymoments.lol|hb-nippon.com|heureka.cz|horairesdouverture24.fr|hotcopper.co.nz|hotcopper.com.au|hvac-talk.com|idokep.hu|infor.pl|iza.ne.jp|j-cast.com|j-town.net|j7p.jp|jablickar.cz|javatpoint.com|jawapos.com|jiji.com|jikayosha.jp|jmty.jp|joemonster.org|judgehype.com|kinmaweb.jp|km77.com|kobe-journal.com|kompasiana.com|kreuzwortraetsel.de|kurashinista.jp|kurashiru.com|kyoteibiyori.com|lacuarta.com|laleggepertutti.it|lamire.jp|langenscheidt.com|laposte.net|lawyersgunsmoneyblog.com|ldoceonline.com|leckerschmecker.me|lifehacker.jp|listentotaxman.com|livenewschat.eu|luremaga.jp|m.economictimes.com|mafab.hu|mahjongchest.com|mainichi.jp|maketecheasier.com|malaymail.com|mamastar.jp|mathplayzone.com|mentalfloss.com|meteo60.fr|midhudsonnews.com|minesweeperquest.com|minkou.jp|mmm.lt|modhub.us|modsfire.com|moin.de|motor-talk.de|motorbikecatalog.com|motorradfrage.net|motscroises.fr|movie-locations.com|muragon.com|namemc.com|nana-press.com|natalie.mu|nationaltoday.com|nbadraft.net|newatlas.com|news.zerkalo.io|newsweekjapan.jp|niketalk.com|nikkan-gendai.com|nikkansports.com|nlab.itmedia.co.jp|notebookcheck-cn.com|notebookcheck-hu.com|notebookcheck-ru.com|notebookcheck-tr.com|notebookcheck.*|nouvelobs.com|nyitvatartas24.hu|oeffnungszeitenbuch.de|ondemandkorea.com|onlineradiobox.com|operawire.com|optionsprofitcalculator.com|oraridiapertura24.it|oricon.co.jp|oxfordlearnersdictionaries.com|palabr.as|pashplus.jp|persoenlich.com|petitfute.com|picksandparlays.net|picrew.me|play-games.com|pons.com|popdaily.com.tw|powerpyx.com|pptvhd36.com|profitline.hu|programme-tv.net|puzzlegarage.com|pwctrader.com|quefaire.be|radio-australia.org|radio-osterreich.at|raetsel-hilfe.de|raider.io|ranking.net|raskakcija.lt|references.be|reisefrage.net|relevantmagazine.com|reptilesmagazine.com|roleplayer.me|rostercon.com|samsungmagazine.eu|sankei.com|sanspo.com|scribens.com|scribens.fr|slashdot.org|snowmobiletrader.com|soccerdigestweb.com|solitairehut.com|sourceforge.net|southhemitv.com|sportalkorea.com|sportlerfrage.net|statecollege.com|steamidfinder.com|sudokutable.com|superhonda.com|syosetu.com|szamoldki.hu|talkwithstranger.com|tbs.co.jp|tbsradio.jp|techdico.com|the-crossword-solver.com|thecelticblog.com|thedigestweb.com|thefirearmblog.com|traicy.com|transparentcalifornia.com|transparentnevada.com|trilltrill.jp|tunebat.com|tvtv.ca|tvtv.us|tweaktown.com|twn.hu|tyda.se|ufret.jp|universalis.fr|uptodown.com|uranai.nosv.org|uscreditcardguide.com|verkaufsoffener-sonntag.com|vimm.net|wamgame.jp|watchdocumentaries.com|wattedoen.be|webdesignledger.com|weldingweb.com|wetteronline.de|wfmz.com|wieistmeineip.*|winfuture.de|word-grabber.com|worldjournal.com|worldle.teuteuf.fr|wort-suchen.de|woxikon.*|yakkun.com|young-machine.com|yugioh-starlight.com|yutura.net|zagreb.info|zakzak.co.jp
+		Salvaged rule by ignoring 5 unsupported domain= option: 24sata.hr|373news.com|actugaming.net|aerotrader.com|alc.co.jp|alfa.lt|allthetests.com|animanch.com|aniroleplay.com|apkmirror.com|areaconnect.com|as-web.jp|atvtrader.com|aucfree.com|autoby.jp|autoc-one.jp|autofrage.net|automobile-catalog.com|bab.la|babla.*|baseballchannel.jp|bg-mania.jp|bien.hu|bilis.lt|blogmura.com|boredpanda.com|bunshun.jp|buzzfeed.com|buzzfeednews.com|calculatorsoup.com|cesoirtv.com|chanto.jp.net|cinetrafic.fr|cocokara-next.com|collinsdictionary.com|commercialtrucktrader.com|computerfrage.net|crosswordsolver.com|cruciverba.it|cults3d.com|culturequizz.com|cycletrader.com|daily.co.jp|dailynewshungary.com|dallashoopsjournal.com|dayspedia.com|dictionary.cambridge.org|dictionnaire.lerobert.com|dnevno.hr|dreamchance.net|dropgame.jp|drweil.com|dziennik.pl|ecranlarge.com|eigachannel.jp|equipmenttrader.com|etaplius.lt|ev-times.com|finanzfrage.net|footballchannel.jp|forsal.pl|futabanet.jp|fxstreet-id.com|fxstreet-vn.com|fxstreet.*|game8.jp|games.arkadium.com|gamewith.jp|gardeningsoul.com|gazetaprawna.pl|genialetricks.de|gesundheitsfrage.net|gifu-np.co.jp|gigafile.nu|globalrph.com|gloria.hr|golf-live.at|grapee.jp|gutefrage.net|happymoments.lol|hb-nippon.com|heureka.cz|horairesdouverture24.fr|hotcopper.co.nz|hotcopper.com.au|hvac-talk.com|idokep.hu|infor.pl|iza.ne.jp|j-cast.com|j-town.net|j7p.jp|jablickar.cz|javatpoint.com|jawapos.com|jiji.com|jikayosha.jp|jmty.jp|joemonster.org|judgehype.com|kinmaweb.jp|km77.com|kobe-journal.com|kompasiana.com|kreuzwortraetsel.de|kurashinista.jp|kurashiru.com|kyoteibiyori.com|lacuarta.com|laleggepertutti.it|lamire.jp|langenscheidt.com|laposte.net|lawyersgunsmoneyblog.com|ldoceonline.com|leckerschmecker.me|lifehacker.jp|listentotaxman.com|livenewschat.eu|luremaga.jp|m.economictimes.com|mafab.hu|mahjongchest.com|mainichi.jp|maketecheasier.com|malaymail.com|mamastar.jp|mathplayzone.com|mentalfloss.com|meteo60.fr|midhudsonnews.com|minesweeperquest.com|minkou.jp|mmm.lt|modhub.us|modsfire.com|moin.de|motor-talk.de|motorbikecatalog.com|motorradfrage.net|motscroises.fr|movie-locations.com|muragon.com|namemc.com|nana-press.com|natalie.mu|nationaltoday.com|nbadraft.net|newatlas.com|news.zerkalo.io|newsweekjapan.jp|niketalk.com|nikkan-gendai.com|nikkansports.com|nlab.itmedia.co.jp|notebookcheck-cn.com|notebookcheck-hu.com|notebookcheck-ru.com|notebookcheck-tr.com|notebookcheck.*|nouvelobs.com|nyitvatartas24.hu|oeffnungszeitenbuch.de|ondemandkorea.com|onlineradiobox.com|operawire.com|optionsprofitcalculator.com|oraridiapertura24.it|oricon.co.jp|oxfordlearnersdictionaries.com|palabr.as|pashplus.jp|persoenlich.com|petitfute.com|picksandparlays.net|picrew.me|play-games.com|pons.com|popdaily.com.tw|powerpyx.com|pptvhd36.com|profitline.hu|programme-tv.net|puzzlegarage.com|pwctrader.com|quefaire.be|radio-australia.org|radio-osterreich.at|raetsel-hilfe.de|raider.io|ranking.net|raskakcija.lt|references.be|reisefrage.net|relevantmagazine.com|reptilesmagazine.com|roleplayer.me|rostercon.com|samsungmagazine.eu|sankei.com|sanspo.com|scribens.com|scribens.fr|si.com|slashdot.org|snowmobiletrader.com|soccerdigestweb.com|solitairehut.com|sourceforge.net|southhemitv.com|sportalkorea.com|sportlerfrage.net|statecollege.com|steamidfinder.com|sudokutable.com|superhonda.com|syosetu.com|szamoldki.hu|talkwithstranger.com|tbs.co.jp|tbsradio.jp|techdico.com|the-crossword-solver.com|thecelticblog.com|thedigestweb.com|thefirearmblog.com|traicy.com|transparentcalifornia.com|transparentnevada.com|trilltrill.jp|tunebat.com|tvtv.ca|tvtv.us|tweaktown.com|twn.hu|tyda.se|ufret.jp|universalis.fr|uptodown.com|uranai.nosv.org|uscreditcardguide.com|verkaufsoffener-sonntag.com|vimm.net|wamgame.jp|watchdocumentaries.com|wattedoen.be|webdesignledger.com|weldingweb.com|wetteronline.de|wfmz.com|wieistmeineip.*|winfuture.de|word-grabber.com|worldhistory|worldjournal.com|worldle.teuteuf.fr|wort-suchen.de|woxikon.*|yakkun.com|young-machine.com|yugioh-starlight.com|yutura.net|zagreb.info|zakzak.co.jp
 		Salvaged rule by ignoring 3 unsupported domain= option: all3do.com|d-s.io|d0000d.com|d000d.com|d0o0d.com|do0od.com|do7go.com|dood.*|doods.*|dooodster.com|dooood.*|doply.net|ds2play.com|ds2video.com|dsvplay.com|vide0.net|vidply.com|vvide0.com
 		Salvaged rule by ignoring 1 unsupported domain= option: vtube.network|vtube.to|vtbe.*
 		Salvaged rule by ignoring 1 unsupported domain= option: piraproxy.app|unblocksite.pw|theproxy.*
@@ -35,9 +35,9 @@ Output rule count: 5631
 		Salvaged rule by ignoring 1 unsupported domain= option: girlmms.com|ottxmaza.com|sexmazahd.com|webxmaza.com|desiflix.*
 		Salvaged rule by ignoring 2 unsupported domain= option: povvldeo.*|powcloud.*|povvldeo.lol
 		Salvaged rule by ignoring 7 unsupported domain= option: zdnet.fr|imgsen.com|senmanga.com|mangovideo.*|imgdawgknuttz.com|deltabit.co|bolly4umovies.*|songsio.com|2filmy4web.com.in|links.filmymeet.wiki|lovelynudez.com|classicpornbest.com|topwwnews.com|javdoe.to|javtc.*|pornxp.com|suicidepics.com|tanix.net|ukrainesmodels.com|freeadultcomix.com|xxxwebdlxxx.top|uproxy2.biz|dvdplay.*|mangaraw.org|imgsto.*|pics4upload.com|aiblog.tv|amateurblog.tv|gravureblog.tv|latinblog.tv|silverblog.tv|socialblog.tv|starblog.tv|xblog.tv|streamgoto.*|dropmms.*|zinchanmanga.com|eromanga-show.com|hentai-one.com|hentaipaw.com|nukibooks.com|moviehaxx.pro|onlyjerk.net|khatrimazafull.makeup|movietp.com|player.videasy.net|x-x-x.video|watchluna.com
-		Salvaged rule by ignoring 13 unsupported domain= option: andyday.*|andyday.pe|anime3rb.com|animeflv.net|animeunity.*|animez.org|bflix.*|bflix.sh|capo5play.com|cardboardtranslation.com|cloudnestra.com|curiosidadtop.com|dlhd.*|dlhd.click|dokoembed.pw|dorawatch.net|ebook-hunter.org|embedcanais.com|embedtv.net|fbstreams.pm|fojik.*|fojik.com|freemoviesfull.com|futemais.net|giize.com|hianime.*|hoca6.com|instalker.org|kaa.mx|luckypatchers.com|luluvdoo.com|mlbb.space|moviesjoy.*|mywatchseries.*|olympustaff.com|playerflixapi.com|rivestream.org|souq-design.com|sportshub.*|spotifylists.com|streaming-community.*|streamingcommunityz.*|streamlord.com|telepisodes.org|tfp.is|tutvlive.ru|ups2up.fun|vecloud.eu|vipbox.*|vipbox.lc|watchf1full.com|way2movies.*|webxzplay.cfd|xoxocomic.com|yuppow.com
-		Salvaged rule by ignoring 13 unsupported domain= option: andyday.*|andyday.pe|anime3rb.com|animeflv.net|animeunity.*|animez.org|bflix.*|bflix.sh|capo5play.com|cardboardtranslation.com|cloudnestra.com|curiosidadtop.com|dlhd.*|dlhd.click|dokoembed.pw|dorawatch.net|ebook-hunter.org|embedcanais.com|embedtv.net|fbstreams.pm|fojik.*|fojik.com|freemoviesfull.com|futemais.net|giize.com|hianime.*|hoca6.com|instalker.org|kaa.mx|luckypatchers.com|luluvdoo.com|mlbb.space|moviesjoy.*|mywatchseries.*|olympustaff.com|playerflixapi.com|rivestream.org|souq-design.com|sportshub.*|spotifylists.com|streaming-community.*|streamingcommunityz.*|streamlord.com|telepisodes.org|tfp.is|tutvlive.ru|ups2up.fun|vecloud.eu|vipbox.*|vipbox.lc|watchf1full.com|way2movies.*|webxzplay.cfd|xoxocomic.com|yuppow.com
-		Salvaged rule by ignoring 13 unsupported domain= option: andyday.*|andyday.pe|anime3rb.com|animeflv.net|animeunity.*|animez.org|bflix.*|bflix.sh|capo5play.com|cardboardtranslation.com|cloudnestra.com|curiosidadtop.com|dlhd.*|dlhd.click|dokoembed.pw|dorawatch.net|ebook-hunter.org|embedcanais.com|embedtv.net|fbstreams.pm|fojik.*|fojik.com|freemoviesfull.com|futemais.net|giize.com|hianime.*|hoca6.com|instalker.org|kaa.mx|luckypatchers.com|luluvdoo.com|mlbb.space|moviesjoy.*|mywatchseries.*|olympustaff.com|playerflixapi.com|rivestream.org|souq-design.com|sportshub.*|spotifylists.com|streaming-community.*|streamingcommunityz.*|streamlord.com|telepisodes.org|tfp.is|tutvlive.ru|ups2up.fun|vecloud.eu|vipbox.*|vipbox.lc|watchf1full.com|way2movies.*|webxzplay.cfd|xoxocomic.com|yuppow.com
+		Salvaged rule by ignoring 14 unsupported domain= option: andyday.*|andyday.pe|anime3rb.com|animeflv.net|animeunity.*|animez.org|asd.*|bflix.*|bflix.sh|capo5play.com|cardboardtranslation.com|cloudnestra.com|curiosidadtop.com|dlhd.*|dlhd.click|dokoembed.pw|dorawatch.net|ebook-hunter.org|embedcanais.com|embedtv.net|fbstreams.pm|fojik.*|fojik.com|freemoviesfull.com|futemais.net|giize.com|hianime.*|hoca6.com|instalker.org|kaa.mx|luckypatchers.com|luluvdoo.com|mlbb.space|moviesjoy.*|mywatchseries.*|olympustaff.com|playerflixapi.com|rivestream.org|souq-design.com|sportshub.*|spotifylists.com|streaming-community.*|streamingcommunityz.*|streamlord.com|telepisodes.org|tfp.is|tutvlive.ru|ups2up.fun|vecloud.eu|vipbox.*|vipbox.lc|watchf1full.com|way2movies.*|webxzplay.cfd|xoxocomic.com|yuppow.com
+		Salvaged rule by ignoring 14 unsupported domain= option: andyday.*|andyday.pe|anime3rb.com|animeflv.net|animeunity.*|animez.org|asd.*|bflix.*|bflix.sh|capo5play.com|cardboardtranslation.com|cloudnestra.com|curiosidadtop.com|dlhd.*|dlhd.click|dokoembed.pw|dorawatch.net|ebook-hunter.org|embedcanais.com|embedtv.net|fbstreams.pm|fojik.*|fojik.com|freemoviesfull.com|futemais.net|giize.com|hianime.*|hoca6.com|instalker.org|kaa.mx|luckypatchers.com|luluvdoo.com|mlbb.space|moviesjoy.*|mywatchseries.*|olympustaff.com|playerflixapi.com|rivestream.org|souq-design.com|sportshub.*|spotifylists.com|streaming-community.*|streamingcommunityz.*|streamlord.com|telepisodes.org|tfp.is|tutvlive.ru|ups2up.fun|vecloud.eu|vipbox.*|vipbox.lc|watchf1full.com|way2movies.*|webxzplay.cfd|xoxocomic.com|yuppow.com
+		Salvaged rule by ignoring 14 unsupported domain= option: andyday.*|andyday.pe|anime3rb.com|animeflv.net|animeunity.*|animez.org|asd.*|bflix.*|bflix.sh|capo5play.com|cardboardtranslation.com|cloudnestra.com|curiosidadtop.com|dlhd.*|dlhd.click|dokoembed.pw|dorawatch.net|ebook-hunter.org|embedcanais.com|embedtv.net|fbstreams.pm|fojik.*|fojik.com|freemoviesfull.com|futemais.net|giize.com|hianime.*|hoca6.com|instalker.org|kaa.mx|luckypatchers.com|luluvdoo.com|mlbb.space|moviesjoy.*|mywatchseries.*|olympustaff.com|playerflixapi.com|rivestream.org|souq-design.com|sportshub.*|spotifylists.com|streaming-community.*|streamingcommunityz.*|streamlord.com|telepisodes.org|tfp.is|tutvlive.ru|ups2up.fun|vecloud.eu|vipbox.*|vipbox.lc|watchf1full.com|way2movies.*|webxzplay.cfd|xoxocomic.com|yuppow.com
 		Salvaged rule by ignoring 1 unsupported domain= option: ceesty.com|corneey.com|destyy.com|festyy.com|gestyy.com|bolly4umovies.*|pcgamez-download.com|lovelynudez.com|hd-easyporn.com|nxbrew.com|gayforit.eu|nsfwyoutube.com|streamblasters.pm
 		Salvaged rule by ignoring 19 unsupported domain= option: colourxh.site|fullxh.com|galleryxh.site|megaxh.com|movingxh.world|seexh.com|unlockxh4.com|valuexh.life|xhaccess.com|xhadult2.com|xhadult3.com|xhadult4.com|xhadult5.com|xhamster.*|xhamster10.*|xhamster11.*|xhamster12.*|xhamster13.*|xhamster14.*|xhamster15.*|xhamster16.*|xhamster17.*|xhamster18.*|xhamster19.*|xhamster2.*|xhamster20.*|xhamster3.*|xhamster4.*|xhamster42.*|xhamster46.com|xhamster5.*|xhamster7.*|xhamster8.*|xhamsterporno.mx|xhbig.com|xhbranch5.com|xhchannel.com|xhdate.world|xhlease.world|xhmoon5.com|xhofficial.com|xhopen.com|xhplanet1.com|xhplanet2.com|xhreal2.com|xhreal3.com|xhspot.com|xhtotal.com|xhtree.com|xhvictory.com|xhwebsite.com|xhwebsite2.com|xhwebsite5.com|xhwide1.com|xhwide2.com|xhwide5.com
 		Salvaged rule by ignoring 2 unsupported domain= option: cpmlink.net|lusthero.com|goto.com.np|imgtorrnt.in|9ig.de|imgdawgknuttz.com|vev.red|vidop.icu|vidup.io|pornclassic.tube|tubepornclassic.com|bolly4umovies.*|pcgamez-download.com|curto.win|freeadultcomix.com|xxxwebdlxxx.top|bc.vc|dropmms.*
@@ -863,21 +863,21 @@ Output rule count: 5631
 		Incompatible with DNR: *$script,redirect-rule=prebid-ads.js,domain=read.amazon.*
 		Incompatible with DNR: *$script,3p,redirect-rule=noopjs,domain=kio.ac
 		Incompatible with DNR: @@||googletagmanager.com/gtm.js$script,redirect-rule,domain=rocketnews24.com
-CSS-generic: 165 specific CSS exceptions
+CSS-generic: 166 specific CSS exceptions
 CSS-generic: 136 plain CSS selectors
 CSS-generic-high: 74 plain CSS selectors
-CSS-specific: 4633 distinct filters
-	Combined into 4504 distinct hostnames
-Procedural-related distinct filters: 1206 distinct combined selectors
-	Combined into 1651 distinct hostnames
+CSS-specific: 4639 distinct filters
+	Combined into 4507 distinct hostnames
+Procedural-related distinct filters: 1208 distinct combined selectors
+	Combined into 1653 distinct hostnames
 ============================
 Listset for 'easylist':
 	Fetching remote https://ublockorigin.github.io/uAssets/thirdparties/easylist.txt
-Input filter count: 52822
-	Accepted filter count: 52798
+Input filter count: 53461
+	Accepted filter count: 53437
 	Rejected filter count: 19
 Output rule count: 3584
-	Pruning requestDomains: from 42316 to 42315
+	Pruning requestDomains: from 42953 to 42952
 	Static rules: 3558
 
 	Maybe good (regexes): 19
@@ -901,19 +901,19 @@ CSS-generic: 3892 plain CSS selectors
 	Removing excepted highly generic filter ##[data-adblockkey]
 	Removing excepted highly generic filter ##[data-advadstrackid]
 	Removing excepted highly generic filter ##[data-ad-manager-id]
-CSS-generic-high: 452 plain CSS selectors
-CSS-specific: 9710 distinct filters
-	Combined into 8094 distinct hostnames
-Procedural-related distinct filters: 210 distinct combined selectors
-	Combined into 214 distinct hostnames
+CSS-generic-high: 453 plain CSS selectors
+CSS-specific: 9725 distinct filters
+	Combined into 8098 distinct hostnames
+Procedural-related distinct filters: 208 distinct combined selectors
+	Combined into 213 distinct hostnames
 ============================
 Listset for 'easyprivacy':
 	Fetching remote https://ublockorigin.github.io/uAssets/thirdparties/easyprivacy.txt
-Input filter count: 54380
-	Accepted filter count: 54347
+Input filter count: 54384
+	Accepted filter count: 54351
 	Rejected filter count: 32
-Output rule count: 8322
-	Static rules: 8315
+Output rule count: 8327
+	Static rules: 8320
 		Salvaged rule by ignoring 1 unsupported domain= option: allmodern.com|birchlane.com|catbirdnyc.com|gametime.co|jossandmain.com|ladym.com|libertylondon.com|mediamarkt.de|nobullproject.com|paynow.pmnts.io|perigold.com|theathletesfoot.co.nz|theathletesfoot.com.au|wayfair.*
 	Maybe good (regexes): 7
 	urlskip=: 0
@@ -926,11 +926,11 @@ Procedural-related distinct filters: 3 distinct combined selectors
 ============================
 Listset for 'pgl':
 	Fetching remote https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=1&mimetype=plaintext
-Input filter count: 3439
-	Accepted filter count: 3360
+Input filter count: 3440
+	Accepted filter count: 3361
 	Rejected filter count: 79
 Output rule count: 1
-	Pruning requestDomains: from 3360 to 3359
+	Pruning requestDomains: from 3361 to 3360
 	Static rules: 1
 
 	Maybe good (regexes): 0
@@ -940,13 +940,13 @@ Output rule count: 1
 ============================
 Listset for 'ublock-badware':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/badware.min.txt
-Input filter count: 10524
-	Accepted filter count: 10493
+Input filter count: 10499
+	Accepted filter count: 10468
 	Rejected filter count: 0
-Output rule count: 1265
-	Pruning requestDomains: from 1359 to 1358
-	Pruning requestDomains: from 2983 to 2980
-	Static rules: 1085
+Output rule count: 1264
+	Pruning requestDomains: from 1354 to 1353
+	Pruning requestDomains: from 2979 to 2976
+	Static rules: 1084
 
 	Maybe good (regexes): 129
 	urlskip=: 0
@@ -1011,11 +1011,11 @@ Procedural-related distinct filters: 11 distinct combined selectors
 ============================
 Listset for 'urlhaus-full':
 	Fetching remote https://malware-filter.gitlab.io/malware-filter/urlhaus-filter-hosts.txt
-Input filter count: 6733
-	Accepted filter count: 6733
+Input filter count: 6837
+	Accepted filter count: 6837
 	Rejected filter count: 0
 Output rule count: 1
-	Pruning requestDomains: from 6733 to 6683
+	Pruning requestDomains: from 6837 to 6788
 	Static rules: 1
 
 	Maybe good (regexes): 0
@@ -1041,8 +1041,8 @@ Output rule count: 552
 CSS-generic: 17 specific CSS exceptions
 CSS-generic: 15 plain CSS selectors
 CSS-generic-high: 14 plain CSS selectors
-CSS-specific: 5134 distinct filters
-	Combined into 4111 distinct hostnames
+CSS-specific: 5137 distinct filters
+	Combined into 4113 distinct hostnames
 Procedural-related distinct filters: 474 distinct combined selectors
 	Combined into 427 distinct hostnames
 ============================
@@ -1076,8 +1076,8 @@ Output rule count: 1
 ============================
 Listset for 'adguard-spyware-url':
 	Fetching remote https://filters.adtidy.org/extension/ublock/filters/17.txt
-Input filter count: 2262
-	Accepted filter count: 2244
+Input filter count: 2263
+	Accepted filter count: 2245
 	Rejected filter count: 0
 Output rule count: 743
 	Static rules: 621
@@ -1233,10 +1233,10 @@ Output rule count: 1759
 CSS-generic: 201 specific CSS exceptions
 CSS-generic: 3964 plain CSS selectors
 CSS-generic-high: 167 plain CSS selectors
-CSS-specific: 6630 distinct filters
-	Combined into 18683 distinct hostnames
+CSS-specific: 6631 distinct filters
+	Combined into 18685 distinct hostnames
 Procedural-related distinct filters: 95 distinct combined selectors
-	Combined into 2867 distinct hostnames
+	Combined into 2889 distinct hostnames
 ============================
 Listset for 'annoyances-overlays':
 	Fetching remote https://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt
@@ -1282,8 +1282,8 @@ Output rule count: 349
 CSS-generic: 9 specific CSS exceptions
 CSS-generic: 1005 plain CSS selectors
 CSS-generic-high: 14 plain CSS selectors
-CSS-specific: 3871 distinct filters
-	Combined into 5361 distinct hostnames
+CSS-specific: 3874 distinct filters
+	Combined into 5364 distinct hostnames
 Procedural-related distinct filters: 489 distinct combined selectors
 	Combined into 1216 distinct hostnames
 Rejecting +js(trusted-set-cookie.js,"pum-9137","true"): annoyances-overlays is not trusted
@@ -1303,15 +1303,15 @@ Output rule count: 598
 CSS-generic: 93 specific CSS exceptions
 CSS-generic: 3648 plain CSS selectors
 CSS-generic-high: 111 plain CSS selectors
-CSS-specific: 2932 distinct filters
-	Combined into 4973 distinct hostnames
+CSS-specific: 2937 distinct filters
+	Combined into 4976 distinct hostnames
 Procedural-related distinct filters: 36 distinct combined selectors
 	Combined into 36 distinct hostnames
 ============================
 Listset for 'annoyances-widgets':
 	Fetching remote https://ublockorigin.github.io/uAssets/thirdparties/easylist-chat.txt
-Input filter count: 226
-	Accepted filter count: 225
+Input filter count: 227
+	Accepted filter count: 226
 	Rejected filter count: 1
 Output rule count: 59
 	Pruning requestDomains: from 151 to 150
@@ -1344,7 +1344,7 @@ CSS-generic: 14 specific CSS exceptions
 CSS-generic: 691 plain CSS selectors
 CSS-generic-high: 19 plain CSS selectors
 CSS-specific: 2063 distinct filters
-	Combined into 2622 distinct hostnames
+	Combined into 2624 distinct hostnames
 Procedural-related distinct filters: 66 distinct combined selectors
 	Combined into 86 distinct hostnames
 ============================
@@ -1361,7 +1361,7 @@ Output rule count: 277
 	Unsupported: 0
 
 CSS-generic: 6 specific CSS exceptions
-CSS-generic: 253 plain CSS selectors
+CSS-generic: 254 plain CSS selectors
 CSS-generic-high: 11 plain CSS selectors
 CSS-specific: 691 distinct filters
 	Combined into 1202 distinct hostnames
@@ -1456,13 +1456,13 @@ CSS-specific: 404 distinct filters
 ============================
 Listset for 'chn-0':
 	Fetching remote https://filters.adtidy.org/extension/ublock/filters/224.txt
-Input filter count: 13939
-	Accepted filter count: 13927
+Input filter count: 13972
+	Accepted filter count: 13960
 	Rejected filter count: 4
-Output rule count: 6597
-	Pruning requestDomains: from 4845 to 4844
+Output rule count: 6599
+	Pruning requestDomains: from 4871 to 4870
 	Pruning requestDomains: from 269 to 267
-	Static rules: 6553
+	Static rules: 6555
 
 	Maybe good (regexes): 36
 	urlskip=: 0
@@ -1476,10 +1476,10 @@ Output rule count: 6597
 		Invalid network filter in chn-0: @@||ad.alimama.com^$genericblock
 		Invalid network filter in chn-0: @@||cmechina.net^$genericblock
 CSS-generic: 199 specific CSS exceptions
-CSS-generic: 683 plain CSS selectors
+CSS-generic: 684 plain CSS selectors
 CSS-generic-high: 193 plain CSS selectors
-CSS-specific: 7099 distinct filters
-	Combined into 3260 distinct hostnames
+CSS-specific: 7104 distinct filters
+	Combined into 3262 distinct hostnames
 Procedural-related distinct filters: 185 distinct combined selectors
 	Combined into 190 distinct hostnames
 ============================
@@ -1513,20 +1513,21 @@ Listset for 'deu-0':
 Input filter count: 2326
 	Accepted filter count: 2323
 	Rejected filter count: 3
-Output rule count: 1833
+Output rule count: 1834
 	Static rules: 1825
 
 	Maybe good (regexes): 4
 	urlskip=: 0
-	Unsupported: 4
+	Unsupported: 5
 		Rejected filter: chip.de#?#a:-abp-properties(min-height: 250px;)
+		Rejected filter: onvista.de#?#div[class="col col-12"]:-abp-has(:-abp-properties(Werbung))
 		Rejected filter: windowspro.de#?#article:-abp-has(:-abp-properties(content: "(Anzeige)";))
 		Rejected filter: windowspro.de#?#article:-abp-has(:-abp-properties(content: "Anzeige";))
 		Invalid network filter in deu-0: @@||gofeminin.de^$genericblock
 CSS-generic: 36 specific CSS exceptions
 CSS-generic: 326 plain CSS selectors
 CSS-generic-high: 35 plain CSS selectors
-CSS-specific: 3016 distinct filters
+CSS-specific: 3018 distinct filters
 	Combined into 2105 distinct hostnames
 Procedural-related distinct filters: 109 distinct combined selectors
 	Combined into 79 distinct hostnames
@@ -1567,7 +1568,7 @@ Output rule count: 180
 CSS-generic: 7 specific CSS exceptions
 CSS-generic: 54 plain CSS selectors
 CSS-generic-high: 14 plain CSS selectors
-CSS-specific: 996 distinct filters
+CSS-specific: 997 distinct filters
 	Combined into 541 distinct hostnames
 Procedural-related distinct filters: 153 distinct combined selectors
 	Combined into 116 distinct hostnames
@@ -1575,8 +1576,8 @@ Procedural-related distinct filters: 153 distinct combined selectors
 Listset for 'fra-0':
 	Fetching remote https://filters.adtidy.org/extension/ublock/filters/16.txt
 Input filter count: 13556
-	Accepted filter count: 13126
-	Rejected filter count: 423
+	Accepted filter count: 13125
+	Rejected filter count: 424
 Output rule count: 4206
 	Static rules: 4194
 		Salvaged rule by ignoring 1 unsupported domain= option: dl-protect.link|fsmirror93.lol|zone-telechargement.*
@@ -1667,12 +1668,12 @@ Procedural-related distinct filters: 58 distinct combined selectors
 ============================
 Listset for 'idn-0':
 	Fetching remote https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt
-Input filter count: 4187
-	Accepted filter count: 4186
+Input filter count: 4190
+	Accepted filter count: 4189
 	Rejected filter count: 0
-Output rule count: 3147
-	Static rules: 3146
-		Salvaged rule by ignoring 4 unsupported domain= option: 149.56.24.226|15.235.11.45|anichin.watch|baladfilm.*|bgibola.com|bioskopkerenin.org|hrv.okestream365.xyz|kiryuu.org|komikcast.*|lk21official.biz|lk21official.live|lk21official.org|mangakita.id|movieajip.online|movieku.fit|nomat.top|nontondrama.*|nontonfilmgratis.club|okestream.us|okestreamtv.com|oploverz.*|oploverz.best|oploverz.love|shinigami09.com
+Output rule count: 3150
+	Static rules: 3149
+		Salvaged rule by ignoring 4 unsupported domain= option: 149.56.24.226|15.235.11.45|198.105.112.57|anichin.watch|baladfilm.*|bgibola.com|bioskopkerenin.org|hrv.okestream365.xyz|kiryuu.org|komikcast.*|lk21official.biz|lk21official.live|lk21official.org|mangakita.id|movieajip.online|movieku.fit|nomat.top|nontondrama.*|nontonfilmgratis.club|okestream.us|okestreamtv.com|oploverz.*|oploverz.best|oploverz.love|shinigami09.com
 		Salvaged rule by ignoring 1 unsupported domain= option: igodesu.tv|presdelafontaine.*
 	Maybe good (regexes): 0
 	urlskip=: 0
@@ -1681,8 +1682,8 @@ Output rule count: 3147
 CSS-generic: 8 specific CSS exceptions
 CSS-generic: 363 plain CSS selectors
 CSS-generic-high: 3813 plain CSS selectors
-CSS-specific: 1207 distinct filters
-	Combined into 756 distinct hostnames
+CSS-specific: 1209 distinct filters
+	Combined into 757 distinct hostnames
 Procedural-related distinct filters: 18 distinct combined selectors
 	Combined into 15 distinct hostnames
 ============================
@@ -1778,26 +1779,26 @@ Listset for 'isr-0':
 Input filter count: 489
 	Accepted filter count: 489
 	Rejected filter count: 0
-Output rule count: 262
-	Static rules: 248
+Output rule count: 263
+	Static rules: 249
 
 	Maybe good (regexes): 4
 	urlskip=: 0
 	Unsupported: 10
 		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+:\/+(api-mail|dal|dcx|isc|iscwne|walla-api|6days|animals|astrology|b|buzzit|calendar|cars|celebs|e|elections|euro|fashion|finance|food|forums|friends|fun|gaming|healthy|home|horoscope|judaism|kids|law|mag|mail|maps|marketing|mekomi|milon|movies|mundial|nadlan|news|nick|olympics|play|search|sheva7|special|sports|tags|tech|translate|travel|tv-guide|tv|usaelections|viva|vod|wallaplus|weather|www)\.walla\.co\.il\.?(\/|:|$))^[a-zA-Z0-9\-]+:\/+([a-zA-Z0-9\-]+\.)+walla\.co\.il\.?(\/|:|$)
 		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+:\/+www\.sheee\.co\.il\.?(\/|:|$))^[a-zA-Z0-9\-]+:\/+([a-zA-Z0-9\-]+\.)+sheee\.co\.il\.?(\/|:|$)
-		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+\:\/+(([^\/\:\.]+\.)*(il|com|net|org|gov|mil|edu|int|(ac|edu|gov|govt|mil)\.[a-zA-Z][a-zA-Z]|([a-zA-Z][a-zA-Z]|fed|isa|nsn|dni)\.us|(bl|nhs|parliament|police|mod|ukaea|rct|royal)\.uk|europa\.eu|canada\.ca|(google|amazon|microsoft|apple|yahoo|yandex|youtube)|(google|blogspot|youtube|paypal|amazon|ebay|bing|msn|yandex|nintendo|disney|surveymonkey)\.(com?\.)?[a-zA-Z][a-zA-Z])|([0-9]+\.)+[0-9]+|([^\/\:\.]+\.)*(omny\.fm|anchor\.fm|simplecast\.fm|captivate\.fm|megaphone\.fm|castbox\.fm|transistor\.fm|fireside\.fm|chrt\.fm|pdst\.fm|pscrb\.fm|pdcn\.co|acast\.cloud|podigee\.io|github\.io|gitlab\.io|gitcdn\.xyz|gitcdn\.link|statically\.io|socket\.io|codepen\.io|polyfill\.io|polyfill-fastly\.io|plyr\.io|embed\.ly|iframe\.ly|infogr\.am|jifo\.co|plot\.ly|t\.me|flourish\.studio|flourish\.rocks|iconify\.design|uri\.sh|forkaweso\.me|po\.st|pippa\.io|scdn\.co|powr\.io|umbraco\.io|heyday\.io|prcdn\.co|redcdn\.pl|piano\.io|firebasedatabase\.app|openassistantgpt\.io|gfx\.ms|marker\.io|sided\.co|telegram\.space|tg\.dev|google\.dev|last\.fm|adobe\.io|ves\.io|viafoura\.co|bsky\.app|mastodon\.social|mastodon\.online|mastodon\.art|masto\.host|mastodon\.world|mstdn\.social|mas\.to|techhub\.social |floss\.social|peertube\.tv|ccc\.de|matrix\.to|weatherwidget\.io|lmao\.ninja|disease\.sh|web\.app|rss\.app|railway\.app|stripe\.network|growthbook\.io|mailmunch\.co|beyondwords\.io|soundcloud\.cloud|tredio\.io|iris\.tv|arc\.io|jika\.io|mytuner\.mobi|getbutton\.io|intercom\.io|privy\.io|magic\.link|redd\.it|tenor\.co|twitch\.tv|dlive\.tv|rumble\.cloud|rmbl\.ws|ok\.ru|okcdn\.ru|triller\.co|popkey\.co|ibb\.co|vgy\.me|postimg\.cc|imageshack\.us|prnt\.sc|imagesup\.co|weserv\.nl|archive\.is|archive\.ph|privacymanager\.io|trustindex\.io|optmn\.cloud|terrific\.live|playgen\.io|jogo\.studio|pluro\.ai|equally\.ai|trinitymedia\.ai|whtvr\.ai|whtvr\.io|stories\.sc|storycards\.co|spot\.im|spots\.im|activetrail\.biz|oles\.tv|inthegame\.io|cybercdn\.live|livecdn\.biz|g-mana\.live|g-mana\.online|immergo\.tv|ondigitalocean\.app|wiztivi\.io|cdn-redge\.media|bridged\.media|gostreaming\.tv|h-cdn\.co|minute\.ly|vttp\.co|tldw\.me|tawk\.to|cbox\.ws|crisp\.chat|blings\.io|smoove\.io|vp4\.me|nanorep\.co|w-x\.co|commbox\.io|flashy\.app|amagi\.tv|wizzo\.media|wizzo\.stream|nagishly\.co|user1st\.info|userway\.dev|accessi\.do|getmood\.io|ex\.co|feeder\.co|del\.icio\.us|telesco\.pe|telegram\.me|vk\.ru|cdn-vk\.ru|dzen\.ru|bit\.ly|goo\.gl|g\.co|yt\.be|youtu\.be|t\.co|fb\.me|m\.me|instagr\.am|wa\.me|amzn\.to|wp\.me|git\.io|docdro\.id|arcg\.is|ow\.ly|disq\.us|discord\.gg|musical\.ly|trib\.al|rb\.ly|t\.ly|tiny\.cc|did\.li|w\.wiki|periscope\.tv|pscp\.tv|vine\.co|vid\.me|dailymail\.co\.uk|dailystar\.co\.uk|metro\.co\.uk|bbc\.net\.uk|bbc\.co\.uk|cnn\.io|ren\.tv|knesset\.tv|knesset\.live|l-p\.site|stari\.world|walla\.cloud|103\.fm|zahav\.ru|nickjr\.tv|sentry\.io|atom-data\.io|gemius\.pl|clarity\.ms|logidea\.info|zoomanalytics\.co|snackly\.co|trace\.events|firstimpression\.io|rtk\.io|trb\.tv|outbid\.io))\.?([\/\:]|$))^[^\/\:\.]+\:\/+[^\/\:\.]
+		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+\:\/+(([^\/\:\.]+\.)*(il|com|net|org|gov|mil|edu|int|(ac|edu|gov|govt|mil)\.[a-zA-Z][a-zA-Z]|([a-zA-Z][a-zA-Z]|fed|isa|nsn|dni)\.us|(bl|nhs|parliament|police|mod|ukaea|rct|royal)\.uk|europa\.eu|canada\.ca|(google|amazon|microsoft|apple|yahoo|yandex|youtube)|(google|blogspot|youtube|paypal|amazon|ebay|bing|msn|yandex|nintendo|disney|surveymonkey)\.(com?\.)?[a-zA-Z][a-zA-Z])|([0-9]+\.)+[0-9]+|([^\/\:\.]+\.)*(omny\.fm|anchor\.fm|simplecast\.fm|captivate\.fm|megaphone\.fm|castbox\.fm|transistor\.fm|fireside\.fm|chrt\.fm|pdst\.fm|pscrb\.fm|pdcn\.co|acast\.cloud|podigee\.io|github\.io|gitlab\.io|gitcdn\.xyz|gitcdn\.link|statically\.io|socket\.io|codepen\.io|polyfill\.io|polyfill-fastly\.io|plyr\.io|embed\.ly|iframe\.ly|infogr\.am|jifo\.co|plot\.ly|t\.me|flourish\.studio|flourish\.rocks|iconify\.design|uri\.sh|forkaweso\.me|po\.st|pippa\.io|scdn\.co|powr\.io|umbraco\.io|heyday\.io|prcdn\.co|redcdn\.pl|piano\.io|firebasedatabase\.app|openassistantgpt\.io|gfx\.ms|marker\.io|sided\.co|telegram\.space|tg\.dev|google\.dev|last\.fm|adobe\.io|ves\.io|viafoura\.co|bsky\.app|mastodon\.social|mastodon\.online|mastodon\.art|masto\.host|mastodon\.world|mstdn\.social|mas\.to|techhub\.social |floss\.social|peertube\.tv|ccc\.de|matrix\.to|weatherwidget\.io|lmao\.ninja|disease\.sh|web\.app|rss\.app|railway\.app|stripe\.network|growthbook\.io|mailmunch\.co|beyondwords\.io|soundcloud\.cloud|tredio\.io|iris\.tv|arc\.io|jika\.io|mytuner\.mobi|getbutton\.io|intercom\.io|privy\.io|magic\.link|redd\.it|tenor\.co|twitch\.tv|dlive\.tv|rumble\.cloud|rmbl\.ws|ok\.ru|okcdn\.ru|triller\.co|popkey\.co|ibb\.co|vgy\.me|postimg\.cc|imageshack\.us|prnt\.sc|imagesup\.co|weserv\.nl|archive\.is|archive\.ph|privacymanager\.io|transcend\.io|trustindex\.io|optmn\.cloud|terrific\.live|playgen\.io|jogo\.studio|pluro\.ai|equally\.ai|trinitymedia\.ai|whtvr\.ai|whtvr\.io|stories\.sc|storycards\.co|spot\.im|spots\.im|activetrail\.biz|oles\.tv|inthegame\.io|cybercdn\.live|livecdn\.biz|g-mana\.live|g-mana\.online|immergo\.tv|ondigitalocean\.app|wiztivi\.io|cdn-redge\.media|bridged\.media|gostreaming\.tv|h-cdn\.co|minute\.ly|vttp\.co|tldw\.me|tawk\.to|cbox\.ws|crisp\.chat|blings\.io|smoove\.io|vp4\.me|nanorep\.co|w-x\.co|commbox\.io|flashy\.app|amagi\.tv|wizzo\.media|wizzo\.stream|nagishly\.co|user1st\.info|userway\.dev|accessi\.do|getmood\.io|ex\.co|feeder\.co|del\.icio\.us|telesco\.pe|telegram\.me|vk\.ru|cdn-vk\.ru|dzen\.ru|bit\.ly|goo\.gl|g\.co|yt\.be|youtu\.be|t\.co|fb\.me|m\.me|instagr\.am|wa\.me|amzn\.to|wp\.me|git\.io|docdro\.id|arcg\.is|ow\.ly|disq\.us|discord\.gg|musical\.ly|trib\.al|rb\.ly|t\.ly|tiny\.cc|did\.li|w\.wiki|periscope\.tv|pscp\.tv|vine\.co|vid\.me|dailymail\.co\.uk|dailystar\.co\.uk|metro\.co\.uk|bbc\.net\.uk|bbc\.co\.uk|cnn\.io|ren\.tv|knesset\.tv|knesset\.live|l-p\.site|stari\.world|walla\.cloud|103\.fm|zahav\.ru|nickjr\.tv|sentry\.io|atom-data\.io|gemius\.pl|clarity\.ms|logidea\.info|zoomanalytics\.co|snackly\.co|trace\.events|firstimpression\.io|rtk\.io|trb\.tv|outbid\.io))\.?([\/\:]|$))^[^\/\:\.]+\:\/+[^\/\:\.]
 		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+\:\/+([^\/\:\.]+\.)*((gov|idf|muni|ac|k12|net)\.il|(google|blogspot|youtube|paypal|amazon|ebay|bing|msn|yandex|nintendo|disney|surveymonkey|phpbb|minifier|enable|wcag2|tadam|vagas|nagich|nagishplus|nagishexpress|nagishly|livedns|user-a|access4u|accessnet|emap|23tv|glz|icast|ecast|mediacast|livecast|live1|siz|gif|meduzot|telesport|teleline|livegames|newsnow|2net|weather2day|israelweather|mavir|mekorotapp|e-vrit|xword|uzit|fav|slash|rabbi|creditguard|tase|paisplus|pais|winner|israelpost|postalfinance|bankhadoar|israports|iroads|nta|rail|dankal|ayalonhw|transisrael|iec|mekorot|kav-layla|zemereshet|upsite|triple|pulseem|wizzo|easy|mymarketing|dolcemaster|hotelscombined|hamara|talniri|sponser|kaplanopensource|systematics|israelcoronamap|icdn|wcdn|wallanews|wallashops|wallatours|wallaart|wallaprint|walla|hamal|sheee|globes|madlan|yad2|mipo|b144|bezeq|pelephone|yes|fxp|nick|d|maariv|mako|13tv|sheva7|iol|dominos|magazineitsuv|doctors|mishpati|lawguide|arcdb|zebarur|wlcdn|linicom|erate)\.co\.il|(kan|kankids|makan|iba|oref|iaf|yeshiva|boi|parks|iaa|imj|nli|bh|anumuseum|filmfund|rashut2|isoc|hebrew-academy|kineret|ikinneret|ocean|kkl|teva|zavit|birds|1221|yadsarah|kolzchut|guidestar|osh|sii|tmir|acum|football|accessible|ip6|profile)\.org\.il)\.?([\/\:]|$))^[a-zA-Z0-9\-]+\:\/+[^\/\:]+\.il\.?([\/\:]|$)
 		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+\:\/+([^\/\:\.]+\.)*(facebook|fbcdn|threads|dmcdn|jsdelivr|cloudfront|cloudflare|fastly|fastlylb|ovh|cloudfunctions|gammacdn|edgecastcdn|edgio|blazingcdn|incapdns|impervadns|cachefly|footprint|cloudapp|brightcove|akamai|akamaihd|akamaized|akamaiedge|akamaistream|akahost|akadns|ctedgecdn|2mdn|edgesuite|azurewebsites|azureedge|azurefd|windows|hwcdn|zencdn|b-cdn|bunny|llnwd|llnwi|boltdns|msecnd|a-msedge|l-msedge|t-msedge|fb-t-msedge|msauth|msftauth|omegacdn|sigmacdn|trafficmanager|queue-it|bitsngo|nocookie|recaptcha|httpschecker|imgix|hlsplayer|datatables|docdroid|iframely|slideshare|algolia|3dissue|pinecast|anvato|maphub|virtualearth|cdnpk|dwcdn|typekit|edgefonts|fonts|ampproject|ctfassets|hsforms|hscollectedforms|viafoura|yandex|yastatic|yahoo|yahoodns|lldns|web-view|v0cdn|wistia|liveperson|2cnt|adobedc|behance|darksky|meteocast|radio|radio-api|google|speedtest|metercustom|researchgate|example|podigee-cdn|twitchcdn|ttvnw|jtvnw|vkuser|nflxso|sourceforge|dailyuploads|deviantart|8ch|vodgc|streamlock|streamgates|cdnwz|cdnwiz|playgorithm|vidiom|radwarecloud|glassix|f-static|xicdn|wixapps|maskyoo|crazysob|mivzakim|mygemel|bringthemhomenow|artipbox|sc-static|crwdcntrl|chartbeat|doubleclick|advsnx)\.net\.?([\/\:]|$))^[a-zA-Z0-9\-]+\:\/+[^\/\:]+\.net\.?([\/\:]|$)
-		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+\:\/+([^\/\:\.]+\.)*(flowplayer|amara|h5p|d3js|ampproject|promisejs|backbonejs|angularjs|dojotoolkit|staticfile|telegram|telegram-cdn|cdn-telegram|openstreetmap|wmflabs|wikimapia|wikimedia|wikipedia|wiktionary|wikisource|wikiquote|wikibooks|wikivoyage|wikiversity|wikinews|wikidata|mediawiki|w3|schema|archive|mozilla|chromium|documentcloud|w|mathjax|pannellum|tmdb|muses|npr|weatherwidget|openweathermap|lightningmaps|opensubtitles|chess|geogebra|diasporafoundation|joinmastodon|joinpeertube|discourse|matrix|f-droid|ipify|privacy-center|cookielaw|featuregates|cleantalk|walletlink|walletconnect|cdn77|userway|consensu|mediamatters|librivox|example|uploadimage|postimages|postimage|imgsafe|4chan|4channel|4cdn|olympic|pbs|pbskids|ntp|gnu|creativecommons|eff|icann|iana|ietf|apache|opensource|bitcoin|ethereum|litecoin|wikileaks|ourworldindata|un|c-span|c-spanvideo|gutenberg|doi|arxiv|scirp|google|browser-update|wp-accessibility|wordpress-accessibility|widgetlogic|ipv6-il|benyehuda|thekotel|yadvashem|mdais|covid19maps|coronaisrael)\.org\.?([\/\:]|$))^[a-zA-Z0-9\-]+\:\/+[^\/\:]+\.org\.?([\/\:]|$)
-		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+\:\/+([^\/\:\.]+\.)*(google|gstatic|googleapis|jquery|youtube|youtubekids|youtube-nocookie|ytimg|facebook|fbsbx|x|twitter|twimg|instagram|cdninstagram|pinterest|pinimg|tumblr|giphy|vimeo|vimeocdn|dailymotion|flickr|staticflickr|soundcloud|sndcdn|scribd|scribdassets|tiktok|tiktokcdn|tiktokcdn-us|tiktokcdn-eu|tiktokv|ttwstatic|muscdn|ibytedtos|sharethis|addthis|addthisedge|addthiscdn|reddit|redditmedia|redditstatic|redditgifts|linkedin|licdn|fontawesome|cdnfonts|image-maps|cloudflare|pacloudflare|bootstrapcdn|unpkg|cdnjs|stackpathdns|stackpathcdn|maxcdn|maxcdn-edge|netdna-ssl|netdna-cdn|kxcdn|ssl-cdn|muicss|tinymce|createjs|github|githubusercontent|githubassets|aspnetcdn|azure|amazonaws|awswaf|elasticbeanstalk|bunnycdn|vercel-dns|serverable|herokuapp|herokudns|rackcdn|raxcdn|lwcdn|netlify|wasabisys|zdassets|jwplayer|jwpcdn|jwpltx|jwpsrv|jwplatform|brightcove|brightcovecdn|flowplayer|foliovision|fluidplayer|jasperplayer|wowza|streamable|streamtheworld|mixcloud|bandcamp|bcbits|spotify|spotifycdn|omnystudio|omnycontent|cdnstream1|tritondigital|iheart|spreaker|podbean|buzzsprout|rss|simplecast|simplecastaudio|simplecastcdn|pinecast|acast|art19|redcircle|libsyn|podtail|tunein|stitcher|listennotes|castos|radiopublic|blogtalkradio|audioboom|apple|cdn-apple|applemediaservices|mzstatic|nobexpartners|podtrac|chtbl|sermonaudio|audio|soundhelix|vocaroo|embedly|iframely|snapwidget|thinglink|infogram|highcharts|barchart|tableau|powerbi|powerapps|visualstudio|office|dynamics|airtable|printfriendly|algolianet|gravatar|unisvg|simplesvg|svgur|svgshare|svgrepo|vecteezy|imgur|imgflip|gifer|gfycat|tenor|disqus|disquscdn|disqusservice|oneall|oneallcdn|tapatalk|tapatalk-cdn|fastcomments|graphcomment|intensedebate|hyvor|vuukle|mapbox|maptiler|mapquest|arcgis|arcgisonline|esri|here|carto|cartocdn|hcaptcha|raincaptcha|ted|tedcdn|kickstarter|riddle|strawpoll|surveymonkey|yelp|9gag|9cache|unsplash|freepik|imageshack|pastebin|desmos|gitlab|githack|rawgit|rawgithub|knockoutjs|gridstackjs|ravenjs|liveleak|ign|ignimgs|365scores|pressreader|3dissue|substack|substackcdn|blogger|blogspot|wordpress|wp|wpengine|videopress|wptavern|themeruby|livejournal|googleoptimize|withgoogle|googlegroups|googlesource|googleusercontent|googlevideo|ggpht|noembed|appspot|firebaseio|firebaseapp|libring|taggbox|addtoany|addthisevent|addevent|addtocalendar|onesignal|tinypass|stripe|paypal|paypalobjects|amazon|ssl-images-amazon|media-amazon|media-imdb|ebay|ebayimg|microsoft|microsoftonline|s-microsoft|live|bing|msn|yahoo|yimg|yahooapis|duckduckgo|yandex|optimizely|hsforms|hs-scripts|hubspot|nitroscripts|nitrocdn|webflow|rtlcss|tailwindcss|typography|typotheque|typenetwork|webtype|lightwidget|ezojs|mailerlite|typeform|convertbox|tiqcdn|zohopublic|opecloud|queryly|remixd|sparemin|auth0|windy|theweather|weather|accuweather|theweathernetwork|wunderground|sat24|windfinder|rainviewer|uvlens|weatherapi|holfuy|surfline|travelriskmap|dropbox|dropboxusercontent|dropboxstatic|dropbox-dns|youbora|soundcharts|radiojar|musicradio|mytuner-radio|live365|aaplimg|twitcount|flipboard|buzzfeed|digg|stumbleupon|mix|getpocket|timezonedb|timeanddate|momentjs|statcounter|buymeacoffee|gofundme|cookieinfoscript|cookiebot|cdn-cookieyes|privacy-mgmt|iabtechlab|ip-api|userapi|vk|flagsapi|odysee|rumble|bitchute|truthsocial|polymarket|alchemy|instatus|intercomcdn|walletconnect|moonpay|quizlet|eloqua|adobe|adobedtm|onetrust|cookiepro|website-files|investing|tradingview|tradingview-widget|cloudinary|kaltura|openweb|waze|summurai|univtec|wistia|livefyre|pushwoosh|sumo|sumome|chatango|bytecdntp|bitly|tinyurl|radarbox|radarbox24|avionio|ipcamlive|speedtestcustom|nperf|fast|openspeedtest|booking|bstatic|shopify|shopifyapps|site|salesforce|salesforce-scrt|livechatinc|virtualspirits|slickstream|exiteme|hypemarks|tintup|ogols|cquotient|braze|braze-images|l7cdn|icons8|iconfinder|iconarchive|iconscout|flaticon|linearicons|kindpng|pngitem|gamepix|steampowered|steamstatic|playstation|xbox|xboxservices|nintendo|discord|discordapp|gettr|gab|minds|mewe|parler|mixer|metacafe|mcstatic|slideplayer|firefoxusercontent|box|feedly|feedburner|phpbb|whatsapp|vroptimal-3dx-assets|gamezhero|gameboss|addictinggames|funhtml5games|gamedistribution|monsteraplay|sportradar|wallst|nasdaq|nyse|euronext|londonstockexchange|financial|config-security|signature-it|consentframework|android|chrome|netflix|disney|cnet|cnevids|voanews|bbc|cnn|go|abcnews|cbsnews|nbcnews|msnbc|cnbc|nytimes|nyt|washingtonpost|thehill|today|usatoday|bloomberg|wsj|nypost|foxnews|foxbusiness|espn|eurosport|fifa|uefa|nba|wnba|nfl|nhl|nhle|mlb|mlbstatic|turner|rttv|rt|dw|xkcd|reactiongifs|gifbin|gif-finder|gifyu|makeagif|kym-cdn|gyazo|prntscr|tinypic|photobox|photobucket|imgbox|imagebam|deviantart|dmca|mtvnservices|cc|tmz|example|webydo|elementor|wix|wixstatic|wix-code|commentsplugin|parastorage|usrfiles|bugsnag|zoro|hebcal|fontsproject|kayma|kayma-dashboards|kayma-insights|kampyle|vicomi|colbass|cincopa|avplayer|vidnt|peer5|minutemediacdn|mmvideocdn|h-cdn|bynetcdn|cdnwiz|best-tv|viewbix|streamrail|smv-cdn|cloudvideoplatform|dxmcdn|dxmdp|reblaze|rbzdns|hunchbots|jeeng|sphereup|poloriz|applicaster|cloudwm|cloudwm-waf|negishim|accessibe|accessibeapp|acsbap|acsbapp|vollotech|mk-sense|user1st|allyable|equalweb|magixite|purple-lens|peach-in|gigya|glassix|rabbicdn|shortaudition|flashyapp|tranzila|ownid|membitbot|texterchat|nanorep|nixale|walkme|pulseem|zoomengage|vee-crm|trvdp|opinionstage|segmanta|spaceil|clear-map|playbuzz|apester|qmerce|outbrain|taboola|taboolasyndication|google-analytics|googletagservices|googletagmanager|googleadservices|googlesyndication|cloudflareinsights|viglink|parsely|sentry-cdn|getsentry|chartbeat|scorecardresearch|serving-sys|exposebox|imrworldwide|hotjar|amplitude|trackjs|dynamicyield|connatix|coralogix|cooladata|vlitag|browsiprod|petametrics|pusher|fortvision|fortcdn|walla|nick|nickjr|teennick|sinclairstoryline|fresnobee|nbcchicago|magazina-il|pagewiz|pas-rahav|aniview|pubmatic|adnxs|sekindo)\.com\.?([\/\:]|$))^[a-zA-Z0-9\-]+\:\/+[^\/\:]+\.com\.?([\/\:]|$)
+		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+\:\/+([^\/\:\.]+\.)*(flowplayer|amara|h5p|d3js|ampproject|promisejs|backbonejs|angularjs|dojotoolkit|staticfile|telegram|telegram-cdn|cdn-telegram|openstreetmap|wmflabs|wikimapia|wikimedia|wikipedia|wiktionary|wikisource|wikiquote|wikibooks|wikivoyage|wikiversity|wikinews|wikidata|mediawiki|w3|schema|archive|mozilla|chromium|documentcloud|w|mathjax|pannellum|tmdb|muses|npr|weatherwidget|openweathermap|lightningmaps|opensubtitles|chess|geogebra|diasporafoundation|joinmastodon|joinpeertube|discourse|matrix|f-droid|ipify|privacy-center|cookielaw|featuregates|cleantalk|walletlink|walletconnect|cdn77|userway|consensu|mediamatters|librivox|pythonhosted|pypi|example|uploadimage|postimages|postimage|imgsafe|4chan|4channel|4cdn|olympic|pbs|pbskids|ntp|gnu|creativecommons|eff|icann|iana|ietf|apache|opensource|bitcoin|ethereum|litecoin|wikileaks|ourworldindata|un|c-span|c-spanvideo|gutenberg|doi|arxiv|scirp|google|browser-update|wp-accessibility|wordpress-accessibility|widgetlogic|ipv6-il|benyehuda|thekotel|yadvashem|mdais|covid19maps|coronaisrael)\.org\.?([\/\:]|$))^[a-zA-Z0-9\-]+\:\/+[^\/\:]+\.org\.?([\/\:]|$)
+		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+\:\/+([^\/\:\.]+\.)*(google|gstatic|googleapis|jquery|youtube|youtubekids|youtube-nocookie|ytimg|facebook|fbsbx|threads|x|twitter|twimg|instagram|cdninstagram|pinterest|pinimg|tumblr|giphy|vimeo|vimeocdn|dailymotion|flickr|staticflickr|soundcloud|sndcdn|scribd|scribdassets|tiktok|tiktokcdn|tiktokcdn-us|tiktokcdn-eu|tiktokv|ttwstatic|muscdn|ibytedtos|sharethis|addthis|addthisedge|addthiscdn|reddit|redditmedia|redditstatic|redditgifts|linkedin|licdn|fontawesome|cdnfonts|image-maps|cloudflare|pacloudflare|bootstrapcdn|unpkg|cdnjs|stackpathdns|stackpathcdn|maxcdn|maxcdn-edge|netdna-ssl|netdna-cdn|kxcdn|ssl-cdn|muicss|tinymce|createjs|github|githubusercontent|githubassets|aspnetcdn|azure|amazonaws|awswaf|elasticbeanstalk|bunnycdn|vercel-dns|serverable|herokuapp|herokudns|rackcdn|raxcdn|lwcdn|netlify|wasabisys|zdassets|jwplayer|jwpcdn|jwpltx|jwpsrv|jwplatform|brightcove|brightcovecdn|flowplayer|foliovision|fluidplayer|jasperplayer|wowza|streamable|streamtheworld|mixcloud|bandcamp|bcbits|spotify|spotifycdn|omnystudio|omnycontent|cdnstream1|tritondigital|iheart|spreaker|podbean|buzzsprout|rss|simplecast|simplecastaudio|simplecastcdn|pinecast|acast|art19|redcircle|libsyn|podtail|tunein|stitcher|listennotes|castos|radiopublic|blogtalkradio|audioboom|apple|cdn-apple|applemediaservices|mzstatic|nobexpartners|podtrac|chtbl|sermonaudio|audio|soundhelix|vocaroo|embedly|iframely|snapwidget|thinglink|infogram|highcharts|barchart|tableau|powerbi|powerapps|visualstudio|office|dynamics|airtable|printfriendly|algolianet|gravatar|unisvg|simplesvg|svgur|svgshare|svgrepo|vecteezy|imgur|imgflip|gifer|gfycat|tenor|disqus|disquscdn|disqusservice|oneall|oneallcdn|tapatalk|tapatalk-cdn|fastcomments|graphcomment|intensedebate|hyvor|vuukle|mapbox|maptiler|mapquest|arcgis|arcgisonline|esri|here|carto|cartocdn|hcaptcha|raincaptcha|ted|tedcdn|kickstarter|riddle|strawpoll|surveymonkey|yelp|9gag|9cache|unsplash|freepik|imageshack|pastebin|desmos|gitlab|githack|rawgit|rawgithub|knockoutjs|gridstackjs|ravenjs|liveleak|ign|ignimgs|365scores|pressreader|3dissue|substack|substackcdn|blogger|blogspot|wordpress|wp|wpengine|videopress|wptavern|themeruby|livejournal|googleoptimize|withgoogle|googlegroups|googlesource|googleusercontent|googlevideo|ggpht|noembed|appspot|firebaseio|firebaseapp|libring|taggbox|addtoany|addthisevent|addevent|addtocalendar|onesignal|tinypass|stripe|paypal|paypalobjects|amazon|ssl-images-amazon|media-amazon|media-imdb|ebay|ebayimg|microsoft|microsoftonline|s-microsoft|live|bing|msn|yahoo|yimg|yahooapis|duckduckgo|yandex|optimizely|hsforms|hs-scripts|hubspot|nitroscripts|nitrocdn|webflow|rtlcss|tailwindcss|typography|typotheque|typenetwork|webtype|lightwidget|ezojs|mailerlite|typeform|convertbox|tiqcdn|zohopublic|opecloud|queryly|remixd|sparemin|auth0|windy|theweather|weather|accuweather|theweathernetwork|wunderground|sat24|windfinder|rainviewer|uvlens|weatherapi|holfuy|surfline|travelriskmap|dropbox|dropboxusercontent|dropboxstatic|dropbox-dns|youbora|soundcharts|radiojar|musicradio|mytuner-radio|live365|aaplimg|twitcount|flipboard|buzzfeed|digg|stumbleupon|mix|getpocket|timezonedb|timeanddate|momentjs|statcounter|buymeacoffee|gofundme|cookieinfoscript|cookiebot|cdn-cookieyes|privacy-mgmt|ketchjs|ketchcdn|transcend-cdn|iabtechlab|ip-api|userapi|vk|flagsapi|odysee|rumble|bitchute|truthsocial|polymarket|alchemy|instatus|intercomcdn|walletconnect|moonpay|quizlet|eloqua|adobe|adobedtm|onetrust|cookiepro|website-files|investing|tradingview|tradingview-widget|cloudinary|kaltura|openweb|waze|summurai|univtec|wistia|livefyre|pushwoosh|sumo|sumome|chatango|bytecdntp|bitly|tinyurl|radarbox|radarbox24|avionio|ipcamlive|speedtestcustom|nperf|fast|openspeedtest|booking|bstatic|shopify|shopifyapps|site|salesforce|salesforce-scrt|livechatinc|virtualspirits|slickstream|exiteme|hypemarks|tintup|ogols|cquotient|braze|braze-images|l7cdn|icons8|iconfinder|iconarchive|iconscout|flaticon|linearicons|kindpng|pngitem|gamepix|steampowered|steamstatic|playstation|xbox|xboxservices|nintendo|discord|discordapp|gettr|gab|minds|mewe|parler|mixer|metacafe|mcstatic|slideplayer|firefoxusercontent|box|feedly|feedburner|phpbb|whatsapp|vroptimal-3dx-assets|gamezhero|gameboss|addictinggames|funhtml5games|gamedistribution|monsteraplay|sportradar|wallst|nasdaq|nyse|euronext|londonstockexchange|financial|config-security|signature-it|consentframework|android|chrome|netflix|disney|cnet|cnevids|voanews|bbc|cnn|go|abcnews|cbsnews|nbcnews|msnbc|cnbc|nytimes|nyt|washingtonpost|thehill|today|usatoday|bloomberg|wsj|nypost|foxnews|foxbusiness|espn|eurosport|fifa|uefa|nba|wnba|nfl|nhl|nhle|mlb|mlbstatic|turner|rttv|rt|dw|xkcd|reactiongifs|gifbin|gif-finder|gifyu|makeagif|kym-cdn|gyazo|prntscr|tinypic|photobox|photobucket|imgbox|imagebam|deviantart|dmca|mtvnservices|cc|tmz|example|webydo|elementor|wix|wixstatic|wix-code|commentsplugin|parastorage|usrfiles|bugsnag|zoro|hebcal|fontsproject|kayma|kayma-dashboards|kayma-insights|kampyle|vicomi|colbass|cincopa|avplayer|vidnt|peer5|minutemediacdn|mmvideocdn|h-cdn|bynetcdn|cdnwiz|best-tv|viewbix|streamrail|smv-cdn|cloudvideoplatform|dxmcdn|dxmdp|reblaze|rbzdns|hunchbots|jeeng|sphereup|poloriz|applicaster|cloudwm|cloudwm-waf|negishim|accessibe|accessibeapp|acsbap|acsbapp|vollotech|mk-sense|user1st|allyable|equalweb|magixite|purple-lens|peach-in|gigya|glassix|rabbicdn|shortaudition|flashyapp|tranzila|ownid|membitbot|texterchat|nanorep|nixale|walkme|pulseem|zoomengage|vee-crm|trvdp|opinionstage|segmanta|spaceil|clear-map|playbuzz|apester|qmerce|outbrain|taboola|taboolasyndication|google-analytics|googletagservices|googletagmanager|googleadservices|googlesyndication|cloudflareinsights|viglink|parsely|sentry-cdn|getsentry|chartbeat|scorecardresearch|serving-sys|exposebox|imrworldwide|hotjar|amplitude|trackjs|dynamicyield|connatix|coralogix|cooladata|vlitag|browsiprod|petametrics|pusher|fortvision|fortcdn|walla|nick|nickjr|teennick|sinclairstoryline|fresnobee|nbcchicago|magazina-il|pagewiz|pas-rahav|aniview|pubmatic|adnxs|sekindo)\.com\.?([\/\:]|$))^[a-zA-Z0-9\-]+\:\/+[^\/\:]+\.com\.?([\/\:]|$)
 		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+:\/+www\.(walla(news|shops|tours|art|print)|hamal|sheee)\.co\.il\.?(\/|:|$))^[a-zA-Z0-9\-]+:\/+([a-zA-Z0-9\-]+\.)+(walla(news|shops|tours|art|print)|hamal|sheee)\.co\.il\.?(\/|:|$)
 		regexFilter is not RE2-compatible: ^(?![a-zA-Z0-9\-]+:\/+(www\.(walla(news|shops|tours|art|print)|hamal)|(api-mail|dal|dcx|isc|iscwne|walla-api|www)\.walla)\.co\.il\.?(\/|:|$))^[a-zA-Z0-9\-]+:\/+([a-zA-Z0-9\-]+\.)+(walla(news|shops|tours|art|print)?|hamal)\.co\.il\.?(\/|:|$)
 		Incompatible with DNR: ||doubleclick.net^$xhr,redirect-rule=nooptext,domain=13news.co.il|13tv.co.il
 CSS-generic: 20 specific CSS exceptions
-CSS-generic: 4 plain CSS selectors
-CSS-specific: 685 distinct filters
-	Combined into 364 distinct hostnames
+CSS-generic: 3 plain CSS selectors
+CSS-specific: 696 distinct filters
+	Combined into 365 distinct hostnames
 Procedural-related distinct filters: 12 distinct combined selectors
 	Combined into 10 distinct hostnames
 ============================
@@ -1816,19 +1817,19 @@ Output rule count: 1053
 CSS-generic: 7 specific CSS exceptions
 CSS-generic: 348 plain CSS selectors
 CSS-generic-high: 54 plain CSS selectors
-CSS-specific: 2540 distinct filters
+CSS-specific: 2542 distinct filters
 	Combined into 2780 distinct hostnames
 Procedural-related distinct filters: 24 distinct combined selectors
 	Combined into 24 distinct hostnames
 ============================
 Listset for 'jpn-1':
 	Fetching remote https://filters.adtidy.org/extension/ublock/filters/7.txt
-Input filter count: 2291
-	Accepted filter count: 2291
+Input filter count: 2290
+	Accepted filter count: 2290
 	Rejected filter count: 0
-Output rule count: 1693
+Output rule count: 1692
 	Pruning requestDomains: from 178 to 177
-	Static rules: 1657
+	Static rules: 1656
 
 	Maybe good (regexes): 18
 	urlskip=: 0
@@ -1854,9 +1855,9 @@ Output rule count: 1693
 CSS-generic: 83 specific CSS exceptions
 CSS-generic: 106 plain CSS selectors
 CSS-generic-high: 12 plain CSS selectors
-CSS-specific: 7967 distinct filters
-	Combined into 5251 distinct hostnames
-Procedural-related distinct filters: 945 distinct combined selectors
+CSS-specific: 7971 distinct filters
+	Combined into 5253 distinct hostnames
+Procedural-related distinct filters: 946 distinct combined selectors
 	Combined into 724 distinct hostnames
 ============================
 Listset for 'kor-1':
@@ -1864,12 +1865,12 @@ Listset for 'kor-1':
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/3rd_domains.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/1st_domains.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/general_elemhide.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/general_url.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/specific_ELEMHIDE.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/general_url.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/general_url.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/specific_URL.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/allowlist.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/specific_ELEMHIDE.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/allowlist.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/extended_css_ELEMHIDE.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/extended_css_INJECTION.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/specific_REDIRECT.txt
@@ -1915,8 +1916,8 @@ Listset for 'kor-1':
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-share/extended_css_ELEMHIDE.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-share/extended_css_INJECTION.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/specific_REDIRECT.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/extended_css_INJECTION.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/extended_css_ELEMHIDE.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/extended_css_INJECTION.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/scriptlets.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-share/javascript.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/javascript.txt
@@ -1930,15 +1931,15 @@ Listset for 'kor-1':
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/specific_ELEMHIDE.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/general_url.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/general_url.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/specific_URL.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/specific_ELEMHIDE.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/specific_URL.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/allowlist.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/extended_css_ELEMHIDE.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/extended_css_INJECTION.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/specific_REDIRECT.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/extended_css_ELEMHIDE.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/extended_css_INJECTION.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/scriptlets.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/extended_css_INJECTION.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/javascript.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/javascript.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/antiadblock.txt
@@ -1947,18 +1948,18 @@ Listset for 'kor-1':
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/specific_URL.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-share/specific_CSS.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/adblocking/filters-uBO/specific_CSS.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/analytics/filters-uBO/specific_CSS.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/specific_CSS.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/analytics/filters-share/specific_CSS.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/specific_CSS.txt
-	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/specific_CSS.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/analytics/filters-uBO/specific_CSS.txt
 	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-share/specific_CSS.txt
-Input filter count: 1532
-	Accepted filter count: 1524
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/annoyance/filters-uBO/specific_CSS.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-share/specific_CSS.txt
+	Fetching remote https://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/antiadblockplus/filters-uBO/specific_CSS.txt
+Input filter count: 1533
+	Accepted filter count: 1525
 	Rejected filter count: 1
-Output rule count: 1135
+Output rule count: 1136
 	Pruning requestDomains: from 337 to 332
-	Static rules: 915
+	Static rules: 916
 
 	Maybe good (regexes): 148
 	urlskip=: 0
@@ -2108,11 +2109,11 @@ Procedural-related distinct filters: 2 distinct combined selectors
 ============================
 Listset for 'nld-0':
 	Fetching remote https://filters.adtidy.org/extension/ublock/filters/8.txt
-Input filter count: 565
-	Accepted filter count: 563
+Input filter count: 566
+	Accepted filter count: 564
 	Rejected filter count: 0
-Output rule count: 486
-	Static rules: 485
+Output rule count: 488
+	Static rules: 487
 
 	Maybe good (regexes): 1
 	urlskip=: 0
@@ -2129,8 +2130,8 @@ Procedural-related distinct filters: 55 distinct combined selectors
 Listset for 'nor-0':
 	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianList.txt
 	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/AntiAdblockEntries.txt
-	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotBrave.txt
 	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotFirefox.txt
+	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFilters-NotBrave.txt
 	Fetching remote https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/AdditionalGenericEntriesForUBO.txt
 Input filter count: 3439
 	Accepted filter count: 3424
@@ -2317,8 +2318,8 @@ Output rule count: 401
 CSS-generic: 3 specific CSS exceptions
 CSS-generic: 10 plain CSS selectors
 CSS-generic-high: 3 plain CSS selectors
-CSS-specific: 794 distinct filters
-	Combined into 416 distinct hostnames
+CSS-specific: 795 distinct filters
+	Combined into 417 distinct hostnames
 Procedural-related distinct filters: 70 distinct combined selectors
 	Combined into 64 distinct hostnames
 ============================
@@ -2331,18 +2332,18 @@ Listset for 'rus-0':
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/popup.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_antisocial.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_block.txt
-	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_hide.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_special.txt
+	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/specific_hide.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/thirdparty.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/advblock/whitelist.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/css-fixes-experimental.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/js-fixes-experimental.txt
 	Fetching remote https://raw.githubusercontent.com/easylist/ruadlist/master/AWRL-non-sync.txt
-Input filter count: 18770
-	Accepted filter count: 18760
+Input filter count: 18776
+	Accepted filter count: 18766
 	Rejected filter count: 7
-Output rule count: 5936
-	Static rules: 5912
+Output rule count: 5938
+	Static rules: 5914
 
 	Maybe good (regexes): 18
 	urlskip=: 0
@@ -2356,9 +2357,9 @@ Output rule count: 5936
 CSS-generic: 159 specific CSS exceptions
 CSS-generic: 296 plain CSS selectors
 CSS-generic-high: 597 plain CSS selectors
-CSS-specific: 10374 distinct filters
-	Combined into 7554 distinct hostnames
-Procedural-related distinct filters: 1237 distinct combined selectors
+CSS-specific: 10376 distinct filters
+	Combined into 7555 distinct hostnames
+Procedural-related distinct filters: 1239 distinct combined selectors
 	Combined into 1186 distinct hostnames
 ============================
 Listset for 'rus-1':
@@ -2464,11 +2465,11 @@ Output rule count: 880
 		Incompatible with DNR: ||securepubads.g.doubleclick.net/pagead/ppub_config$xmlhttprequest,redirect-rule=noop.txt,domain=redbolivision.tv.bo|repretel.com|c9n.com.py|tn23.tv|canal13mexico.com|vtv.com.hn|chapintv.com|canal12.com.sv|rqp.com.bo|antena7.com.do|elcomercio.com|monumental.co.cr|atv.pe
 		Incompatible with DNR: $script,redirect-rule=noop.js,domain=hinatasoul.com
 		Incompatible with DNR: $xmlhttprequest,redirect-rule=noop.txt,domain=suaurl.com|reidoplacar.com|suaads.com
-CSS-generic: 42 specific CSS exceptions
+CSS-generic: 43 specific CSS exceptions
 CSS-generic: 86 plain CSS selectors
 CSS-generic-high: 4 plain CSS selectors
-CSS-specific: 3098 distinct filters
-	Combined into 1791 distinct hostnames
+CSS-specific: 3102 distinct filters
+	Combined into 1793 distinct hostnames
 Procedural-related distinct filters: 188 distinct combined selectors
 	Combined into 246 distinct hostnames
 ============================
@@ -2493,11 +2494,11 @@ Procedural-related distinct filters: 2 distinct combined selectors
 ============================
 Listset for 'swe-1':
 	Fetching remote https://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/master/Frellwits-Swedish-Filter.txt
-Input filter count: 1751
-	Accepted filter count: 1751
+Input filter count: 1750
+	Accepted filter count: 1750
 	Rejected filter count: 0
-Output rule count: 1377
-	Static rules: 1371
+Output rule count: 1376
+	Static rules: 1370
 
 	Maybe good (regexes): 1
 	urlskip=: 0
@@ -2538,11 +2539,11 @@ Procedural-related distinct filters: 14 distinct combined selectors
 ============================
 Listset for 'tur-0':
 	Fetching remote https://filters.adtidy.org/extension/ublock/filters/13.txt
-Input filter count: 1491
-	Accepted filter count: 1490
+Input filter count: 1488
+	Accepted filter count: 1487
 	Rejected filter count: 0
-Output rule count: 1234
-	Static rules: 1196
+Output rule count: 1231
+	Static rules: 1193
 		Salvaged rule by ignoring 3 unsupported domain= option: ajans32.com|asyadiziizle.com|birasyadizi.com|dizicaps.*|diziplus.*|duzcetv.com|erotikfilmtube.com|ertehaber.com|filmgo1.com|filmzevkim.com|haber32.com.tr|haberant.com|hdfilmizleamk.*|justintvnews.com|malatyamegahaber.com|medya32.com|mnfilmizle.com|mnfilmizle1.com|muglayenigun.com|sexfilmleriizle.com|sinefilmgo.org|sinekolikk.com|sinemangoo.org|sinetiktok.com|technopat.net|unyenethaber.com
 		Salvaged rule by ignoring 3 unsupported domain= option: buenosairesideal.com|herpet.net|hudsonlegalblog.com|inattvgiris.pro|selcuk-sports.com|selcuksports.*|selcuksportss.*|taraftarium.*|taraftariumlive.com
 		Salvaged rule by ignoring 1 unsupported domain= option: turkcealtyazi.org|filmmakinesi.*
@@ -2576,10 +2577,10 @@ Output rule count: 1234
 CSS-generic: 24 specific CSS exceptions
 CSS-generic: 155 plain CSS selectors
 CSS-generic-high: 60 plain CSS selectors
-CSS-specific: 3151 distinct filters
-	Combined into 3360 distinct hostnames
-Procedural-related distinct filters: 246 distinct combined selectors
-	Combined into 544 distinct hostnames
+CSS-specific: 3154 distinct filters
+	Combined into 3361 distinct hostnames
+Procedural-related distinct filters: 247 distinct combined selectors
+	Combined into 545 distinct hostnames
 ============================
 Listset for 'ukr-0':
 	Fetching remote https://filters.adtidy.org/extension/ublock/filters/23.txt
@@ -2606,8 +2607,8 @@ Procedural-related distinct filters: 105 distinct combined selectors
 ============================
 Listset for 'vie-1':
 	Fetching remote https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_ublock.txt
-Input filter count: 457
-	Accepted filter count: 457
+Input filter count: 458
+	Accepted filter count: 458
 	Rejected filter count: 0
 Output rule count: 327
 	Static rules: 325
@@ -2619,7 +2620,7 @@ Output rule count: 327
 CSS-generic: 15 specific CSS exceptions
 CSS-generic: 20 plain CSS selectors
 CSS-generic-high: 6 plain CSS selectors
-CSS-specific: 703 distinct filters
-	Combined into 410 distinct hostnames
+CSS-specific: 704 distinct filters
+	Combined into 411 distinct hostnames
 Procedural-related distinct filters: 6 distinct combined selectors
 	Combined into 8 distinct hostnames

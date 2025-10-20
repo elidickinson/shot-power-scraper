@@ -323,7 +323,7 @@ async def navigate_to_url(page, shot_config):
         await trigger_lazy_load(page)
 
     # Apply viewport expansion to fix intersection observers when blocking is enabled
-    elif shot_config.popup_block or shot_config.ad_block:
+    elif shot_config.ad_block:
         if Config.verbose:
             click.echo("Applying viewport expansion to fix intersection observers...", err=True)
 

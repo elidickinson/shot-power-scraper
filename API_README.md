@@ -35,7 +35,7 @@ uv pip install -r requirements-api.txt
 python api_server.py
 
 # With blocking features enabled
-python api_server.py --ad-block --popup-block
+python api_server.py --ad-block --ublock-lists annoyances-cookies,annoyances-overlays
 
 # Run with visible browser (headful mode)
 python api_server.py --headful
@@ -53,7 +53,7 @@ The API server supports the following command-line options:
 
 - `--headful` / `--no-headless`: Run with visible browser (non-headless mode)
 - `--ad-block` / `--no-ad-block`: Enable ad blocking using built-in filter lists
-- `--popup-block` / `--no-popup-block`: Enable popup blocking (cookie notices, etc.)
+- `--ublock-lists`: Comma-separated list of additional uBlock filter lists (e.g., annoyances-cookies,annoyances-overlays)
 - `--paywall-block` / `--no-paywall-block`: Enable paywall bypass
 - `--user-agent`: Set custom User-Agent header
 - `--enable-gpu`: Enable GPU acceleration
