@@ -77,7 +77,7 @@ from typing import Optional, List
 import click
 from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 # Add parent directory to path to import shot_power_scraper
 sys.path.insert(0, str(Path(__file__).parent))
@@ -157,7 +157,8 @@ class BaseRequest(BaseModel):
     """Base request model with shared validation"""
     url: str = Field(..., description="URL to process")
 
-    @validator('url')
+    @field_validator('url', mode='before')
+    @classmethod
     def validate_url(cls, v):
         """Auto-add https:// if URL has no schema"""
         if not re.match(r'^https?://', v):
@@ -579,11 +580,11 @@ async def shot(request: ShotRequest):
         # Determine content type based on quality setting
         if request.quality:
             content_type = "image/jpeg"
+            ext = "jpg"
         else:
             content_type = "image/png"
+            ext = "png"
 
-        # Generate filename based on URL
-        ext = "jpg" if request.quality else "png"
         filename = filename_for_url(request.url, ext=ext)
 
         # Return the image
@@ -703,13 +704,23 @@ def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, head
     if workers > 1:
         click.echo(f"Running with {workers} worker processes")
 
-    uvicorn.run(
-        app,
-        host=host,
-        port=port,
-        reload=reload,
-        workers=workers
-    )
+    # Use import string when workers > 1 or reload is enabled
+    if workers > 1 or reload:
+        uvicorn.run(
+            "api_server:app",
+            host=host,
+            port=port,
+            reload=reload,
+            workers=workers
+        )
+    else:
+        uvicorn.run(
+            app,
+            host=host,
+            port=port,
+            reload=reload,
+            workers=workers
+        )
 
 
 if __name__ == "__main__":
