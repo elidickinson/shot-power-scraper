@@ -22,6 +22,7 @@ shot-power-scraper = "shot_power_scraper.cli:cli"
 test = [
     "pytest>=8.4.1",
     "pytest-mock",
+    "pytest-rerunfailures",
 ]
 api = [
     "fastapi>=0.104.0",

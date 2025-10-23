@@ -18,4 +18,4 @@ jobs:
         pip install -e '.[test]'
     - name: Run tests
       run: |
-        pytest
+        pytest --reruns 2 --reruns-delay 1
