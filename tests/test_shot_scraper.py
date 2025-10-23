@@ -1,4 +1,5 @@
 import os
+import sys
 import pathlib
 from unittest.mock import patch, MagicMock
 import textwrap
@@ -8,10 +9,10 @@ from shot_power_scraper.cli import cli
 
 
 
-# Mark for tests that require a working browser (skip only in CI)
+# Mark for tests that require a working browser (skip only on Linux CI)
 browser_required = pytest.mark.skipif(
-    "CI" in os.environ or "GITHUB_ACTIONS" in os.environ,
-    reason="Requires browser, skipped in CI"
+    sys.platform.startswith('linux') and "CI" in os.environ,
+    reason="Requires browser display, skipped on Linux CI"
 )
 
 
