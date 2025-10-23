@@ -6,6 +6,8 @@
 
 This is a fork of Simon Willison's excellent [shot-scraper](https://github.com/simonw/shot-scraper), migrated from Playwright to [nodriver](https://github.com/ultrafunkamsterdam/nodriver). This provides powerful, built-in bypass capabilities for CAPTCHAs and services like Cloudflare.
 
+> **Experimental**: This tool works! But it is still a work in progress and there appear to be some underlying bugs in the [nodriver](https://github.com/ultrafunkamsterdam/nodriver) library that can lead to chrome crashing. Use with caution in production environments.
+
 ## Installation
 
 The easiest way to install this tool is with `uv`:

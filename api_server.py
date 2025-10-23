@@ -108,7 +108,9 @@ async def lifespan(app: FastAPI):
     # Startup
     global browser_instance
     if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
-        browser_args = getattr(app.state, 'browser_args', [])
+        # Read browser args from env (for multi-worker) or app.state (single worker)
+        env_args = os.getenv("SHOT_API_BROWSER_ARGS")
+        browser_args = env_args.split(",") if env_args else getattr(app.state, 'browser_args', [])
         await get_browser(browser_args=browser_args)
 
     yield
@@ -226,26 +228,42 @@ async def get_browser(browser_args=None):
         Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
         Config.silent = not Config.verbose
 
-        # Set global Config values from app state
-        Config.enable_gpu = getattr(app.state, 'enable_gpu', False)
+        # Read configuration from environment variables (for multi-worker) or app.state (single worker)
+        enable_gpu = os.getenv("SHOT_API_ENABLE_GPU") == "1" or getattr(app.state, 'enable_gpu', False)
+        ad_block = os.getenv("SHOT_API_AD_BLOCK") == "1" or getattr(app.state, 'ad_block', False)
+        paywall_block = os.getenv("SHOT_API_PAYWALL_BLOCK") == "1" or getattr(app.state, 'paywall_block', False)
+        headful = os.getenv("SHOT_API_HEADFUL") == "1" or getattr(app.state, 'headful', False)
+        reduced_motion = os.getenv("SHOT_API_REDUCED_MOTION") == "1" or getattr(app.state, 'reduced_motion', False)
+        user_agent = os.getenv("SHOT_API_USER_AGENT") or getattr(app.state, 'user_agent', None)
 
-        # Get blocking options and other settings from app state
+        # Parse browser args from env if not provided
+        if not browser_args:
+            env_args = os.getenv("SHOT_API_BROWSER_ARGS")
+            if env_args:
+                browser_args = env_args.split(",")
+            else:
+                browser_args = getattr(app.state, 'browser_args', [])
+
+        # Set global Config values
+        Config.enable_gpu = enable_gpu
+
+        # Get blocking options
         blocking_options = {
-            'ad_block': getattr(app.state, 'ad_block', False),
-            'paywall_block': getattr(app.state, 'paywall_block', False),
+            'ad_block': ad_block,
+            'paywall_block': paywall_block,
         }
 
         # Create a ShotConfig object with the browser settings
         config_dict = {
             "browser_args": browser_args or [],
-            "headful": getattr(app.state, 'headful', False),
-            "reduced_motion": getattr(app.state, 'reduced_motion', False),
+            "headful": headful,
+            "reduced_motion": reduced_motion,
             **blocking_options,
         }
 
-        # Only set user_agent if provided on command line, otherwise let ShotConfig handle config file fallback
-        if hasattr(app.state, 'user_agent') and app.state.user_agent is not None:
-            config_dict["user_agent"] = app.state.user_agent
+        # Only set user_agent if provided
+        if user_agent:
+            config_dict["user_agent"] = user_agent
 
         shot_config = ShotConfig(config_dict)
 
@@ -302,10 +320,18 @@ async def log_requests(request: Request, call_next):
 @app.get("/api", tags=["utility"], summary="API Information")
 async def api_info():
     """API information and server settings"""
+    # Read from env vars (for multi-worker) or app.state (single worker)
+    ad_block = os.getenv("SHOT_API_AD_BLOCK") == "1" or getattr(app.state, 'ad_block', False)
+    paywall_block = os.getenv("SHOT_API_PAYWALL_BLOCK") == "1" or getattr(app.state, 'paywall_block', False)
+    user_agent = os.getenv("SHOT_API_USER_AGENT") or getattr(app.state, 'user_agent', None)
+    enable_gpu = os.getenv("SHOT_API_ENABLE_GPU") == "1" or getattr(app.state, 'enable_gpu', False)
+    reduced_motion = os.getenv("SHOT_API_REDUCED_MOTION") == "1" or getattr(app.state, 'reduced_motion', False)
+    trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1" or getattr(app.state, 'trigger_lazy_load', False)
+
     blocking_features = []
-    if getattr(app.state, 'ad_block', False):
+    if ad_block:
         blocking_features.append("ad_block")
-    if getattr(app.state, 'paywall_block', False):
+    if paywall_block:
         blocking_features.append("paywall_block")
 
     return {
@@ -329,10 +355,10 @@ async def api_info():
         ],
         "server_settings": {
             "blocking_features": blocking_features,
-            "user_agent": getattr(app.state, 'user_agent', None),
-            "enable_gpu": getattr(app.state, 'enable_gpu', False),
-            "reduced_motion": getattr(app.state, 'reduced_motion', False),
-            "trigger_lazy_load": getattr(app.state, 'trigger_lazy_load', False)
+            "user_agent": user_agent,
+            "enable_gpu": enable_gpu,
+            "reduced_motion": reduced_motion,
+            "trigger_lazy_load": trigger_lazy_load
         }
     }
 
@@ -542,7 +568,8 @@ async def shot(request: ShotRequest):
     browser = await get_browser()
 
     # Use server-level trigger_lazy_load as default if request doesn't specify
-    trigger_lazy_load = request.trigger_lazy_load if request.trigger_lazy_load else getattr(app.state, 'trigger_lazy_load', False)
+    server_trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1" or getattr(app.state, 'trigger_lazy_load', False)
+    trigger_lazy_load = request.trigger_lazy_load if request.trigger_lazy_load else server_trigger_lazy_load
 
     # Build shot configuration
     shot_config = ShotConfig({
@@ -713,6 +740,23 @@ def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, head
 
     if workers > 1:
         click.echo(f"Running with {workers} worker processes")
+
+    # Set environment variables for worker processes to read
+    # This is necessary because workers > 1 causes each process to import the module fresh
+    # TODO: Document SHOT_API_* environment variables as a first-class configuration method
+    #       and consider making them the primary way to configure the server (more standard
+    #       for containerized deployments, systemd services, etc.) rather than CLI flags.
+    #       Should also validate/parse them more robustly and centralize the reading logic.
+    if browser_args:
+        os.environ.setdefault("SHOT_API_BROWSER_ARGS", ",".join(browser_args))
+    if user_agent:
+        os.environ.setdefault("SHOT_API_USER_AGENT", user_agent)
+    os.environ.setdefault("SHOT_API_ENABLE_GPU", "1" if enable_gpu else "")
+    os.environ.setdefault("SHOT_API_HEADFUL", "1" if headful else "")
+    os.environ.setdefault("SHOT_API_REDUCED_MOTION", "1" if reduced_motion else "")
+    os.environ.setdefault("SHOT_API_AD_BLOCK", "1" if ad_block else "")
+    os.environ.setdefault("SHOT_API_PAYWALL_BLOCK", "1" if paywall_block else "")
+    os.environ.setdefault("SHOT_API_TRIGGER_LAZY_LOAD", "1" if trigger_lazy_load else "")
 
     # Use import string when workers > 1 or reload is enabled
     if workers > 1 or reload:
