@@ -5,14 +5,14 @@ Screenshot API Server
 A FastAPI server that provides REST endpoints for taking screenshots using shot-power-scraper.
 
 Usage:
-    python api_server.py [--browser-arg ARG ...] [--ad-block] [--paywall-block]
+    python api_server.py [--browser-arg ARG ...] [--ad-block] [--paywall-block] [--trigger-lazy-load]
 
 Example server startup:
     # Start server with custom browser arguments
     python api_server.py --browser-arg --window-size=1920,1080 --browser-arg --disable-dev-shm-usage
 
-    # Start server with blocking features
-    python api_server.py --ad-block --paywall-block
+    # Start server with blocking features and lazy loading
+    python api_server.py --ad-block --paywall-block --trigger-lazy-load
 
     # Start server with proxy settings
     python api_server.py --browser-arg "--proxy-server=http://localhost:8888"
@@ -331,7 +331,8 @@ async def api_info():
             "blocking_features": blocking_features,
             "user_agent": getattr(app.state, 'user_agent', None),
             "enable_gpu": getattr(app.state, 'enable_gpu', False),
-            "reduced_motion": getattr(app.state, 'reduced_motion', False)
+            "reduced_motion": getattr(app.state, 'reduced_motion', False),
+            "trigger_lazy_load": getattr(app.state, 'trigger_lazy_load', False)
         }
     }
 
@@ -540,6 +541,9 @@ async def shot(request: ShotRequest):
     """Take a screenshot and return the image"""
     browser = await get_browser()
 
+    # Use server-level trigger_lazy_load as default if request doesn't specify
+    trigger_lazy_load = request.trigger_lazy_load if request.trigger_lazy_load else getattr(app.state, 'trigger_lazy_load', False)
+
     # Build shot configuration
     shot_config = ShotConfig({
         "url": request.url,
@@ -558,7 +562,7 @@ async def shot(request: ShotRequest):
         "omit_background": request.omit_background,
         "skip_challenge_page_check": request.skip_challenge_page_check,
         "skip_wait_for_load": request.skip_wait_for_load,
-        "trigger_lazy_load": request.trigger_lazy_load,
+        "trigger_lazy_load": trigger_lazy_load,
         "silent": True
     })
 
@@ -647,6 +651,7 @@ async def html(request: HtmlRequest) -> HTMLResponse:
             help="Additional arguments to pass to the browser")
 @click.option("--ad-block/--no-ad-block", default=False, help="Enable ad blocking using built-in filter lists")
 @click.option("--paywall-block/--no-paywall-block", default=False, help="Enable paywall bypass using Bypass Paywalls Clean extension")
+@click.option("--trigger-lazy-load", is_flag=True, help="Trigger lazy loading of images for all requests by default")
 @click.option(
     "--host",
     default=lambda: os.getenv("HOST", "127.0.0.1"),
@@ -671,7 +676,7 @@ async def html(request: HtmlRequest) -> HTMLResponse:
     help="Number of worker processes (default: 1, can be overridden with WORKERS env var)"
 )
 def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, headful, reduced_motion,
-         ad_block, paywall_block):
+         ad_block, paywall_block, trigger_lazy_load):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
 
@@ -683,6 +688,7 @@ def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, head
     app.state.reduced_motion = reduced_motion
     app.state.ad_block = ad_block
     app.state.paywall_block = paywall_block
+    app.state.trigger_lazy_load = trigger_lazy_load
 
     click.echo(f"Starting Shot Power Scraper API Server on {host}:{port}")
     click.echo(f"API documentation available at http://{host}:{port}/docs")
@@ -695,6 +701,10 @@ def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, head
         if paywall_block:
             blocking_features.append("paywall bypass")
         click.echo(f"Blocking features enabled: {' + '.join(blocking_features)}")
+
+    # Show trigger lazy load if enabled
+    if trigger_lazy_load:
+        click.echo("Lazy loading enabled by default for all requests")
 
     if browser_args:
         click.echo(f"Browser args: {list(browser_args)}")
