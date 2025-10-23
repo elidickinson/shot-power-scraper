@@ -82,6 +82,7 @@ def test_multi_error_on_non_list(input):
     assert result.output == "Error: YAML file must contain a list\n"
 
 
+@browser_required
 @pytest.mark.parametrize(
     "args,expected_shot_count",
     (
