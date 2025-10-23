@@ -355,31 +355,31 @@ async def navigate_to_url(page, shot_config):
 async def evaluate_js(page, javascript):
     """
     Wrapper for page.evaluate() that converts ExceptionDetails to proper exceptions.
-    
+
     nodriver has a design flaw where page.evaluate() returns cdp.runtime.ExceptionDetails
     objects instead of throwing exceptions when JavaScript evaluation fails. This wrapper
     fixes that by converting ExceptionDetails to proper ClickExceptions, ensuring errors
     fail fast and loud as required by the project principles.
-    
+
     Args:
         page: nodriver page object
         javascript: JavaScript code to evaluate
-        
+
     Returns:
         The result of the JavaScript evaluation
-        
+
     Raises:
         click.ClickException: If JavaScript evaluation fails
     """
     from nodriver import cdp
-    
+
     result = await page.evaluate(javascript)
-    
+
     # Convert ExceptionDetails to proper exceptions
     if isinstance(result, cdp.runtime.ExceptionDetails):
         error_msg = result.text or "JavaScript evaluation failed"
         raise click.ClickException(f"JavaScript evaluation error: {error_msg}")
-    
+
     return result
 
 
@@ -405,7 +405,7 @@ async def detect_siteground_challenge(page):
         (() => {
             return document.title === 'Robot Challenge Screen' ||
                    !!window.sgchallenge ||
-                   Array.from(document.querySelectorAll('script')).some(script => 
+                   Array.from(document.querySelectorAll('script')).some(script =>
                        script.textContent.includes('sgchallenge')
                    );
         })()
@@ -534,6 +534,11 @@ async def trigger_lazy_load(page, timeout_ms=5000):
                     img.decode(); // try to force loading right now
                     count++;
                 }
+                // remove responsive elements - fix to current src
+                const currentSrc = img.currentSrc || img.src;
+                img.src = currentSrc;
+                img.removeAttribute('srcset');
+                img.removeAttribute('sizes');
             });
 
             // Handle other elements that might have data-src (like iframes)
