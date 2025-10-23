@@ -40,42 +40,69 @@ fi
 
 cd "$BUILD_DIR"
 
+# Enable desired filter lists in rulesets.json before building
+echo "Configuring filter list selections..."
+cp platform/mv3/rulesets.json platform/mv3/rulesets.json.backup
+
+# Enable annoyance filters and block-lan
+python3 -c "
+import json
+with open('platform/mv3/rulesets.json') as f:
+    rulesets = json.load(f)
+
+# List of filter IDs to enable
+filters_to_enable = [
+    'block-lan',
+    'annoyances-cookies',
+    'annoyances-overlays',
+    'annoyances-widgets',
+    'annoyances-others',
+    'annoyances-notifications'
+]
+
+# Enable the specified filters
+for ruleset in rulesets:
+    if ruleset['id'] in filters_to_enable:
+        ruleset['enabled'] = True
+        print(f\"Enabled: {ruleset['id']}\")
+
+with open('platform/mv3/rulesets.json', 'w') as f:
+    json.dump(rulesets, f, indent=2)
+"
+
 # Inject custom rules if they exist
+CUSTOM_RULES_ENABLED=0
 if [ -f "$CUSTOM_RULES" ] && [ -s "$CUSTOM_RULES" ]; then
     echo "Adding custom filter rules from $CUSTOM_RULES..."
+    CUSTOM_RULES_ENABLED=1
 
-    # Add custom rules to assets.json if not already there
-    if ! grep -q "shot-power-scraper-custom" assets/assets.json; then
-        echo "Registering custom ruleset in assets.json..."
-        # Create backup
-        cp assets/assets.json assets/assets.json.backup
+    # Remove existing custom entry if present, then add fresh
+    echo "Registering custom ruleset in rulesets.json..."
 
-        # Add our custom list entry (insert before the closing brace of contentFiltering)
-        python3 -c "
+    # Use a fake HTTPS URL - we'll pre-populate the cache
+    CUSTOM_URL="https://shot-power-scraper.local/custom-rules.txt"
+
+    # Remove old entry and add fresh one
+    python3 -c "
 import json
-with open('assets/assets.json') as f:
-    assets = json.load(f)
+with open('platform/mv3/rulesets.json') as f:
+    rulesets = json.load(f)
 
-# Add custom filter list
-assets['shot-power-scraper-custom'] = {
-    'content': 'filters',
-    'contentURL': [
-        'file://$CUSTOM_RULES'
-    ],
-    'title': 'Shot Power Scraper Custom Rules'
-}
+# Remove any existing custom rules entry
+rulesets = [r for r in rulesets if r.get('id') != 'shot-power-scraper-custom']
 
-with open('assets/assets.json', 'w') as f:
-    json.dump(assets, f, indent=2)
+# Add custom filter list entry
+rulesets.append({
+    'id': 'shot-power-scraper-custom',
+    'name': 'Shot Power Scraper Custom Rules',
+    'group': 'default',
+    'enabled': True,
+    'urls': ['$CUSTOM_URL']
+})
+
+with open('platform/mv3/rulesets.json', 'w') as f:
+    json.dump(rulesets, f, indent=2)
 "
-    fi
-
-    # Copy custom rules to a location uBlock can access during build
-    mkdir -p dist/filters
-    cp "$CUSTOM_RULES" dist/filters/custom-rules.txt
-
-    # Update the path in assets.json to use the copied file
-    sed -i.bak "s|file://$CUSTOM_RULES|file://$(pwd)/dist/filters/custom-rules.txt|g" assets/assets.json
 fi
 
 if [ $CLEAN_ASSETS -eq 1 ]; then
@@ -85,12 +112,21 @@ else
     echo "Skipping asset cleanup (--use-cache flag provided)"
 fi
 
+# Pre-populate cache with custom rules AFTER cleanassets
+if [ $CUSTOM_RULES_ENABLED -eq 1 ]; then
+    # The cache filename is the URL with https:// removed and / replaced with _
+    mkdir -p dist/build/mv3-data
+    CACHE_FILENAME="shot-power-scraper.local_custom-rules.txt"
+    cp "$CUSTOM_RULES" "dist/build/mv3-data/$CACHE_FILENAME"
+    echo "Custom rules cached at dist/build/mv3-data/$CACHE_FILENAME"
+fi
+
 echo "Building uBlock Lite for Chromium (this may take 2-3 minutes)..."
 make mv3-chromium
 
-# Restore original assets.json if we modified it
-if [ -f "assets/assets.json.backup" ]; then
-    mv assets/assets.json.backup assets/assets.json
+# Restore original rulesets.json if we modified it
+if [ -f "platform/mv3/rulesets.json.backup" ]; then
+    mv platform/mv3/rulesets.json.backup platform/mv3/rulesets.json
 fi
 
 echo "Backing up current version..."

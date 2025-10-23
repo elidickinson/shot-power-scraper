@@ -296,6 +296,11 @@
         "id": "vie-1",
         "enabled": false,
         "path": "/rulesets/main/vie-1.json"
+      },
+      {
+        "id": "shot-power-scraper-custom",
+        "enabled": true,
+        "path": "/rulesets/main/shot-power-scraper-custom.json"
       }
     ]
   },
@@ -326,7 +331,7 @@
   "storage": {
     "managed_schema": "managed_storage.json"
   },
-  "version": "2025.1020.1835",
+  "version": "2025.1023.225",
   "web_accessible_resources": [
     {
       "resources": [

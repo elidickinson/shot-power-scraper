@@ -1,0 +1,32 @@
+[
+{
+ "action": {
+  "type": "block"
+ },
+ "condition": {
+  "urlFilter": "||cnn.com/wbdotp/scripttemplates/otsdkstub.js^"
+ },
+ "id": 1,
+ "priority": 10
+},
+{
+ "action": {
+  "type": "block"
+ },
+ "condition": {
+  "urlFilter": "/wp-content/plugins/pressidium-cookie-consent/"
+ },
+ "id": 2,
+ "priority": 10
+},
+{
+ "action": {
+  "type": "block"
+ },
+ "condition": {
+  "urlFilter": "||cdn.wisepops.com/shared/wisepops/"
+ },
+ "id": 3,
+ "priority": 10
+}
+]

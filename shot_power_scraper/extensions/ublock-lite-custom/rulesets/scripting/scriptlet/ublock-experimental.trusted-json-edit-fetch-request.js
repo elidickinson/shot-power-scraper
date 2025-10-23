@@ -26,63 +26,71 @@
 // Isolate from global scope
 
 // Start of local scope
-(function uBOL_trustedJsonEditXhrRequest() {
+(function uBOL_trustedJsonEditFetchRequest() {
 
 /******************************************************************************/
 
-function trustedJsonEditXhrRequest(jsonq = '', ...args) {
-    jsonEditXhrRequestFn(true, jsonq, ...args);
+function trustedJsonEditFetchRequest(jsonq = '', ...args) {
+    jsonEditFetchRequestFn(true, jsonq, ...args);
 }
 
-function jsonEditXhrRequestFn(trusted, jsonq = '') {
+function jsonEditFetchRequestFn(trusted, jsonq = '') {
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix(
-        `${trusted ? 'trusted-' : ''}json-edit-xhr-request`,
+        `${trusted ? 'trusted-' : ''}json-edit-fetch-request`,
         jsonq
     );
-    const xhrInstances = new WeakMap();
     const jsonp = JSONPath.create(jsonq);
     if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
     const propNeedles = parsePropertiesToMatchFn(extraArgs.propsToMatch, 'url');
-    self.XMLHttpRequest = class extends self.XMLHttpRequest {
-        open(method, url, ...args) {
-            const xhrDetails = { method, url };
-            const matched = propNeedles.size === 0 ||
-                matchObjectPropertiesFn(propNeedles, xhrDetails);
-            if ( matched ) {
-                if ( safe.logLevel > 1 && Array.isArray(matched) ) {
-                    safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
+    const filterBody = body => {
+        if ( typeof body !== 'string' ) { return; }
+        let data;
+        try { data = safe.JSON_parse(body); }
+        catch { }
+        if ( data instanceof Object === false ) { return; }
+        const objAfter = jsonp.apply(data);
+        if ( objAfter === undefined ) { return; }
+        return safe.JSON_stringify(objAfter);
+    }
+    const proxyHandler = context => {
+        const args = context.callArgs;
+        const [ resource, options ] = args;
+        const bodyBefore = options?.body;
+        if ( Boolean(bodyBefore) === false ) { return context.reflect(); }
+        const bodyAfter = filterBody(bodyBefore);
+        if ( bodyAfter === undefined || bodyAfter === bodyBefore ) {
+            return context.reflect();
+        }
+        if ( propNeedles.size !== 0 ) {
+            const objs = [
+                resource instanceof Object ? resource : { url: `${resource}` }
+            ];
+            if ( objs[0] instanceof Request ) {
+                try {
+                    objs[0] = safe.Request_clone.call(objs[0]);
+                } catch(ex) {
+                    safe.uboErr(logPrefix, 'Error:', ex);
                 }
-                xhrInstances.set(this, xhrDetails);
             }
-            return super.open(method, url, ...args);
-        }
-        send(body) {
-            const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails ) {
-                body = this.#filterBody(body) || body;
-            }
-            super.send(body);
-        }
-        #filterBody(body) {
-            if ( typeof body !== 'string' ) { return; }
-            let data;
-            try { data = safe.JSON_parse(body); }
-            catch { }
-            if ( data instanceof Object === false ) { return; }
-            const objAfter = jsonp.apply(data);
-            if ( objAfter === undefined ) { return; }
-            body = safe.JSON_stringify(objAfter);
-            safe.uboLog(logPrefix, 'Edited');
+            const matched = matchObjectPropertiesFn(propNeedles, ...objs);
+            if ( matched === undefined ) { return context.reflect(); }
             if ( safe.logLevel > 1 ) {
-                safe.uboLog(logPrefix, `After edit:\n${body}`);
+                safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
             }
-            return body;
         }
+        safe.uboLog(logPrefix, 'Edited');
+        if ( safe.logLevel > 1 ) {
+            safe.uboLog(logPrefix, `After edit:\n${bodyAfter}`);
+        }
+        options.body = bodyAfter;
+        return context.reflect();
     };
+    proxyApplyFn('fetch', proxyHandler);
+    proxyApplyFn('Request', proxyHandler);
 }
 
 class JSONPath {
@@ -574,6 +582,91 @@ function parsePropertiesToMatchFn(propsToMatch, implicit = '') {
     return needles;
 }
 
+function proxyApplyFn(
+    target = '',
+    handler = ''
+) {
+    let context = globalThis;
+    let prop = target;
+    for (;;) {
+        const pos = prop.indexOf('.');
+        if ( pos === -1 ) { break; }
+        context = context[prop.slice(0, pos)];
+        if ( context instanceof Object === false ) { return; }
+        prop = prop.slice(pos+1);
+    }
+    const fn = context[prop];
+    if ( typeof fn !== 'function' ) { return; }
+    if ( proxyApplyFn.CtorContext === undefined ) {
+        proxyApplyFn.ctorContexts = [];
+        proxyApplyFn.CtorContext = class {
+            constructor(...args) {
+                this.init(...args);
+            }
+            init(callFn, callArgs) {
+                this.callFn = callFn;
+                this.callArgs = callArgs;
+                return this;
+            }
+            reflect() {
+                const r = Reflect.construct(this.callFn, this.callArgs);
+                this.callFn = this.callArgs = this.private = undefined;
+                proxyApplyFn.ctorContexts.push(this);
+                return r;
+            }
+            static factory(...args) {
+                return proxyApplyFn.ctorContexts.length !== 0
+                    ? proxyApplyFn.ctorContexts.pop().init(...args)
+                    : new proxyApplyFn.CtorContext(...args);
+            }
+        };
+        proxyApplyFn.applyContexts = [];
+        proxyApplyFn.ApplyContext = class {
+            constructor(...args) {
+                this.init(...args);
+            }
+            init(callFn, thisArg, callArgs) {
+                this.callFn = callFn;
+                this.thisArg = thisArg;
+                this.callArgs = callArgs;
+                return this;
+            }
+            reflect() {
+                const r = Reflect.apply(this.callFn, this.thisArg, this.callArgs);
+                this.callFn = this.thisArg = this.callArgs = this.private = undefined;
+                proxyApplyFn.applyContexts.push(this);
+                return r;
+            }
+            static factory(...args) {
+                return proxyApplyFn.applyContexts.length !== 0
+                    ? proxyApplyFn.applyContexts.pop().init(...args)
+                    : new proxyApplyFn.ApplyContext(...args);
+            }
+        };
+        proxyApplyFn.isCtor = new Map();
+    }
+    if ( proxyApplyFn.isCtor.has(target) === false ) {
+        proxyApplyFn.isCtor.set(target, fn.prototype?.constructor === fn);
+    }
+    const fnStr = fn.toString();
+    const toString = (function toString() { return fnStr; }).bind(null);
+    const proxyDetails = {
+        apply(target, thisArg, args) {
+            return handler(proxyApplyFn.ApplyContext.factory(target, thisArg, args));
+        },
+        get(target, prop) {
+            if ( prop === 'toString' ) { return toString; }
+            return Reflect.get(target, prop);
+        },
+    };
+    if ( proxyApplyFn.isCtor.get(target) ) {
+        proxyDetails.construct = function(target, args) {
+            return handler(proxyApplyFn.CtorContext.factory(target, args));
+        };
+    }
+    context[prop] = new Proxy(fn, proxyDetails);
+}
+
 function safeSelf() {
     if ( scriptletGlobals.safeSelf ) {
         return scriptletGlobals.safeSelf;
@@ -767,7 +860,7 @@ function safeSelf() {
 /******************************************************************************/
 
 const scriptletGlobals = {}; // eslint-disable-line
-const argsList = [["..client[?.clientScreen==\"WATCH_FULL_SCREEN\"].clientScreen=\"CHANNEL\"","propsToMatch","/player"]];
+const argsList = [["..client[?.clientScreen==\"WATCH\"].clientScreen=\"CHANNEL\"","propsToMatch","/\\/(player|get_watch)/"]];
 const hostnamesMap = new Map([["www.youtube.com",0]]);
 const exceptionsMap = new Map([]);
 const hasEntities = false;
@@ -836,7 +929,7 @@ if ( hasAncestors ) {
 // Apply scriplets
 for ( const i of todoIndices ) {
     if ( tonotdoIndices.has(i) ) { continue; }
-    try { trustedJsonEditXhrRequest(...argsList[i]); }
+    try { trustedJsonEditFetchRequest(...argsList[i]); }
     catch { }
 }
 

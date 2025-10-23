@@ -2272,6 +2272,7 @@
     "remove-node-text",
     {
      "hostnames": [
+      "4kfilme.de",
       "frixtender.de",
       "minaprotocol.com",
       "rittmeisterdestille.de"
@@ -3228,6 +3229,15 @@
     }
    ],
    [
+    "trusted-json-edit-fetch-request",
+    {
+     "hostnames": [
+      "www.youtube.com"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
     "trusted-json-edit-xhr-request",
     {
      "hostnames": [
@@ -3982,7 +3992,7 @@
     }
    ],
    [
-    "spoof-css",
+    "set-constant",
     {
      "hostnames": [
       "telsu.fi"
@@ -6419,7 +6429,6 @@
       "rg.ru",
       "shedevrum.ai",
       "sm.news",
-      "ura.news",
       "veseloeradio.ru",
       "yapx.ru"
      ],
@@ -6663,6 +6672,7 @@
     {
      "hostnames": [
       "afisha.ru",
+      "author.today",
       "cnews.ru",
       "film.ru",
       "filmpro.ru",
@@ -8405,7 +8415,6 @@
       "goctruyentranhvui17.com",
       "gotphim.com",
       "haysexvl.net",
-      "haysexvn.lat",
       "hentaivc.com",
       "hh2d.tv",
       "hh3dhay.life",
@@ -8423,7 +8432,6 @@
       "linkneverdie2.com",
       "lrepacks.net",
       "lxmanga.my",
-      "memecup.io",
       "misskon.com",
       "motchilltvphim.com",
       "motphim.pokemonviet.com",
@@ -8432,8 +8440,9 @@
       "p.thoctv.com",
       "phim.haysex.asia",
       "phim18hdxx.com",
+      "phimlongtieng.net",
       "phimmoi.sale",
-      "phimsexhayvn36.com",
+      "phimsexhayvn38.com",
       "phimtho.cc",
       "player-cdn.com",
       "playhydrax.com",
@@ -8441,7 +8450,9 @@
       "rphang.online",
       "s4.chinav.sex",
       "saigon24.net",
-      "sayhentaii.art",
+      "saveusfarms.org",
+      "sayhentaii.ink",
+      "sexdepvn.me",
       "sexdiary.club",
       "sextop1.show",
       "soha.vn",
@@ -8459,14 +8470,15 @@
       "tuoitre.vn",
       "tusachmanga99.com",
       "umetruyenz.net",
-      "vailonxx.vip",
+      "vailonxx.co",
       "vanphatelectric.com",
       "viet69.my",
       "vlxx.bz",
       "vn2.xvideos69.xxx",
       "vn5.sexviet88.xyz",
+      "vozer.io",
       "vungoctuan.vn",
-      "www.motchill28.com",
+      "www.motchill29.com",
       "www.toptruyentv11.com",
       "www.truyen35zz.com",
       "xem.sexnung3x.com",
@@ -8520,7 +8532,7 @@
       "tv.tvhayhd.org",
       "ungtycomicsha.com",
       "vinaurl.net",
-      "www.motchill28.com",
+      "www.motchill29.com",
       "www.nettruyenupp.com",
       "www.sieutamphim.pro",
       "xem.sexnung3x.com",
@@ -8533,27 +8545,18 @@
     }
    ],
    [
-    "abort-on-property-write",
-    {
-     "hostnames": [
-      "baomoi.com"
-     ],
-     "world": "MAIN"
-    }
-   ],
-   [
     "set-constant",
     {
      "hostnames": [
       "abysscdn.com",
       "afamily.vn",
+      "babelzilla.org",
       "cafef.vn",
       "cliphot69.pics",
       "clipsex.cam",
       "freeplayervideo.com",
       "gamek.vn",
       "genk.vn",
-      "geodb.com",
       "hayhaytv.site",
       "kenh14.vn",
       "motchillzz.site",
@@ -8567,6 +8570,15 @@
       "vndoc.com",
       "www.gvnvh.net",
       "www.iosviet.com"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
+    "abort-on-property-write",
+    {
+     "hostnames": [
+      "baomoi.com"
      ],
      "world": "MAIN"
     }

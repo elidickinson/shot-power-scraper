@@ -1,7 +1,7 @@
 /*******************************************************************************
 
     uBlock Origin Lite - a comprehensive, MV3-compliant content blocker
-    Copyright (C) 2014-present Raymond Hill
+    Copyright (C) 2019-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,21 +19,21 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-// ruleset: ublock-experimental
+// ruleset: shot-power-scraper-custom
 
 // Important!
 // Isolate from global scope
-(function uBOL_cssProceduralImport() {
+(function uBOL_cssSpecificImports() {
 
 /******************************************************************************/
 
-const argsList = ["[]","[{\"selector\":\"ytd-watch-flexy[player-unavailable]\",\"action\":[\"remove-attr\",\"player-unavailable\"]}]"];
+const argsList = ["","div[style=\"background-color: rgba(0, 0, 0, 0.4); position: fixed; min-width: 100%; min-height: 100%; inset: 0px; z-index: 999999;\"]"];
 const argsSeqs = [0,1];
-const hostnamesMap = new Map([["www.youtube.com",1]]);
+const hostnamesMap = new Map([["cnn.com",1]]);
 const hasEntities = false;
 
-self.proceduralImports = self.proceduralImports || [];
-self.proceduralImports.push({ argsList, argsSeqs, hostnamesMap, hasEntities });
+self.specificImports = self.specificImports || [];
+self.specificImports.push({ argsList, argsSeqs, hostnamesMap, hasEntities });
 
 /******************************************************************************/
 
