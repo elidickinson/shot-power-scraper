@@ -272,6 +272,19 @@ async def navigate_to_url(page, shot_config):
             if not Config.silent:
                 click.echo("Warning: Challenge page may still be active", err=True)
 
+    if shot_config.paywall_block:
+        # Custom bypass logic for substack - can't click it too quickly
+        maybeLater = await evaluate_js(page, """document.querySelector(".intro-popup button[data-testid='maybeLater']")""")
+        if maybeLater:
+            await asyncio.sleep(1)
+            await evaluate_js(page, """
+                const maybeLaterButton = document.querySelector(".intro-popup button[data-testid='maybeLater']");
+                if (maybeLaterButton) {
+                    maybeLaterButton.click();
+                    console.log("*** Clicked Substack 'Maybe Later' button to dismiss popup");
+                }
+            """)
+
     # Check if page failed to load
     has_error, error_msg = await detect_navigation_error(page, url)
     if has_error:
