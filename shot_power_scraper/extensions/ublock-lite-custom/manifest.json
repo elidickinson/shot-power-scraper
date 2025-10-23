@@ -59,7 +59,7 @@
       },
       {
         "id": "block-lan",
-        "enabled": false,
+        "enabled": true,
         "path": "/rulesets/main/block-lan.json"
       },
       {
@@ -74,12 +74,12 @@
       },
       {
         "id": "annoyances-cookies",
-        "enabled": false,
+        "enabled": true,
         "path": "/rulesets/main/annoyances-cookies.json"
       },
       {
         "id": "annoyances-overlays",
-        "enabled": false,
+        "enabled": true,
         "path": "/rulesets/main/annoyances-overlays.json"
       },
       {
@@ -89,17 +89,17 @@
       },
       {
         "id": "annoyances-widgets",
-        "enabled": false,
+        "enabled": true,
         "path": "/rulesets/main/annoyances-widgets.json"
       },
       {
         "id": "annoyances-others",
-        "enabled": false,
+        "enabled": true,
         "path": "/rulesets/main/annoyances-others.json"
       },
       {
         "id": "annoyances-notifications",
-        "enabled": false,
+        "enabled": true,
         "path": "/rulesets/main/annoyances-notifications.json"
       },
       {
