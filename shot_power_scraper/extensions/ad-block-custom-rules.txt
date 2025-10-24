@@ -23,6 +23,9 @@ cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-w
 ##.elementor-popup-modal
 ##div.newspack-popup-container
 ##.CampaignType--popup
+##.fancybox-overlay
+##.ays-pb-close-popup-with-esc
+##iframe[title="Popup"][src="about:blank"]
 
 ! === NETWORK RULES (URL Blocking) ===
 ! Block CNN cookie/privacy script

@@ -46,3 +46,4 @@ test_*.py
 test_*.html
 *_rules_support.md
 !docs/*
+/shot_power_scraper/extensions/ublock-lite-custom/log.txt

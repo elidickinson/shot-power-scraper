@@ -1572,8 +1572,8 @@
    "rejected": 0
   },
   "css": {
-   "generic": 3,
-   "generichigh": 0,
+   "generic": 5,
+   "generichigh": 1,
    "specific": 1,
    "procedural": 0
   },

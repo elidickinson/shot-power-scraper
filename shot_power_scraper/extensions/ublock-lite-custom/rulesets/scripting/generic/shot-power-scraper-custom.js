@@ -27,7 +27,7 @@
 
 /******************************************************************************/
 
-const genericSelectorMap = [[2707,".elementor-popup-modal"],[3316,"div.newspack-popup-container"],[2050,".CampaignType--popup"]];
+const genericSelectorMap = [[2707,".elementor-popup-modal"],[3316,"div.newspack-popup-container"],[2050,".CampaignType--popup"],[872,".fancybox-overlay"],[2812,".ays-pb-close-popup-with-esc"]];
 const genericExceptionSieve = undefined;
 const genericExceptionMap = undefined;
 
