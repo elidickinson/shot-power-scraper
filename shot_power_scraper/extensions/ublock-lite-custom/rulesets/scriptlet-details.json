@@ -12,6 +12,15 @@
     }
    ],
    [
+    "trusted-json-edit-fetch-request",
+    {
+     "hostnames": [
+      "www.youtube.com"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
     "adjust-setTimeout",
     {
      "hostnames": [
@@ -150,34 +159,7 @@
     }
    ],
    [
-    "trusted-set-attr",
-    {
-     "hostnames": [
-      "*"
-     ],
-     "world": "ISOLATED"
-    }
-   ],
-   [
-    "prevent-fetch",
-    {
-     "hostnames": [
-      "*"
-     ],
-     "world": "MAIN"
-    }
-   ],
-   [
     "trusted-suppress-native-method",
-    {
-     "hostnames": [
-      "*"
-     ],
-     "world": "MAIN"
-    }
-   ],
-   [
-    "prevent-setTimeout",
     {
      "hostnames": [
       "*"
@@ -195,7 +177,25 @@
     }
    ],
    [
-    "trusted-replace-outbound-text",
+    "prevent-xhr",
+    {
+     "hostnames": [
+      "*"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
+    "prevent-setTimeout",
+    {
+     "hostnames": [
+      "*"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
+    "prevent-fetch",
     {
      "hostnames": [
       "*"
@@ -213,7 +213,7 @@
     }
    ],
    [
-    "prevent-xhr",
+    "trusted-replace-outbound-text",
     {
      "hostnames": [
       "*"
@@ -246,6 +246,16 @@
       "klouderr.com",
       "pvpoke-re.com",
       "www.photopea.com"
+     ],
+     "world": "ISOLATED"
+    }
+   ],
+   [
+    "trusted-set-attr",
+    {
+     "hostnames": [
+      "mt-soft.sakura.ne.jp",
+      "pvpoke-re.com"
      ],
      "world": "ISOLATED"
     }
@@ -3344,6 +3354,8 @@
     {
      "hostnames": [
       "aiyifan.tv",
+      "hanime1-me.icu",
+      "hanime1-me.top",
       "iyf.tv",
       "mcappx.com",
       "pcbeta.com",
@@ -3447,6 +3459,8 @@
       "axjbt.com",
       "caq98i.top",
       "goodav17.com",
+      "hanime1-me.icu",
+      "hanime1-me.top",
       "iyf.tv",
       "m.86kl.com",
       "papalah.com",
@@ -5805,6 +5819,17 @@
   "nld-0",
   [
    [
+    "abort-current-script",
+    {
+     "hostnames": [
+      "indeleiderstrui.nl",
+      "webcams-texel.nl",
+      "webcams-vlissingen.nl"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
     "prevent-setTimeout",
     {
      "hostnames": [
@@ -5859,16 +5884,6 @@
       "looopings.nl"
      ],
      "world": "ISOLATED"
-    }
-   ],
-   [
-    "abort-current-script",
-    {
-     "hostnames": [
-      "indeleiderstrui.nl",
-      "webcams-texel.nl"
-     ],
-     "world": "MAIN"
     }
    ],
    [
@@ -8054,6 +8069,15 @@
     }
    ],
    [
+    "remove-cookie",
+    {
+     "hostnames": [
+      "yabancidiziio.com"
+     ],
+     "world": "ISOLATED"
+    }
+   ],
+   [
     "prevent-refresh",
     {
      "hostnames": [
@@ -8442,7 +8466,7 @@
       "phim18hdxx.com",
       "phimlongtieng.net",
       "phimmoi.sale",
-      "phimsexhayvn38.com",
+      "phimsexhayvn39.com",
       "phimtho.cc",
       "player-cdn.com",
       "playhydrax.com",
@@ -8450,7 +8474,6 @@
       "rphang.online",
       "s4.chinav.sex",
       "saigon24.net",
-      "saveusfarms.org",
       "sayhentaii.ink",
       "sexdepvn.me",
       "sexdiary.club",
@@ -8458,6 +8481,7 @@
       "soha.vn",
       "teamlanhlungday.store",
       "thanhnien.vn",
+      "thiendia1.vip",
       "tram3d.com",
       "tram3d.me",
       "tram3d.xyz",
@@ -8469,10 +8493,11 @@
       "truyenvn.shop",
       "tuoitre.vn",
       "tusachmanga99.com",
-      "umetruyenz.net",
+      "umetruyenz.org",
       "vailonxx.co",
       "vanphatelectric.com",
       "viet69.my",
+      "vintagegraphics.co.uk",
       "vlxx.bz",
       "vn2.xvideos69.xxx",
       "vn5.sexviet88.xyz",
@@ -8545,12 +8570,20 @@
     }
    ],
    [
+    "abort-on-property-write",
+    {
+     "hostnames": [
+      "baomoi.com"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
     "set-constant",
     {
      "hostnames": [
       "abysscdn.com",
       "afamily.vn",
-      "babelzilla.org",
       "cafef.vn",
       "cliphot69.pics",
       "clipsex.cam",
@@ -8562,6 +8595,7 @@
       "motchillzz.site",
       "phimvuihd.org",
       "player-cdn.com",
+      "prismafinance.com",
       "sexdiaryx.to",
       "soha.vn",
       "tailieumoi.vn",
@@ -8570,15 +8604,6 @@
       "vndoc.com",
       "www.gvnvh.net",
       "www.iosviet.com"
-     ],
-     "world": "MAIN"
-    }
-   ],
-   [
-    "abort-on-property-write",
-    {
-     "hostnames": [
-      "baomoi.com"
      ],
      "world": "MAIN"
     }

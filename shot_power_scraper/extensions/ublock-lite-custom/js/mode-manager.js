@@ -56,8 +56,8 @@ export const MODE_COMPLETE = 3;
 export const defaultFilteringModes = {
     none: [],
     basic: [],
-    optimal: [ 'all-urls' ],
-    complete: [],
+    optimal: [],
+    complete: [ 'all-urls' ],
 };
 
 /******************************************************************************/

@@ -89,12 +89,26 @@ This is different from `-i/--interactive` mode which shows the browser AND pause
 
 ### Ad and Popup Blocking
 
-This fork uses uBlock Lite for content blocking during screenshot capture. Use `--ad-block` to enable blocking, and add `--ublock-lists` to enable additional filter lists for blocking popups, cookie notices, and other annoyances.
+This fork uses **uBlock Origin Lite** for content blocking during screenshot capture. Use `--ad-block` to enable blocking, and add `--ublock-lists` to enable additional filter lists for blocking popups, cookie notices, and other annoyances.
 
     shot-power-scraper --ad-block https://example.com
     shot-power-scraper --ad-block --ublock-lists annoyances-cookies,annoyances-overlays https://example.com
 
 This can be enabled by default using the `config` command. For detailed information about available filter lists and customization, see [EXTENSIONS.md](EXTENSIONS.md).
+
+#### Building uBlock Origin Lite
+
+Our custom build includes "Complete" filtering mode (maximum blocking), annoyance filters, and custom rules support:
+
+```bash
+# Build extension with latest filter lists (2-3 minutes)
+./shot_power_scraper/extensions/update-ublock.sh
+
+# Build faster using cached filter lists
+./shot_power_scraper/extensions/update-ublock.sh --use-cache
+```
+
+The script automatically clones/updates uBlock Origin, enables selected filter lists, sets "Complete" mode as default, and installs to `shot_power_scraper/extensions/ublock-lite-custom/`.
 
 ## ⚠️ Important: Differences from Original shot-scraper
 

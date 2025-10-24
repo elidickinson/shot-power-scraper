@@ -332,10 +332,10 @@ function runAt(fn, when) {
 /******************************************************************************/
 
 const scriptletGlobals = {}; // eslint-disable-line
-const argsList = [[".navbar-nav > li#navpromo2.nav-item > a","onclick","let a=function(){};return false;"],["ins.adsbygoogle:has(> #aswift_0_host)","data-ad-status","unfilled"],["*:not(#nitro-top,.nitro-any,#nitro-body-desktop,#nitro-header-mobile) > ins.adsbygoogle:not(:has(#aswift_0))","data-ad-status","filled"],["frameset[rows=\"95,30,*\"]","rows","0,30,*"]];
-const hostnamesMap = new Map([["japscan.*",0],["pvpoke-re.com",[1,2]],["mt-soft.sakura.ne.jp",3]]);
+const argsList = [["ins.adsbygoogle:has(> #aswift_0_host)","data-ad-status","unfilled"],["*:not(#nitro-top,.nitro-any,#nitro-body-desktop,#nitro-header-mobile) > ins.adsbygoogle:not(:has(#aswift_0))","data-ad-status","filled"],["frameset[rows=\"95,30,*\"]","rows","0,30,*"]];
+const hostnamesMap = new Map([["pvpoke-re.com",[0,1]],["mt-soft.sakura.ne.jp",2]]);
 const exceptionsMap = new Map([]);
-const hasEntities = true;
+const hasEntities = false;
 const hasAncestors = false;
 
 const collectArgIndices = (hn, map, out) => {

@@ -26,10 +26,15 @@ echo "Updating uBlock Lite with latest filter lists..."
 
 # Check if we already have the repo cloned
 if [ -d "$BUILD_DIR" ]; then
-    echo "Updating existing uBlock repository..."
-    cd "$BUILD_DIR"
-    git pull origin master
-    git submodule update --init
+    if [ $CLEAN_ASSETS -eq 1 ]; then
+        echo "Updating existing uBlock repository..."
+        cd "$BUILD_DIR"
+        git pull origin master
+        git submodule update --init
+    else
+        echo "Using cached uBlock repository (--use-cache flag provided)..."
+        cd "$BUILD_DIR"
+    fi
 else
     echo "Cloning uBlock repository..."
     cd "$EXTENSIONS_DIR"
@@ -123,6 +128,18 @@ fi
 
 echo "Building uBlock Lite for Chromium (this may take 2-3 minutes)..."
 make mv3-chromium
+
+# Set default filtering mode to "Complete" instead of "Optimal"
+echo "Setting default filtering mode to 'Complete'..."
+MODE_MANAGER="dist/build/uBOLite.chromium/js/mode-manager.js"
+if [ -f "$MODE_MANAGER" ]; then
+    sed -i.bak "s/optimal: \[ 'all-urls' \],/optimal: [],/" "$MODE_MANAGER"
+    sed -i.bak "s/complete: \[\],/complete: [ 'all-urls' ],/" "$MODE_MANAGER"
+    rm "${MODE_MANAGER}.bak"
+    echo "✓ Default filtering mode set to 'Complete'"
+else
+    echo "Warning: Could not find mode-manager.js to set default filtering mode"
+fi
 
 # Restore original rulesets.json if we modified it
 if [ -f "platform/mv3/rulesets.json.backup" ]; then
