@@ -1559,20 +1559,20 @@
   "group": "default",
   "enabled": true,
   "filters": {
-   "total": 3,
-   "accepted": 3,
+   "total": 4,
+   "accepted": 4,
    "rejected": 0
   },
   "rules": {
-   "total": 3,
-   "plain": 3,
+   "total": 4,
+   "plain": 4,
    "regex": 0,
    "strictblock": 0,
    "urlskip": 0,
    "rejected": 0
   },
   "css": {
-   "generic": 5,
+   "generic": 10,
    "generichigh": 1,
    "specific": 1,
    "procedural": 0

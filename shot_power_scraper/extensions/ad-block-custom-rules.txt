@@ -26,6 +26,11 @@ cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-w
 ##.fancybox-overlay
 ##.ays-pb-close-popup-with-esc
 ##iframe[title="Popup"][src="about:blank"]
+##.et_bloom_popup
+##.sqs-popup-overlay
+##.modal[aria-label="Promotional pop up"]
+##.oxy-modal-backdrop
+##.pum-overlay.popmake-overlay
 
 ! === NETWORK RULES (URL Blocking) ===
 ! Block CNN cookie/privacy script
@@ -33,6 +38,7 @@ cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-w
 
 ! Block general cookie consent scripts
 /wp-content/plugins/pressidium-cookie-consent/*
+/wp-content/plugins/cookie-law-info/*
 
 ! Block wisepops popup service
 ||cdn.wisepops.com/shared/wisepops/*

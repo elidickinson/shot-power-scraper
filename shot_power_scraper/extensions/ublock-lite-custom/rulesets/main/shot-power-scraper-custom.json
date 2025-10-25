@@ -24,9 +24,19 @@
   "type": "block"
  },
  "condition": {
-  "urlFilter": "||cdn.wisepops.com/shared/wisepops/"
+  "urlFilter": "/wp-content/plugins/cookie-law-info/"
  },
  "id": 3,
+ "priority": 10
+},
+{
+ "action": {
+  "type": "block"
+ },
+ "condition": {
+  "urlFilter": "||cdn.wisepops.com/shared/wisepops/"
+ },
+ "id": 4,
  "priority": 10
 }
 ]

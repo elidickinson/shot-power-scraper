@@ -27,7 +27,7 @@
 
 /******************************************************************************/
 
-const genericSelectorMap = [[2707,".elementor-popup-modal"],[3316,"div.newspack-popup-container"],[2050,".CampaignType--popup"],[872,".fancybox-overlay"],[2812,".ays-pb-close-popup-with-esc"]];
+const genericSelectorMap = [[2707,".elementor-popup-modal"],[3316,"div.newspack-popup-container"],[2050,".CampaignType--popup"],[872,".fancybox-overlay"],[2812,".ays-pb-close-popup-with-esc"],[764,".et_bloom_popup"],[1976,".sqs-popup-overlay"],[992,".modal[aria-label=\"Promotional pop up\"]"],[2022,".oxy-modal-backdrop"],[3207,".pum-overlay.popmake-overlay"]];
 const genericExceptionSieve = undefined;
 const genericExceptionMap = undefined;
 
