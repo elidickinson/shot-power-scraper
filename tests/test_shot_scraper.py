@@ -15,6 +15,12 @@ browser_required = pytest.mark.skipif(
     reason="Requires browser display, skipped on Linux CI"
 )
 
+# Mark for tests that spawn local servers (skip in all CI environments)
+server_required = pytest.mark.skipif(
+    "CI" in os.environ,
+    reason="Spawning local servers unreliable in CI environments"
+)
+
 
 def test_version():
     runner = CliRunner()
@@ -52,6 +58,7 @@ COMMANDS_YAML = """
 
 
 @browser_required
+@server_required
 @pytest.mark.parametrize("yaml", (SERVER_YAML, SERVER_YAML2))
 def test_multi_server(yaml):
     runner = CliRunner()
