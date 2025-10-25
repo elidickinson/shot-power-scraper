@@ -31,6 +31,8 @@ cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-w
 ##.modal[aria-label="Promotional pop up"]
 ##.oxy-modal-backdrop
 ##.pum-overlay.popmake-overlay
+##.popup-wrapper__content--active
+##section#hy-lead-magnet-section
 
 ! === NETWORK RULES (URL Blocking) ===
 ! Block CNN cookie/privacy script
