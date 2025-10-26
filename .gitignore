@@ -42,7 +42,6 @@ shot_power_scraper/extensions/ublock-lite-backup/
 # Development and debug files
 debug_*.py
 task_log.md
-test_*.py
 test_*.html
 *_rules_support.md
 !docs/*
