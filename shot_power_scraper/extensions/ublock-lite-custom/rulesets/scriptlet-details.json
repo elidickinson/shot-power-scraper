@@ -159,7 +159,7 @@
     }
    ],
    [
-    "trusted-suppress-native-method",
+    "trusted-set-constant",
     {
      "hostnames": [
       "*"
@@ -168,7 +168,7 @@
     }
    ],
    [
-    "trusted-set-constant",
+    "spoof-css",
     {
      "hostnames": [
       "*"
@@ -487,6 +487,15 @@
     }
    ],
    [
+    "trusted-suppress-native-method",
+    {
+     "hostnames": [
+      "*"
+     ],
+     "world": "MAIN"
+    }
+   ],
+   [
     "trusted-click-element",
     {
      "hostnames": [
@@ -597,16 +606,6 @@
       "multiup.org"
      ],
      "world": "ISOLATED"
-    }
-   ],
-   [
-    "spoof-css",
-    {
-     "hostnames": [
-      "1001tracklists.com",
-      "download.megaup.net"
-     ],
-     "world": "MAIN"
     }
    ],
    [
@@ -8423,13 +8422,13 @@
       "cliphot69.pics",
       "cliphot69.shop",
       "cliphubs.com",
-      "clipphot.net",
+      "clipphot.org",
       "clipsexsub3x.net",
       "cunghocvui.com",
       "damconuong.co",
       "demo.14412882.com",
-      "doctruyen3qui15.com",
-      "dualeotruyenev.com",
+      "doctruyen3qui16.com",
+      "dualeotruyenlv.com",
       "economic45882.shop",
       "freeplayervideo.com",
       "game8.vn",
@@ -8466,7 +8465,7 @@
       "phim18hdxx.com",
       "phimlongtieng.net",
       "phimmoi.sale",
-      "phimsexhayvn39.com",
+      "phimsexhayvn41.com",
       "phimtho.cc",
       "player-cdn.com",
       "playhydrax.com",
@@ -8480,6 +8479,7 @@
       "sextop1.show",
       "soha.vn",
       "teamlanhlungday.store",
+      "tekora.space",
       "thanhnien.vn",
       "thiendia1.vip",
       "tram3d.com",
@@ -8550,12 +8550,12 @@
       "teamlanhlung8.shop",
       "thefaplive.com",
       "theicec.com",
-      "thichxemphim.live",
+      "thichxemphim1.site",
       "thuvienhd.biz",
       "truyenfull.vision",
       "truyensieuhay.com",
       "tv.tvhayhd.org",
-      "ungtycomicsha.com",
+      "ungtycomicsay.com",
       "vinaurl.net",
       "www.motchill29.com",
       "www.nettruyenupp.com",
@@ -8595,9 +8595,9 @@
       "motchillzz.site",
       "phimvuihd.org",
       "player-cdn.com",
-      "prismafinance.com",
       "sexdiaryx.to",
       "soha.vn",
+      "streettokitchen.com",
       "tailieumoi.vn",
       "thanhnien.vn",
       "tuoitre.vn",

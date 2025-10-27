@@ -61,7 +61,7 @@ filters_to_enable = [
     'annoyances-cookies',
     'annoyances-overlays',
     'annoyances-widgets',
-    'annoyances-others',
+    # 'annoyances-others',  -- this blocked content on https://www.thedial.world/
     'annoyances-notifications'
 ]
 

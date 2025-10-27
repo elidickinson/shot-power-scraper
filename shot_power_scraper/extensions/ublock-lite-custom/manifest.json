@@ -94,7 +94,7 @@
       },
       {
         "id": "annoyances-others",
-        "enabled": true,
+        "enabled": false,
         "path": "/rulesets/main/annoyances-others.json"
       },
       {
@@ -331,7 +331,7 @@
   "storage": {
     "managed_schema": "managed_storage.json"
   },
-  "version": "2025.1025.403",
+  "version": "2025.1027.337",
   "web_accessible_resources": [
     {
       "resources": [
