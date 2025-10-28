@@ -276,7 +276,7 @@ async def navigate_to_url(page, shot_config):
         # Custom bypass logic for substack - can't click it too quickly
         maybeLater = await evaluate_js(page, """document.querySelector(".intro-popup button[data-testid='maybeLater']")""")
         if maybeLater:
-            await asyncio.sleep(1.5)
+            await asyncio.sleep(0.5)
             await evaluate_js(page, """
                 const maybeLaterButton = document.querySelector(".intro-popup button[data-testid='maybeLater']");
                 if (maybeLaterButton) {
