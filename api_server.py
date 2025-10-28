@@ -63,8 +63,16 @@ Example API calls:
             "wait": 1000
         }' \
         | jq '.html'
+
+Known Issues:
+    - Popup/Child Tab Leak: If a page opens popup windows or child tabs (via window.open,
+      target="_blank", etc.), those tabs are NOT automatically tracked or closed. Over time,
+      orphaned popup tabs will accumulate in the browser process, causing memory leaks and
+      eventual instability. Mitigation: Add --disable-popup-blocking=false to browser args,
+      or implement CDP target tracking to close child tabs.
 """
 
+import asyncio
 import logging
 import os
 import re
@@ -107,6 +115,12 @@ async def lifespan(app: FastAPI):
     """Manage application lifespan events"""
     # Startup
     global browser_instance
+
+    # Create semaphore for concurrency control
+    max_concurrent = int(os.getenv("SHOT_API_MAX_CONCURRENT", "10")) if not hasattr(app.state, 'max_concurrent') else app.state.max_concurrent
+    app.state.screenshot_semaphore = asyncio.Semaphore(max_concurrent)
+    logger.info(f"Initialized screenshot semaphore with max_concurrent={max_concurrent}")
+
     if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
         # Read browser args from env (for multi-worker) or app.state (single worker)
         env_args = os.getenv("SHOT_API_BROWSER_ARGS")
@@ -563,110 +577,140 @@ loadServerSettings();
 
 
 @app.post("/shot", tags=["screenshots"], summary="Capture Screenshot")
-async def shot(request: ShotRequest):
+async def shot(request: ShotRequest, fastapi_request: Request):
     """Take a screenshot and return the image"""
-    browser = await get_browser()
+    async with app.state.screenshot_semaphore:
+        if await fastapi_request.is_disconnected():
+            raise HTTPException(status_code=499, detail="Client disconnected")
 
-    # Use server-level trigger_lazy_load as default if request doesn't specify
-    server_trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1" or getattr(app.state, 'trigger_lazy_load', False)
-    trigger_lazy_load = request.trigger_lazy_load if request.trigger_lazy_load else server_trigger_lazy_load
+        browser = await get_browser()
 
-    # Build shot configuration
-    shot_config = ShotConfig({
-        "url": request.url,
-        "width": request.width,
-        "height": request.height,
-        "selectors": request.selectors,
-        "selectors_all": request.selectors_all,
-        "js_selectors": request.js_selectors,
-        "js_selectors_all": request.js_selectors_all,
-        "padding": request.padding,
-        "javascript": request.javascript,
-        "quality": request.quality,
-        "wait": request.wait,
-        "wait_for": request.wait_for,
-        "timeout": request.timeout // 1000 if request.timeout else 30,  # Convert to seconds
-        "omit_background": request.omit_background,
-        "skip_challenge_page_check": request.skip_challenge_page_check,
-        "skip_wait_for_load": request.skip_wait_for_load,
-        "trigger_lazy_load": trigger_lazy_load,
-        "silent": True
-    })
+        # Use server-level trigger_lazy_load as default if request doesn't specify
+        server_trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1" or getattr(app.state, 'trigger_lazy_load', False)
+        trigger_lazy_load = request.trigger_lazy_load if request.trigger_lazy_load is not None else server_trigger_lazy_load
 
-    # Create a tab context using the browser object
-    from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
-    page = await create_tab_context(browser, shot_config)
+        # Build shot configuration
+        shot_config = ShotConfig({
+            "url": request.url,
+            "width": request.width,
+            "height": request.height,
+            "selectors": request.selectors,
+            "selectors_all": request.selectors_all,
+            "js_selectors": request.js_selectors,
+            "js_selectors_all": request.js_selectors_all,
+            "padding": request.padding,
+            "javascript": request.javascript,
+            "quality": request.quality,
+            "wait": request.wait,
+            "wait_for": request.wait_for,
+            "timeout": request.timeout // 1000 if request.timeout else 30,  # Convert to seconds
+            "omit_background": request.omit_background,
+            "skip_challenge_page_check": request.skip_challenge_page_check,
+            "skip_wait_for_load": request.skip_wait_for_load,
+            "trigger_lazy_load": trigger_lazy_load,
+            "silent": True
+        })
 
-    try:
-        await navigate_to_url(page, shot_config)
+        # Create a tab context using the browser object
+        from shot_power_scraper.page_utils import create_tab_context, navigate_to_url
+        page = await create_tab_context(browser, shot_config)
 
-        # Take the screenshot using the page context
-        screenshot_bytes = await take_shot(
-            page,
-            shot_config,
-            return_bytes=True,
-            skip_navigation=True,  # Already navigated above
-        )
+        try:
+            if await fastapi_request.is_disconnected():
+                raise HTTPException(status_code=499, detail="Client disconnected")
 
-        # Determine content type based on quality setting
-        if request.quality:
-            content_type = "image/jpeg"
-            ext = "jpg"
-        else:
-            content_type = "image/png"
-            ext = "png"
+            await navigate_to_url(page, shot_config)
 
-        filename = filename_for_url(request.url, ext=ext)
+            if await fastapi_request.is_disconnected():
+                raise HTTPException(status_code=499, detail="Client disconnected")
 
-        # Return the image
-        return Response(
-            content=screenshot_bytes,
-            media_type=content_type,
-            headers={
-                "Content-Disposition": f"inline; filename={filename}"
-            }
-        )
+            # Take the screenshot using the page context
+            screenshot_bytes = await take_shot(
+                page,
+                shot_config,
+                return_bytes=True,
+                skip_navigation=True,  # Already navigated above
+            )
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        await page.close()
+            # Determine content type based on quality setting
+            if request.quality:
+                content_type = "image/jpeg"
+                ext = "jpg"
+            else:
+                content_type = "image/png"
+                ext = "png"
+
+            filename = filename_for_url(request.url, ext=ext)
+
+            # Return the image
+            return Response(
+                content=screenshot_bytes,
+                media_type=content_type,
+                headers={
+                    "Content-Disposition": f"inline; filename={filename}"
+                }
+            )
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            try:
+                await asyncio.wait_for(page.close(), timeout=5.0)
+            except asyncio.TimeoutError:
+                logger.error("Tab close timed out after 5s")
+            except Exception as e:
+                logger.error(f"Error closing tab: {e}")
 
 
 @app.post("/html", tags=["content"], summary="Extract HTML Content")
-async def html(request: HtmlRequest) -> HTMLResponse:
+async def html(request: HtmlRequest, fastapi_request: Request) -> HTMLResponse:
     """Extract HTML content from a page"""
-    browser = await get_browser()
+    async with app.state.screenshot_semaphore:
+        if await fastapi_request.is_disconnected():
+            raise HTTPException(status_code=499, detail="Client disconnected")
 
-    shot_config = ShotConfig({
-        "url": request.url,
-        "timeout": request.timeout // 1000,  # Convert to seconds
-        "wait": request.wait,
-        "javascript": request.javascript,
-        "silent": True
-    })
+        browser = await get_browser()
 
-    page = await create_tab_context(browser, shot_config)
+        shot_config = ShotConfig({
+            "url": request.url,
+            "timeout": request.timeout // 1000,  # Convert to seconds
+            "wait": request.wait,
+            "javascript": request.javascript,
+            "silent": True
+        })
 
-    try:
-        await navigate_to_url(page, shot_config)
+        page = await create_tab_context(browser, shot_config)
 
-        # Extract HTML
-        if request.selector:
-            element = await page.select(request.selector)
-            if element:
-                html_content = await element.get_html()
+        try:
+            if await fastapi_request.is_disconnected():
+                raise HTTPException(status_code=499, detail="Client disconnected")
+
+            await navigate_to_url(page, shot_config)
+
+            if await fastapi_request.is_disconnected():
+                raise HTTPException(status_code=499, detail="Client disconnected")
+
+            # Extract HTML
+            if request.selector:
+                element = await page.select(request.selector)
+                if element:
+                    html_content = await element.get_html()
+                else:
+                    raise HTTPException(status_code=404, detail=f"Selector '{request.selector}' not found")
             else:
-                raise HTTPException(status_code=404, detail=f"Selector '{request.selector}' not found")
-        else:
-            html_content = await page.get_content()
+                html_content = await page.get_content()
 
-        return HTMLResponse(content=html_content, status_code=200)
+            return HTMLResponse(content=html_content, status_code=200)
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        await page.close()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            try:
+                await asyncio.wait_for(page.close(), timeout=5.0)
+            except asyncio.TimeoutError:
+                logger.error("Tab close timed out after 5s")
+            except Exception as e:
+                logger.error(f"Error closing tab: {e}")
 
 
 @click.command()
@@ -702,7 +746,13 @@ async def html(request: HtmlRequest) -> HTMLResponse:
     default=lambda: int(os.getenv("WORKERS", "1")),
     help="Number of worker processes (default: 1, can be overridden with WORKERS env var)"
 )
-def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, headful, reduced_motion,
+@click.option(
+    "--max-concurrent",
+    type=int,
+    default=lambda: int(os.getenv("SHOT_API_MAX_CONCURRENT", "10")),
+    help="Maximum concurrent screenshots per worker (default: 10, can be overridden with SHOT_API_MAX_CONCURRENT env var)"
+)
+def main(browser_args, host, port, reload, workers, max_concurrent, user_agent, enable_gpu, headful, reduced_motion,
          ad_block, paywall_block, trigger_lazy_load):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
@@ -716,6 +766,7 @@ def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, head
     app.state.ad_block = ad_block
     app.state.paywall_block = paywall_block
     app.state.trigger_lazy_load = trigger_lazy_load
+    app.state.max_concurrent = max_concurrent
 
     click.echo(f"Starting Shot Power Scraper API Server on {host}:{port}")
     click.echo(f"API documentation available at http://{host}:{port}/docs")
@@ -757,6 +808,7 @@ def main(browser_args, host, port, reload, workers, user_agent, enable_gpu, head
     os.environ.setdefault("SHOT_API_AD_BLOCK", "1" if ad_block else "")
     os.environ.setdefault("SHOT_API_PAYWALL_BLOCK", "1" if paywall_block else "")
     os.environ.setdefault("SHOT_API_TRIGGER_LAZY_LOAD", "1" if trigger_lazy_load else "")
+    os.environ.setdefault("SHOT_API_MAX_CONCURRENT", str(max_concurrent))
 
     # Use import string when workers > 1 or reload is enabled
     if workers > 1 or reload:
