@@ -27,9 +27,9 @@
 
 /******************************************************************************/
 
-const argsList = ["","div[style=\"background-color: rgba(0, 0, 0, 0.4); position: fixed; min-width: 100%; min-height: 100%; inset: 0px; z-index: 999999;\"]"];
-const argsSeqs = [0,1];
-const hostnamesMap = new Map([["cnn.com",1]]);
+const argsList = ["","div[style=\"background-color: rgba(0, 0, 0, 0.4); position: fixed; min-width: 100%; min-height: 100%; inset: 0px; z-index: 999999;\"]",".gcj-popup-overlay"];
+const argsSeqs = [0,1,2];
+const hostnamesMap = new Map([["cnn.com",1],["www.gcj.news",2]]);
 const hasEntities = false;
 
 self.specificImports = self.specificImports || [];

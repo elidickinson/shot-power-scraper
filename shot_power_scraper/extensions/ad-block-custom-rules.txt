@@ -16,8 +16,8 @@
 ! For rule syntax, see: https://adblockplus.org/filter-cheatsheet
 
 ! === COSMETIC RULES (Element Hiding) ===
-! CNN cookie consent overlay
 cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-width: 100%; min-height: 100%; inset: 0px; z-index: 999999;"]
+www.gcj.news##.gcj-popup-overlay
 
 ! General popup/modal elements
 ##.elementor-popup-modal
@@ -33,6 +33,13 @@ cnn.com##div[style="background-color: rgba(0, 0, 0, 0.4); position: fixed; min-w
 ##.pum-overlay.popmake-overlay
 ##.popup-wrapper__content--active
 ##section#hy-lead-magnet-section
+##.cp-popup-container[data-module-type="modal_popup"]
+##dialog.popup
+###signup[role="dialog"]
+###global-popup.modal
+##.modal.is-active
+##.jetpack-subscribe-overlay.open
+##.modal1.is-active
 
 ! === NETWORK RULES (URL Blocking) ===
 ! Block CNN cookie/privacy script

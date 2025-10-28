@@ -159,15 +159,6 @@
     }
    ],
    [
-    "trusted-set-constant",
-    {
-     "hostnames": [
-      "*"
-     ],
-     "world": "MAIN"
-    }
-   ],
-   [
     "spoof-css",
     {
      "hostnames": [
@@ -339,6 +330,15 @@
       "*"
      ],
      "world": "ISOLATED"
+    }
+   ],
+   [
+    "trusted-set-constant",
+    {
+     "hostnames": [
+      "*"
+     ],
+     "world": "MAIN"
     }
    ],
    [
@@ -4266,6 +4266,20 @@
       "arcadiaportal.gr",
       "kavalanews.gr",
       "kolydas.gr"
+     ],
+     "world": "MAIN"
+    }
+   ]
+  ]
+ ],
+ [
+  "hrv-0",
+  [
+   [
+    "set-constant",
+    {
+     "hostnames": [
+      "olx.ba"
      ],
      "world": "MAIN"
     }
@@ -8437,6 +8451,7 @@
       "gocmod.com",
       "goctruyentranhvui17.com",
       "gotphim.com",
+      "haysexdam.info",
       "haysexvl.net",
       "hentaivc.com",
       "hh2d.tv",
@@ -8461,6 +8476,7 @@
       "nettruyenar.com",
       "nettruyenvia.com",
       "p.thoctv.com",
+      "petmoustache.com",
       "phim.haysex.asia",
       "phim18hdxx.com",
       "phimlongtieng.net",
@@ -8474,7 +8490,6 @@
       "s4.chinav.sex",
       "saigon24.net",
       "sayhentaii.ink",
-      "sexdepvn.me",
       "sexdiary.club",
       "sextop1.show",
       "soha.vn",
@@ -8497,7 +8512,6 @@
       "vailonxx.co",
       "vanphatelectric.com",
       "viet69.my",
-      "vintagegraphics.co.uk",
       "vlxx.bz",
       "vn2.xvideos69.xxx",
       "vn5.sexviet88.xyz",
@@ -8587,6 +8601,7 @@
       "cafef.vn",
       "cliphot69.pics",
       "clipsex.cam",
+      "flightcar.com",
       "freeplayervideo.com",
       "gamek.vn",
       "genk.vn",
@@ -8597,7 +8612,6 @@
       "player-cdn.com",
       "sexdiaryx.to",
       "soha.vn",
-      "streettokitchen.com",
       "tailieumoi.vn",
       "thanhnien.vn",
       "tuoitre.vn",
