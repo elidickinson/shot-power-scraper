@@ -134,7 +134,7 @@ async def lifespan(app: FastAPI):
         try:
             await browser_instance.stop()
         except Exception as e:
-            logger.warning(f"Error stopping browser during shutdown: {e}")
+            logger.error(f"Error stopping browser during shutdown: {e}")
         browser_instance = None
 
 
@@ -314,21 +314,15 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Request: {request.method} {request.url.path} from {request.client.host if request.client else 'unknown'}")
 
     # Process request
-    try:
-        response = await call_next(request)
+    response = await call_next(request)
 
-        # Calculate response time
-        duration = (datetime.now() - start_time).total_seconds()
+    # Calculate response time
+    duration = (datetime.now() - start_time).total_seconds()
 
-        # Log response
-        logger.info(f"Response: {response.status_code} - {duration:.3f}s")
+    # Log response
+    logger.info(f"Response: {response.status_code} - {duration:.3f}s")
 
-        return response
-
-    except Exception as e:
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.error(f"Request failed after {duration:.3f}s: {str(e)}")
-        raise
+    return response
 
 
 @app.get("/api", tags=["utility"], summary="API Information")
@@ -651,8 +645,6 @@ async def shot(request: ShotRequest, fastapi_request: Request):
                 }
             )
 
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
         finally:
             try:
                 await asyncio.wait_for(page.close(), timeout=5.0)
@@ -702,8 +694,6 @@ async def html(request: HtmlRequest, fastapi_request: Request) -> HTMLResponse:
 
             return HTMLResponse(content=html_content, status_code=200)
 
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
         finally:
             try:
                 await asyncio.wait_for(page.close(), timeout=5.0)
