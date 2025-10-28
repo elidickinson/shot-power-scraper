@@ -16,12 +16,14 @@ The easiest way to install this tool is with `uv`:
 uv tool install git+https://github.com/elidickinson/shot-power-scraper.git
 ```
 
-Then run the `install` command to verify that it can find your browser:
+Then run the `install` command to test browser detection and set up the correct user agent for stealth mode:
 ```bash
 shot-power-scraper install
 ```
 
 **Requirements**: Google Chrome or Chromium must be installed on your system. No separate driver installation is required.
+
+**Testing**: The test suite runs on macOS CI in GitHub Actions and includes both unit tests and browser integration tests.
 
 ## Taking your first screenshot
 
@@ -117,12 +119,12 @@ This fork has some important differences from the original. It only supports Chr
 ### 🚫 **Commands & Features That Don't Work**
 - `shot-power-scraper accessibility` - Not implemented.
 - `--log-requests` option is not implemented.
-- Selectors like `-s` don't currently work correctly with screenshots
 - `--quality` to specify JPEG quality not implemented.
 
 ### 🔄 **Commands With Limited Functionality**
 - Console logging (`--log-console`) - Basic CDP implementation, may miss some message types.
 - Browser selection (`--browser`) - Only Chrome/Chromium is supported.
+- HAR recording (`har` command) - Content bodies not included in the archive.
 
 ## 📋 **Command Status**
 
@@ -132,7 +134,7 @@ This fork has some important differences from the original. It only supports Chr
 - ✅ `javascript`: Fully Implemented
 - ✅ `html`: Fully Implemented
 - ✅ `mhtml`: Fully Implemented - Create MHTML web page archives
-- ✅ `har`: Fully Implemented - Record HTTP Archive files
+- ✅ `har`: Implemented (limited) - Record HTTP Archive files (content bodies not included)
 - ✅ `auth`: Fully Implemented
 - ✅ `install`: Fully Implemented - also sets up user agent for stealth mode
 - ✅ `config`: Fully Implemented
