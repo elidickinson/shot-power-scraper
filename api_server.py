@@ -20,6 +20,22 @@ Example server startup:
     # Start server on different host/port
     python api_server.py --host 0.0.0.0 --port 8080
 
+Environment Variables:
+    Configuration via environment variables (primary method for containers/systemd):
+
+    SHOT_API_AD_BLOCK=1               # Enable ad blocking
+    SHOT_API_PAYWALL_BLOCK=1           # Enable paywall bypass
+    SHOT_API_TRIGGER_LAZY_LOAD=1       # Enable lazy load by default
+    SHOT_API_ENABLE_GPU=1              # Enable GPU acceleration
+    SHOT_API_HEADFUL=1                 # Run browser in headful mode
+    SHOT_API_REDUCED_MOTION=1          # Emulate reduced motion
+    SHOT_API_USER_AGENT="Custom Agent" # Set custom user agent
+    SHOT_API_BROWSER_ARGS="--arg1,--arg2"  # Browser args (comma-separated)
+    SHOT_API_MAX_CONCURRENT=10         # Max concurrent screenshots per worker
+    PRELOAD_BROWSER=true               # Preload browser on startup (default: true)
+
+    Note: CLI flags automatically set these environment variables.
+
 Example API calls:
     # Simple screenshot
     curl -X POST http://localhost:8123/shot \
@@ -117,14 +133,14 @@ async def lifespan(app: FastAPI):
     global browser_instance
 
     # Create semaphore for concurrency control
-    max_concurrent = int(os.getenv("SHOT_API_MAX_CONCURRENT", "10")) if not hasattr(app.state, 'max_concurrent') else app.state.max_concurrent
+    max_concurrent = int(os.getenv("SHOT_API_MAX_CONCURRENT", "10"))
     app.state.screenshot_semaphore = asyncio.Semaphore(max_concurrent)
     logger.info(f"Initialized screenshot semaphore with max_concurrent={max_concurrent}")
 
     if os.getenv("PRELOAD_BROWSER", "true").lower() in ("true", "1", "yes"):
-        # Read browser args from env (for multi-worker) or app.state (single worker)
+        # Read browser args from environment variables
         env_args = os.getenv("SHOT_API_BROWSER_ARGS")
-        browser_args = env_args.split(",") if env_args else getattr(app.state, 'browser_args', [])
+        browser_args = env_args.split(",") if env_args else []
         await get_browser(browser_args=browser_args)
 
     yield
@@ -242,13 +258,13 @@ async def get_browser(browser_args=None):
         Config.verbose = os.getenv("VERBOSE", "").lower() in ("true", "1", "yes")
         Config.silent = not Config.verbose
 
-        # Read configuration from environment variables (for multi-worker) or app.state (single worker)
-        enable_gpu = os.getenv("SHOT_API_ENABLE_GPU") == "1" or getattr(app.state, 'enable_gpu', False)
-        ad_block = os.getenv("SHOT_API_AD_BLOCK") == "1" or getattr(app.state, 'ad_block', False)
-        paywall_block = os.getenv("SHOT_API_PAYWALL_BLOCK") == "1" or getattr(app.state, 'paywall_block', False)
-        headful = os.getenv("SHOT_API_HEADFUL") == "1" or getattr(app.state, 'headful', False)
-        reduced_motion = os.getenv("SHOT_API_REDUCED_MOTION") == "1" or getattr(app.state, 'reduced_motion', False)
-        user_agent = os.getenv("SHOT_API_USER_AGENT") or getattr(app.state, 'user_agent', None)
+        # Read configuration from environment variables
+        enable_gpu = os.getenv("SHOT_API_ENABLE_GPU") == "1"
+        ad_block = os.getenv("SHOT_API_AD_BLOCK") == "1"
+        paywall_block = os.getenv("SHOT_API_PAYWALL_BLOCK") == "1"
+        headful = os.getenv("SHOT_API_HEADFUL") == "1"
+        reduced_motion = os.getenv("SHOT_API_REDUCED_MOTION") == "1"
+        user_agent = os.getenv("SHOT_API_USER_AGENT")
 
         # Parse browser args from env if not provided
         if not browser_args:
@@ -256,7 +272,7 @@ async def get_browser(browser_args=None):
             if env_args:
                 browser_args = env_args.split(",")
             else:
-                browser_args = getattr(app.state, 'browser_args', [])
+                browser_args = []
 
         # Set global Config values
         Config.enable_gpu = enable_gpu
@@ -328,13 +344,13 @@ async def log_requests(request: Request, call_next):
 @app.get("/api", tags=["utility"], summary="API Information")
 async def api_info():
     """API information and server settings"""
-    # Read from env vars (for multi-worker) or app.state (single worker)
-    ad_block = os.getenv("SHOT_API_AD_BLOCK") == "1" or getattr(app.state, 'ad_block', False)
-    paywall_block = os.getenv("SHOT_API_PAYWALL_BLOCK") == "1" or getattr(app.state, 'paywall_block', False)
-    user_agent = os.getenv("SHOT_API_USER_AGENT") or getattr(app.state, 'user_agent', None)
-    enable_gpu = os.getenv("SHOT_API_ENABLE_GPU") == "1" or getattr(app.state, 'enable_gpu', False)
-    reduced_motion = os.getenv("SHOT_API_REDUCED_MOTION") == "1" or getattr(app.state, 'reduced_motion', False)
-    trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1" or getattr(app.state, 'trigger_lazy_load', False)
+    # Read from environment variables
+    ad_block = os.getenv("SHOT_API_AD_BLOCK") == "1"
+    paywall_block = os.getenv("SHOT_API_PAYWALL_BLOCK") == "1"
+    user_agent = os.getenv("SHOT_API_USER_AGENT")
+    enable_gpu = os.getenv("SHOT_API_ENABLE_GPU") == "1"
+    reduced_motion = os.getenv("SHOT_API_REDUCED_MOTION") == "1"
+    trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1"
 
     blocking_features = []
     if ad_block:
@@ -580,7 +596,7 @@ async def shot(request: ShotRequest, fastapi_request: Request):
         browser = await get_browser()
 
         # Use server-level trigger_lazy_load as default if request doesn't specify
-        server_trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1" or getattr(app.state, 'trigger_lazy_load', False)
+        server_trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1"
         trigger_lazy_load = request.trigger_lazy_load if request.trigger_lazy_load is not None else server_trigger_lazy_load
 
         # Build shot configuration
@@ -747,17 +763,6 @@ def main(browser_args, host, port, reload, workers, max_concurrent, user_agent, 
     """Start the Shot Power Scraper API Server"""
     import uvicorn
 
-    # Store browser args and blocking options in app state for lifespan to access
-    app.state.browser_args = list(browser_args)
-    app.state.user_agent = user_agent
-    app.state.enable_gpu = enable_gpu
-    app.state.headful = headful
-    app.state.reduced_motion = reduced_motion
-    app.state.ad_block = ad_block
-    app.state.paywall_block = paywall_block
-    app.state.trigger_lazy_load = trigger_lazy_load
-    app.state.max_concurrent = max_concurrent
-
     click.echo(f"Starting Shot Power Scraper API Server on {host}:{port}")
     click.echo(f"API documentation available at http://{host}:{port}/docs")
 
@@ -783,11 +788,9 @@ def main(browser_args, host, port, reload, workers, max_concurrent, user_agent, 
         click.echo(f"Running with {workers} worker processes")
 
     # Set environment variables for worker processes to read
-    # This is necessary because workers > 1 causes each process to import the module fresh
-    # TODO: Document SHOT_API_* environment variables as a first-class configuration method
-    #       and consider making them the primary way to configure the server (more standard
-    #       for containerized deployments, systemd services, etc.) rather than CLI flags.
-    #       Should also validate/parse them more robustly and centralize the reading logic.
+    # This is necessary because workers > 1 causes each process to import the module fresh.
+    # SHOT_API_* environment variables are now the primary configuration method - CLI flags
+    # set these env vars which are then read by all workers (both single and multi-worker).
     if browser_args:
         os.environ.setdefault("SHOT_API_BROWSER_ARGS", ",".join(browser_args))
     if user_agent:
