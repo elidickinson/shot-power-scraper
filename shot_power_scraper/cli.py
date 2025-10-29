@@ -18,25 +18,6 @@ from shot_power_scraper.shot_config import ShotConfig, set_config_value
 BROWSERS = ("chromium", "chrome", "chrome-beta")
 
 
-def run_nodriver_async(coro):
-    """Run an async coroutine with nodriver event loop, cleanup warnings, and delay"""
-    import warnings
-    # Suppress harmless cleanup warnings from nodriver
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore",
-                              message=".*Task was destroyed but it is pending.*",
-                              category=RuntimeWarning)
-
-        async def coro_with_cleanup():
-            result = await coro
-            await asyncio.sleep(0.1)  # Give nodriver time to cleanup background processes
-            return result
-
-        # Use nodriver's event loop as recommended in their docs
-        loop = uc.loop()
-        return loop.run_until_complete(coro_with_cleanup())
-
-
 def run_browser_command(command_func, shot_config, **kwargs):
     """ Create a browser, set up a tab, execute command async, and tear it down """
     async def browser_execution():
@@ -68,7 +49,7 @@ def run_browser_command(command_func, shot_config, **kwargs):
         finally:
             await cleanup_browser(browser_obj)
 
-    return run_nodriver_async(browser_execution())
+    return uc.loop().run_until_complete(browser_execution())
 
 
 def setup_common_config(verbose, debug, silent, skip, fail, enable_gpu=False):
@@ -444,7 +425,7 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
             if har_file and not silent:
                 click.echo(f"Wrote to HAR file: {har_file}", err=True)
 
-    run_nodriver_async(run_multi())
+    uc.loop().run_until_complete(run_multi())
 
 
 @cli.command()
@@ -518,19 +499,19 @@ def har(url, zip_, output, javascript, no_response_bodies,
     async def execute_har(page, **kwargs):
         from shot_power_scraper.page_utils import navigate_to_url
         from shot_power_scraper.har_capture import HARCollector
-        
+
         # Set up HAR collection before navigation
         collector = HARCollector(include_response_bodies=not no_response_bodies)
         await collector.setup(page)
         collector.start_recording()
-        
+
         # Navigate to the page
         await navigate_to_url(page, shot_config)
-        
+
         # Wait a moment for any remaining network activity
         import asyncio
         await asyncio.sleep(1)
-        
+
         # Get the HAR data
         har_data = await collector.stop_recording(page)
         return har_data
@@ -544,7 +525,7 @@ def har(url, zip_, output, javascript, no_response_bodies,
         # Create compressed HAR file
         import zipfile
         import io
-        
+
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             # Use base filename without .zip extension for the inner file
@@ -552,7 +533,7 @@ def har(url, zip_, output, javascript, no_response_bodies,
             if not inner_name.endswith('.har'):
                 inner_name += '.har'
             zip_file.writestr(inner_name, har_json)
-        
+
         with open(output, "wb") as f:
             f.write(zip_buffer.getvalue())
     else:
