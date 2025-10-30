@@ -80,6 +80,17 @@ Example API calls:
         }' \
         | jq '.html'
 
+    # Combined screenshot + HTML capture
+    curl -X POST http://localhost:8123/capture \
+        -H "Content-Type: application/json" \
+        -d '{"url": "https://example.com"}' > capture.json
+
+    # Extract screenshot from response
+    cat capture.json | jq -r '.screenshot' | base64 -d > screenshot.png
+
+    # Extract HTML from response
+    cat capture.json | jq -r '.html' > page.html
+
 Known Issues:
     - Popup/Child Tab Leak: If a page opens popup windows or child tabs (via window.open,
       target="_blank", etc.), those tabs are NOT automatically tracked or closed. Over time,
@@ -89,6 +100,7 @@ Known Issues:
 """
 
 import asyncio
+import base64
 import logging
 import os
 import re
@@ -250,6 +262,53 @@ class HtmlRequest(BaseRequest):
         }
 
 
+class CaptureRequest(BaseRequest):
+    """Request model for combined screenshot + HTML capture (full page only)"""
+    width: Optional[int] = Field(None, description="Viewport width in pixels")
+    height: Optional[int] = Field(None, description="Viewport height in pixels")
+    quality: Optional[int] = Field(None, description="JPEG quality (1-100), PNG if not specified")
+    javascript: Optional[str] = Field(None, description="JavaScript to execute before capture")
+    wait: Optional[int] = Field(None, description="Wait time in milliseconds")
+    wait_for: Optional[str] = Field(None, description="JavaScript expression to wait for")
+    timeout: Optional[int] = Field(30000, description="Timeout in milliseconds")
+    omit_background: Optional[bool] = Field(False, description="Omit background for transparency")
+    skip_challenge_page_check: Optional[bool] = Field(False, description="Skip Cloudflare detection")
+    skip_wait_for_load: Optional[bool] = Field(False, description="Skip waiting for page load")
+    trigger_lazy_load: Optional[bool] = Field(False, description="Trigger lazy loading")
+    user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "url": "https://example.com",
+                "width": 1280,
+                "height": 720,
+                "quality": 85,
+                "wait": 1000
+            }
+        }
+
+
+class CaptureResponse(BaseModel):
+    """Response model for combined capture"""
+    screenshot: str = Field(..., description="Base64-encoded screenshot image")
+    screenshot_format: str = Field(..., description="Image format: 'png' or 'jpeg'")
+    html: str = Field(..., description="Full page HTML content")
+    url: str = Field(..., description="URL that was captured")
+    filename: str = Field(..., description="Suggested filename for screenshot")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "screenshot": "iVBORw0KGgoAAAANSUhEUgAAAAUA...",
+                "screenshot_format": "png",
+                "html": "<!DOCTYPE html><html>...</html>",
+                "url": "https://example.com",
+                "filename": "example-com.png"
+            }
+        }
+
+
 async def get_browser(browser_args=None):
     """Get or create a shared browser instance"""
     global browser_instance
@@ -364,6 +423,7 @@ async def api_info():
         "endpoints": {
             "/shot": "POST - Take a screenshot",
             "/html": "POST - Extract HTML content",
+            "/capture": "POST - Capture screenshot + HTML in one request",
             "/api": "GET - API information"
         },
         "documentation": {
@@ -709,6 +769,83 @@ async def html(request: HtmlRequest, fastapi_request: Request) -> HTMLResponse:
                 html_content = await page.get_content()
 
             return HTMLResponse(content=html_content, status_code=200)
+
+        finally:
+            try:
+                await asyncio.wait_for(page.close(), timeout=5.0)
+            except asyncio.TimeoutError:
+                logger.error("Tab close timed out after 5s")
+            except Exception as e:
+                logger.error(f"Error closing tab: {e}")
+
+
+@app.post("/capture", tags=["screenshots"], summary="Capture Screenshot + HTML", response_model=CaptureResponse)
+async def capture(request: CaptureRequest, fastapi_request: Request):
+    """Capture both full-page screenshot and HTML content in a single request"""
+    async with app.state.screenshot_semaphore:
+        if await fastapi_request.is_disconnected():
+            raise HTTPException(status_code=499, detail="Client disconnected")
+
+        browser = await get_browser()
+
+        # Use server-level trigger_lazy_load as default if request doesn't specify
+        server_trigger_lazy_load = os.getenv("SHOT_API_TRIGGER_LAZY_LOAD") == "1"
+        trigger_lazy_load = request.trigger_lazy_load if request.trigger_lazy_load is not None else server_trigger_lazy_load
+
+        # Build shot configuration
+        shot_config = ShotConfig({
+            "url": request.url,
+            "width": request.width,
+            "height": request.height,
+            "javascript": request.javascript,
+            "quality": request.quality,
+            "wait": request.wait,
+            "wait_for": request.wait_for,
+            "timeout": request.timeout // 1000 if request.timeout else 30,  # Convert to seconds
+            "omit_background": request.omit_background,
+            "skip_challenge_page_check": request.skip_challenge_page_check,
+            "skip_wait_for_load": request.skip_wait_for_load,
+            "trigger_lazy_load": trigger_lazy_load,
+            "silent": True
+        })
+
+        page = await create_tab_context(browser, shot_config)
+
+        try:
+            if await fastapi_request.is_disconnected():
+                raise HTTPException(status_code=499, detail="Client disconnected")
+
+            await navigate_to_url(page, shot_config)
+
+            if await fastapi_request.is_disconnected():
+                raise HTTPException(status_code=499, detail="Client disconnected")
+
+            # Take screenshot
+            screenshot_bytes = await take_shot(
+                page,
+                shot_config,
+                return_bytes=True,
+                skip_navigation=True,
+            )
+
+            # Extract full-page HTML
+            html_content = await page.get_content()
+
+            # Determine format and filename
+            screenshot_format = "jpeg" if request.quality else "png"
+            ext = "jpg" if request.quality else "png"
+            filename = filename_for_url(request.url, ext=ext)
+
+            # Base64 encode screenshot
+            screenshot_base64 = base64.b64encode(screenshot_bytes).decode('utf-8')
+
+            return CaptureResponse(
+                screenshot=screenshot_base64,
+                screenshot_format=screenshot_format,
+                html=html_content,
+                url=request.url,
+                filename=filename
+            )
 
         finally:
             try:
