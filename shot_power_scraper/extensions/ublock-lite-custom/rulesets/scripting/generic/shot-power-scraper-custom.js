@@ -27,7 +27,7 @@
 
 /******************************************************************************/
 
-const genericSelectorMap = [[2707,".elementor-popup-modal"],[3316,"div.newspack-popup-container"],[2050,".CampaignType--popup"],[872,".fancybox-overlay"],[2812,".ays-pb-close-popup-with-esc"],[764,".et_bloom_popup"],[1976,".sqs-popup-overlay"],[992,".modal[aria-label=\"Promotional pop up\"],\n.modal.is-active"],[2022,".oxy-modal-backdrop"],[3207,".pum-overlay.popmake-overlay"],[2453,".popup-wrapper__content--active"],[2040,"section#hy-lead-magnet-section"],[2467,".cp-popup-container[data-module-type=\"modal_popup\"]"],[2145,"dialog.popup"],[3763,"#signup[role=\"dialog\"]"],[2737,"#global-popup.modal"],[469,".jetpack-subscribe-overlay.open"],[3346,".modal1.is-active"]];
+const genericSelectorMap = [[2707,".elementor-popup-modal"],[3316,"div.newspack-popup-container"],[2050,".CampaignType--popup"],[872,".fancybox-overlay"],[2812,".ays-pb-close-popup-with-esc"],[764,".et_bloom_popup"],[1976,".sqs-popup-overlay"],[992,".modal[aria-label=\"Promotional pop up\"],\n.modal.is-active"],[2022,".oxy-modal-backdrop"],[3207,".pum-overlay.popmake-overlay"],[2453,".popup-wrapper__content--active"],[2040,"section#hy-lead-magnet-section"],[2467,".cp-popup-container[data-module-type=\"modal_popup\"]"],[2145,"dialog.popup"],[3763,"#signup[role=\"dialog\"]"],[2737,"#global-popup.modal"],[469,".jetpack-subscribe-overlay.open"],[3346,".modal1.is-active"],[679,"#ocn-cookie-wrap"],[3760,"#ROuPvtIdXyOZro"],[1925,"#xdBWbPneRFmtMom"]];
 const genericExceptionSieve = undefined;
 const genericExceptionMap = undefined;
 

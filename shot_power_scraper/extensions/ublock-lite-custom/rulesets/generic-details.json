@@ -3,6 +3,7 @@
   "ublock-filters",
   {
    "unhide": [
+    "10.com.au",
     "1000ps.de",
     "1001tracklists.com",
     "101soundboards.com",
@@ -10,6 +11,7 @@
     "1stcollegescholarship.net",
     "1warie.com",
     "25cineframes.com",
+    "2ix2tv.de",
     "3amid-url.blogspot.com",
     "3dmonitortips.com",
     "3dpchip.com",
@@ -1416,7 +1418,6 @@
    "unhide": [
     "archiveteam.org",
     "docs.qq.com",
-    "flattr.com",
     "fontawesome.com",
     "github.com",
     "github.io",

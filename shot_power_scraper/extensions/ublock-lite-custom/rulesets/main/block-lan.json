@@ -139,6 +139,24 @@
  },
  "condition": {
   "initiatorDomains": [
+   "azure.com",
+   "entra.microsoft.com",
+   "m365.cloud.microsoft"
+  ],
+  "resourceTypes": [
+   "xmlhttprequest"
+  ],
+  "urlFilter": "||login.microsoftonline.com/*/oauth2/"
+ },
+ "id": 4,
+ "priority": 30
+},
+{
+ "action": {
+  "type": "allow"
+ },
+ "condition": {
+  "initiatorDomains": [
    "battlelog.battlefield.com",
    "figma.com"
   ],
@@ -147,7 +165,7 @@
   ],
   "urlFilter": "||127.0.0.1^"
  },
- "id": 4,
+ "id": 5,
  "priority": 30
 },
 {
@@ -163,7 +181,7 @@
   ],
   "urlFilter": "||localhost^"
  },
- "id": 5,
+ "id": 6,
  "priority": 30
 },
 {
@@ -177,7 +195,7 @@
   ],
   "urlFilter": "||127.0.0.1^"
  },
- "id": 6,
+ "id": 7,
  "priority": 30
 },
 {
@@ -196,7 +214,7 @@
   ],
   "urlFilter": "[::1]^"
  },
- "id": 7,
+ "id": 8,
  "priority": 10
 },
 {
@@ -215,7 +233,7 @@
   ],
   "urlFilter": "[::]^"
  },
- "id": 8,
+ "id": 9,
  "priority": 10
 },
 {
@@ -235,7 +253,7 @@
   ],
   "urlFilter": "||plex.direct^"
  },
- "id": 9,
+ "id": 10,
  "priority": 10
 }
 ]

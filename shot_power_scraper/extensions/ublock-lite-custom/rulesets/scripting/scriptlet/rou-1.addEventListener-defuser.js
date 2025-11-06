@@ -20,41 +20,93 @@
 
 */
 
-// ruleset: ublock-filters
+// ruleset: rou-1
 
 // Important!
 // Isolate from global scope
 
 // Start of local scope
-(function uBOL_preventSetInterval() {
+(function uBOL_addEventListenerDefuser() {
 
 /******************************************************************************/
 
-function preventSetInterval(
-    needleRaw = '',
-    delayRaw = ''
+function addEventListenerDefuser(
+    type = '',
+    pattern = ''
 ) {
     const safe = safeSelf();
-    const logPrefix = safe.makeLogPrefix('prevent-setInterval', needleRaw, delayRaw);
-    const needleNot = needleRaw.charAt(0) === '!';
-    const reNeedle = safe.patternToRegex(needleNot ? needleRaw.slice(1) : needleRaw);
-    const range = new RangeParser(delayRaw);
-    proxyApplyFn('setInterval', function(context) {
-        const { callArgs } = context;
-        const a = callArgs[0] instanceof Function
-            ? safe.String(safe.Function_toString(callArgs[0]))
-            : safe.String(callArgs[0]);
-        const b = callArgs[1];
-        if ( needleRaw === '' && range.unbound() ) {
-            safe.uboLog(logPrefix, `Called:\n${a}\n${b}`);
-            return context.reflect();
+    const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
+    const logPrefix = safe.makeLogPrefix('prevent-addEventListener', type, pattern);
+    const reType = safe.patternToRegex(type, undefined, true);
+    const rePattern = safe.patternToRegex(pattern);
+    const debug = shouldDebug(extraArgs);
+    const targetSelector = extraArgs.elements || undefined;
+    const elementMatches = elem => {
+        if ( targetSelector === 'window' ) { return elem === window; }
+        if ( targetSelector === 'document' ) { return elem === document; }
+        if ( elem && elem.matches && elem.matches(targetSelector) ) { return true; }
+        const elems = Array.from(document.querySelectorAll(targetSelector));
+        return elems.includes(elem);
+    };
+    const elementDetails = elem => {
+        if ( elem instanceof Window ) { return 'window'; }
+        if ( elem instanceof Document ) { return 'document'; }
+        if ( elem instanceof Element === false ) { return '?'; }
+        const parts = [];
+        // https://github.com/uBlockOrigin/uAssets/discussions/17907#discussioncomment-9871079
+        const id = String(elem.id);
+        if ( id !== '' ) { parts.push(`#${CSS.escape(id)}`); }
+        for ( let i = 0; i < elem.classList.length; i++ ) {
+            parts.push(`.${CSS.escape(elem.classList.item(i))}`);
         }
-        if ( reNeedle.test(a) !== needleNot && range.test(b) ) {
-            callArgs[0] = function(){};
-            safe.uboLog(logPrefix, `Prevented:\n${a}\n${b}`);
+        for ( let i = 0; i < elem.attributes.length; i++ ) {
+            const attr = elem.attributes.item(i);
+            if ( attr.name === 'id' ) { continue; }
+            if ( attr.name === 'class' ) { continue; }
+            parts.push(`[${CSS.escape(attr.name)}="${attr.value}"]`);
+        }
+        return parts.join('');
+    };
+    const shouldPrevent = (thisArg, type, handler) => {
+        const matchesType = safe.RegExp_test.call(reType, type);
+        const matchesHandler = safe.RegExp_test.call(rePattern, handler);
+        const matchesEither = matchesType || matchesHandler;
+        const matchesBoth = matchesType && matchesHandler;
+        if ( debug === 1 && matchesBoth || debug === 2 && matchesEither ) {
+            debugger; // eslint-disable-line no-debugger
+        }
+        if ( matchesBoth && targetSelector !== undefined ) {
+            if ( elementMatches(thisArg) === false ) { return false; }
+        }
+        return matchesBoth;
+    };
+    const proxyFn = function(context) {
+        const { callArgs, thisArg } = context;
+        let t, h;
+        try {
+            t = String(callArgs[0]);
+            if ( typeof callArgs[1] === 'function' ) {
+                h = String(safe.Function_toString(callArgs[1]));
+            } else if ( typeof callArgs[1] === 'object' && callArgs[1] !== null ) {
+                if ( typeof callArgs[1].handleEvent === 'function' ) {
+                    h = String(safe.Function_toString(callArgs[1].handleEvent));
+                }
+            } else {
+                h = String(callArgs[1]);
+            }
+        } catch {
+        }
+        if ( type === '' && pattern === '' ) {
+            safe.uboLog(logPrefix, `Called: ${t}\n${h}\n${elementDetails(thisArg)}`);
+        } else if ( shouldPrevent(thisArg, t, h) ) {
+            return safe.uboLog(logPrefix, `Prevented: ${t}\n${h}\n${elementDetails(thisArg)}`);
         }
         return context.reflect();
-    });
+    };
+    runAt(( ) => {
+        proxyApplyFn('EventTarget.prototype.addEventListener', proxyFn);
+        proxyApplyFn('document.addEventListener', proxyFn);
+    }, extraArgs.runAt);
 }
 
 function proxyApplyFn(
@@ -142,35 +194,33 @@ function proxyApplyFn(
     context[prop] = new Proxy(fn, proxyDetails);
 }
 
-class RangeParser {
-    constructor(s) {
-        this.not = s.charAt(0) === '!';
-        if ( this.not ) { s = s.slice(1); }
-        if ( s === '' ) { return; }
-        const pos = s.indexOf('-');
-        if ( pos !== 0 ) {
-            this.min = this.max = parseInt(s, 10) || 0;
+function runAt(fn, when) {
+    const intFromReadyState = state => {
+        const targets = {
+            'loading': 1, 'asap': 1,
+            'interactive': 2, 'end': 2, '2': 2,
+            'complete': 3, 'idle': 3, '3': 3,
+        };
+        const tokens = Array.isArray(state) ? state : [ state ];
+        for ( const token of tokens ) {
+            const prop = `${token}`;
+            if ( Object.hasOwn(targets, prop) === false ) { continue; }
+            return targets[prop];
         }
-        if ( pos !== -1 ) {
-            this.max = parseInt(s.slice(pos + 1), 10) || Number.MAX_SAFE_INTEGER;
-        }
+        return 0;
+    };
+    const runAt = intFromReadyState(when);
+    if ( intFromReadyState(document.readyState) >= runAt ) {
+        fn(); return;
     }
-    unbound() {
-        return this.min === undefined && this.max === undefined;
-    }
-    test(v) {
-        const n = Math.min(Math.max(Number(v) || 0, 0), Number.MAX_SAFE_INTEGER);
-        if ( this.min === this.max ) {
-            return (this.min === undefined || n === this.min) !== this.not;
-        }
-        if ( this.min === undefined ) {
-            return (n <= this.max) !== this.not;
-        }
-        if ( this.max === undefined ) {
-            return (n >= this.min) !== this.not;
-        }
-        return (n >= this.min && n <= this.max) !== this.not;
-    }
+    const onStateChange = ( ) => {
+        if ( intFromReadyState(document.readyState) < runAt ) { return; }
+        fn();
+        safe.removeEventListener.apply(document, args);
+    };
+    const safe = safeSelf();
+    const args = [ 'readystatechange', onStateChange, { capture: true } ];
+    safe.addEventListener.apply(document, args);
 }
 
 function safeSelf() {
@@ -363,13 +413,18 @@ function safeSelf() {
     return safe;
 }
 
+function shouldDebug(details) {
+    if ( details instanceof Object === false ) { return false; }
+    return scriptletGlobals.canDebug && details.debug;
+}
+
 /******************************************************************************/
 
 const scriptletGlobals = {}; // eslint-disable-line
-const argsList = [["await"],["/1===|\\?void|&&/"],["setInterval"],["fireEvent","500"],["header_menu_abvs","10000"],["adb"],["/0x|google|ecoded|==/"],["readyState"],["_0x"],["adblockerModal","1000"],["user=null","1000"],["_checkBait"],["()","5000"],["_$","12345"],[".append","1000"],["visibility","1000"],["onAdVideoStart"],["/_0x|debug/"],["complete","50"],["document.readyState"],[".submit"],["0x"],["adblocker"],["visibility"],["iframe"],["adsbygoogle"],["innerHTML"],["?key="],["notifyExec"],["/^/"],["height"],["adblock"],["debugger"],[".offsetHeight"],["clearInterval(i)","1000"],["document.getElementById","10000"],["daadb"],["!display"],["afStorage"],["debug"],["ads"],["Click"],["childNodes"],["goog"],["offsetHeight"],[".hide"],["onerror"],["show"],["AB.html"],["analytics.initialized"],["banner"],["/0x|sandCheck/"],["a0b"],["/_0x|dtaf/"],["pop"],["detector"],["aclib"],["/adex|loadAds|adCollapsedCount|ad-?block/i"],["/adb/i"],["EFFECTIVE_APPS_GCB_BLOCKED_MESSAGE"],["blogherads"]];
-const hostnamesMap = new Map([["cdn.gledaitv.*",0],["th.gl",1],["businessinsider.com",2],["tvtoday.de",3],["vaughn.live",4],["economictimes.indiatimes.com",5],["mylink.*",6],["my1ink.*",6],["myl1nk.*",6],["myli3k.*",6],["frprn.com",7],["gogoanimetv.*",8],["xsanime.com",8],["javfull.net",8],["f2movies.to",8],["ipacrack.com",8],["hulkshare.com",9],["faucetcrypto.com",10],["giveawayoftheday.com",11],["uploadbox.io",12],["megafile.io",12],["myjest.com",13],["4shared.com",14],["streameast.*",15],["thestreameast.*",15],["getfreecourses.*",15],["sombex.com",15],["forex-trnd.com",15],["vidlii.com",15],["verteleseriesonline.com",15],["sukidesuost.info",15],["ricettafitness.com",15],["freenote.biz",15],["womenreality.com",15],["portable4pc.com",15],["localizaagencia.com",15],["themes-dl.com",15],["anomize.xyz",15],["casos-aislados.com",15],["freeomovie.to",15],["myviptuto.com",15],["novelasligera.com",15],["rahim-soft.com",15],["dayoftheweek.org",15],["lookimg.com",15],["aemenstore.com",15],["cazzette.com",15],["jncojeans.com",15],["kiemlua.com",15],["kingsleynyc.com",15],["link1s.*",15],["lucidcam.com",15],["medcpu.com",15],["nguyenvanbao.com",15],["nousdecor.com",15],["pennbookcenter.com",15],["restorbio.com",15],["staaker.com",15],["necksdesign.com",15],["larvelfaucet.com",15],["quicasting.it",15],["iptunnels.com",15],["appsfullversion.com",15],["davidgalaxia.com",15],["anonymous-links.com",15],["planet-streaming1.com",15],["unionmanga.xyz",15],["vviruslove.com",15],["unity3diy.blogspot.com",15],["checkfiletype.com",15],["santoinferninho.com",15],["angeloyeo.github.io",15],["csgo-ranks.com",15],["royalkom.com",15],["super-ethanol.com",15],["surf-trx.com",15],["samapkstore.com",15],["shortenbuddy.com",15],["adeth.cc",15],["swift4claim.com",15],["best-shopme.com",15],["tw-hkt.blogspot.com",15],["hugo3c.tw",15],["shortzzy.*",15],["androidtunado.com.br",15],["newsiqra.com",15],["dota2freaks.com",15],["how2pc.com",15],["weviral.org",15],["alltechnerd.com",15],["shoppinglys.blogspot.com",15],["fzm.*",15],["fzmovies.*",15],["komiktap.in",15],["8tm.net",15],["afasiaarchzine.com",15],["getpczone.com",15],["jaysndees.com",15],["mailocal2.xyz",15],["tqanime.com",15],["anime-saikou.com",15],["donghuanosekai.com",15],["jagoanssh.com",15],["pcso-lottoresults.com",15],["todoseriales1.blogspot.com",15],["omgexploits.com",15],["crazyblog.in",15],["short-zero.com",15],["akwam.*",15],["gifans.com",15],["xanimehub.com",15],["clk.asia",15],["imperialstudy.com",15],["skincarie.com",15],["khsm.io",15],["bg-gledai.*",15],["cheatsquad.gg",15],["crunchyroll.com",16],["extremereportbot.com",17],["tubepornclassic.com",[18,19]],["multiup.io",20],["multiup.org",20],["multiup.eu",20],["mangalist.org",21],["javcl.com",21],["gats.io",21],["videovard.*",21],["freereceivesms.com",21],["live.dragaoconnect.net",21],["techmuzz.com",22],["rmcmv.*",23],["lecourrier-du-soir.com",24],["thgss.com",25],["moviemakeronline.com",25],["soninow.com",25],["premid.app",26],["fileguard.cc",27],["thegadgetking.in",28],["zhlednito.cz",29],["girlsofdesire.org",29],["vrcmods.com",30],["adblockeronstape.*",31],["adblockplustape.*",31],["adblockstreamtape.*",31],["adblockstrtape.*",31],["adblockstrtech.*",31],["adblocktape.*",31],["advertisertape.com",31],["antiadtape.*",31],["gettapeads.com",31],["noblocktape.*",31],["stapadblockuser.*",31],["stape.*",31],["strcloud.*",31],["streamadblocker.*",31],["streamadblockplus.*",31],["streamnoads.com",31],["streamta.*",31],["streamtape.*",31],["streamtapeadblockuser.*",31],["strtape.*",31],["strtapeadblock.*",31],["strtapeadblocker.*",31],["strtpe.*",31],["tapeadsenjoyer.com",31],["tapeadvertisement.com",31],["tapeantiads.com",31],["tapeblocker.com",31],["tapelovesads.org",31],["tapenoads.com",31],["tapepops.com",31],["tapewithadblock.org",31],["watchadsontape.com",31],["gamezop.com",32],["filmoviplex.com",32],["beverfood.com",33],["laptrinhx.com",34],["sunhope.it",35],["openculture.com",36],["sushiscan.*",36],["clapway.com",36],["kawarthanow.com",36],["rollstroll.com",36],["007stockchat.com",36],["stockhideout.com",36],["radio.zone",36],["1cloudfile.com",37],["luckydice.net",38],["thedigitalfix.com",39],["erofound.com",40],["newscon.org",40],["animedb.in",40],["fastconverter.net",41],["expresskaszubski.pl",42],["gniewkowo.eu",42],["molotov.tv",43],["ios.codevn.net",44],["oxy.*",45],["wheelofgold.com",46],["davescomputertips.com",47],["chat.tchatche.com",48],["dvm360.com",49],["freshplaza.com",50],["hortidaily.com",50],["vidsrc.*",51],["work.ink",52],["dragontea.ink",53],["javsek.net",54],["ticketmaster.sg",55],["vidlink.pro",56],["servustv.com",57],["bilinovel.com",58],["policesecurity.com",59],["knowyourmeme.com",60]]);
-const exceptionsMap = new Map([["oxy.edu",[45]]]);
-const hasEntities = true;
+const argsList = [["load","ADS"]];
+const hostnamesMap = new Map([["eporno.ro",0],["filme-porno.ro",0]]);
+const exceptionsMap = new Map([]);
+const hasEntities = false;
 const hasAncestors = false;
 
 const collectArgIndices = (hn, map, out) => {
@@ -435,7 +490,7 @@ if ( hasAncestors ) {
 // Apply scriplets
 for ( const i of todoIndices ) {
     if ( tonotdoIndices.has(i) ) { continue; }
-    try { preventSetInterval(...argsList[i]); }
+    try { addEventListenerDefuser(...argsList[i]); }
     catch { }
 }
 
