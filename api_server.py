@@ -101,6 +101,7 @@ Known Issues:
 
 import asyncio
 import base64
+import io
 import logging
 import os
 import re
@@ -113,6 +114,7 @@ from typing import Optional, List
 import click
 from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.responses import HTMLResponse
+from PIL import Image
 from pydantic import BaseModel, Field, field_validator
 
 # Add parent directory to path to import shot_power_scraper
@@ -136,6 +138,89 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger("shot-power-scraper-api")
+
+
+def process_image(
+    image_bytes: bytes,
+    output_width: Optional[int] = None,
+    output_format: Optional[str] = None,
+    output_quality: Optional[int] = None
+) -> tuple[bytes, str]:
+    """
+    Process screenshot image: resize and/or convert format.
+
+    Args:
+        image_bytes: Original image bytes
+        output_width: Target width in pixels (maintains aspect ratio)
+        output_format: Target format: 'png', 'jpeg', 'webp'
+        output_quality: Quality for lossy formats (1-100)
+                       WebP: defaults to lossless if not specified or if 100
+
+    Returns:
+        Tuple of (processed_image_bytes, content_type)
+    """
+    # Open image from bytes
+    img = Image.open(io.BytesIO(image_bytes))
+
+    # Resize if output_width is specified
+    if output_width and output_width > 0:
+        # Calculate height to maintain aspect ratio
+        aspect_ratio = img.height / img.width
+        output_height = int(output_width * aspect_ratio)
+
+        # Use high-quality Lanczos resampling
+        img = img.resize((output_width, output_height), Image.Resampling.LANCZOS)
+        logger.info(f"Resized image to {output_width}x{output_height}")
+
+    # Determine output format
+    if output_format:
+        output_format = output_format.lower()
+    else:
+        # Keep original format if not specified
+        output_format = img.format.lower() if img.format else 'png'
+
+    # Validate format
+    if output_format not in ['png', 'jpeg', 'jpg', 'webp']:
+        raise ValueError(f"Unsupported output format: {output_format}")
+
+    # Normalize jpeg/jpg
+    if output_format == 'jpg':
+        output_format = 'jpeg'
+
+    # Prepare save parameters
+    save_kwargs = {}
+
+    if output_format == 'png':
+        content_type = 'image/png'
+        save_kwargs['optimize'] = True
+    elif output_format == 'jpeg':
+        content_type = 'image/jpeg'
+        # Convert RGBA to RGB for JPEG
+        if img.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+            img = background
+        save_kwargs['quality'] = output_quality if output_quality else 85
+        save_kwargs['optimize'] = True
+    elif output_format == 'webp':
+        content_type = 'image/webp'
+        # Use lossless compression by default unless quality < 100 is specified
+        if output_quality is None or output_quality == 100:
+            save_kwargs['lossless'] = True
+        else:
+            save_kwargs['quality'] = output_quality
+            save_kwargs['method'] = 6  # Best quality/compression trade-off
+
+    # Save to bytes
+    output_buffer = io.BytesIO()
+    img.save(output_buffer, format=output_format.upper(), **save_kwargs)
+    output_bytes = output_buffer.getvalue()
+
+    logger.info(f"Processed image: format={output_format}, original_size={len(image_bytes)}, output_size={len(output_bytes)}")
+
+    return output_bytes, content_type
 
 
 @asynccontextmanager
@@ -229,6 +314,9 @@ class ShotRequest(BaseRequest):
     skip_wait_for_load: Optional[bool] = Field(False, description="Skip waiting for page load")
     trigger_lazy_load: Optional[bool] = Field(False, description="Trigger lazy loading of images")
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
+    output_width: Optional[int] = Field(None, description="Resize output to this width in pixels (maintains aspect ratio)")
+    output_format: Optional[str] = Field(None, description="Output format: 'png', 'jpeg', or 'webp'")
+    output_quality: Optional[int] = Field(None, description="Quality for output format (1-100). JPEG defaults to 85. WebP defaults to lossless; use <100 for lossy")
 
 
     class Config:
@@ -276,6 +364,9 @@ class CaptureRequest(BaseRequest):
     skip_wait_for_load: Optional[bool] = Field(False, description="Skip waiting for page load")
     trigger_lazy_load: Optional[bool] = Field(False, description="Trigger lazy loading")
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
+    output_width: Optional[int] = Field(None, description="Resize output to this width in pixels (maintains aspect ratio)")
+    output_format: Optional[str] = Field(None, description="Output format: 'png', 'jpeg', or 'webp'")
+    output_quality: Optional[int] = Field(None, description="Quality for output format (1-100). JPEG defaults to 85. WebP defaults to lossless; use <100 for lossy")
 
     class Config:
         json_schema_extra = {
@@ -528,6 +619,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <div class="form-group"><label for="quality">JPEG Quality (1-100)</label><input type="number" id="quality" name="quality" placeholder="PNG" min="1" max="100"></div>
           <div class="form-group"><label for="timeout">Timeout (ms)</label><input type="number" id="timeout" name="timeout" placeholder="30000" min="1000"></div>
         </div>
+        <div style="background: #e0e7ff; padding: 12px; border-radius: 6px; margin: 16px 0; font-size: 13px; color: #4338ca; border-left: 3px solid #667eea;">
+          <strong>🎨 Image Processing:</strong> Resize and recompress screenshots after capture. WebP defaults to lossless compression (use quality &lt;100 for lossy). Example: capture at 1200px then output at 300px width.
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label for="output_width">Output Width (px)</label><input type="number" id="output_width" name="output_width" placeholder="Original" min="1"></div>
+          <div class="form-group">
+            <label for="output_format">Output Format</label>
+            <select id="output_format" name="output_format">
+              <option value="">Original</option>
+              <option value="png">PNG</option>
+              <option value="jpeg">JPEG</option>
+              <option value="webp">WebP</option>
+            </select>
+          </div>
+          <div class="form-group"><label for="output_quality">Output Quality (1-100)</label><input type="number" id="output_quality" name="output_quality" placeholder="WebP: lossless, JPEG: 85" min="1" max="100"></div>
+        </div>
         <div class="checkbox-group">
           <input type="checkbox" id="omit_background" name="omit_background">
           <label for="omit_background">Transparent Background</label>
@@ -581,13 +688,14 @@ async function captureScreenshot(e) {
     const data = new FormData(e.target);
     const body = {url: data.get('url')};
 
-    ['width', 'height', 'wait', 'quality', 'padding', 'timeout'].forEach(f => {
+    ['width', 'height', 'wait', 'quality', 'padding', 'timeout', 'output_width', 'output_quality'].forEach(f => {
         const v = data.get(f);
         if (v) body[f] = parseInt(v);
     });
 
     if (data.get('selector')) body.selectors = [data.get('selector')];
     if (data.get('javascript')) body.javascript = data.get('javascript');
+    if (data.get('output_format')) body.output_format = data.get('output_format');
     body.trigger_lazy_load = data.get('trigger_lazy_load') === 'on';
     body.omit_background = data.get('omit_background') === 'on';
 
@@ -702,13 +810,29 @@ async def shot(request: ShotRequest, fastapi_request: Request):
                 skip_navigation=True,  # Already navigated above
             )
 
-            # Determine content type based on quality setting
-            if request.quality:
-                content_type = "image/jpeg"
-                ext = "jpg"
+            # Apply post-processing (resize/recompress) if requested
+            if request.output_width or request.output_format or request.output_quality:
+                screenshot_bytes, content_type = process_image(
+                    screenshot_bytes,
+                    output_width=request.output_width,
+                    output_format=request.output_format,
+                    output_quality=request.output_quality
+                )
+                # Determine extension from content_type
+                if 'jpeg' in content_type:
+                    ext = 'jpg'
+                elif 'webp' in content_type:
+                    ext = 'webp'
+                else:
+                    ext = 'png'
             else:
-                content_type = "image/png"
-                ext = "png"
+                # Determine content type based on quality setting (original behavior)
+                if request.quality:
+                    content_type = "image/jpeg"
+                    ext = "jpg"
+                else:
+                    content_type = "image/png"
+                    ext = "png"
 
             filename = filename_for_url(request.url, ext=ext)
 
@@ -831,9 +955,29 @@ async def capture(request: CaptureRequest, fastapi_request: Request):
             # Extract full-page HTML
             html_content = await page.get_content()
 
-            # Determine format and filename
-            screenshot_format = "jpeg" if request.quality else "png"
-            ext = "jpg" if request.quality else "png"
+            # Apply post-processing (resize/recompress) if requested
+            if request.output_width or request.output_format or request.output_quality:
+                screenshot_bytes, content_type = process_image(
+                    screenshot_bytes,
+                    output_width=request.output_width,
+                    output_format=request.output_format,
+                    output_quality=request.output_quality
+                )
+                # Determine format and extension from content_type
+                if 'jpeg' in content_type:
+                    screenshot_format = 'jpeg'
+                    ext = 'jpg'
+                elif 'webp' in content_type:
+                    screenshot_format = 'webp'
+                    ext = 'webp'
+                else:
+                    screenshot_format = 'png'
+                    ext = 'png'
+            else:
+                # Determine format and filename (original behavior)
+                screenshot_format = "jpeg" if request.quality else "png"
+                ext = "jpg" if request.quality else "png"
+
             filename = filename_for_url(request.url, ext=ext)
 
             # Base64 encode screenshot
