@@ -614,6 +614,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <div class="form-group"><label for="quality">JPEG Quality (1-100)</label><input type="number" id="quality" name="quality" placeholder="PNG" min="1" max="100"></div>
           <div class="form-group"><label for="timeout">Timeout (ms)</label><input type="number" id="timeout" name="timeout" placeholder="30000" min="1000"></div>
         </div>
+        <div style="background: #e0e7ff; padding: 12px; border-radius: 6px; margin: 16px 0; font-size: 13px; color: #4338ca; border-left: 3px solid #667eea;">
+          <strong>🎨 Image Processing:</strong> Resize and recompress screenshots after capture. For example, capture at 1200px then output at 300px width as WebP.
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label for="output_width">Output Width (px)</label><input type="number" id="output_width" name="output_width" placeholder="Original" min="1"></div>
+          <div class="form-group">
+            <label for="output_format">Output Format</label>
+            <select id="output_format" name="output_format">
+              <option value="">Original</option>
+              <option value="png">PNG</option>
+              <option value="jpeg">JPEG</option>
+              <option value="webp">WebP</option>
+            </select>
+          </div>
+          <div class="form-group"><label for="output_quality">Output Quality (1-100)</label><input type="number" id="output_quality" name="output_quality" placeholder="85" min="1" max="100"></div>
+        </div>
         <div class="checkbox-group">
           <input type="checkbox" id="omit_background" name="omit_background">
           <label for="omit_background">Transparent Background</label>
@@ -667,13 +683,14 @@ async function captureScreenshot(e) {
     const data = new FormData(e.target);
     const body = {url: data.get('url')};
 
-    ['width', 'height', 'wait', 'quality', 'padding', 'timeout'].forEach(f => {
+    ['width', 'height', 'wait', 'quality', 'padding', 'timeout', 'output_width', 'output_quality'].forEach(f => {
         const v = data.get(f);
         if (v) body[f] = parseInt(v);
     });
 
     if (data.get('selector')) body.selectors = [data.get('selector')];
     if (data.get('javascript')) body.javascript = data.get('javascript');
+    if (data.get('output_format')) body.output_format = data.get('output_format');
     body.trigger_lazy_load = data.get('trigger_lazy_load') === 'on';
     body.omit_background = data.get('omit_background') === 'on';
 
