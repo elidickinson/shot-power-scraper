@@ -6,6 +6,7 @@ A FastAPI-based REST API server for the shot-power-scraper screenshot tool. This
 
 - Simple REST API for taking screenshots
 - Shared browser instance for better performance
+- **Image processing**: Resize and recompress screenshots (PNG/JPEG/WebP)
 - Support for all shot-power-scraper features:
   - Custom viewport sizes
   - Element selectors (CSS and JavaScript)
@@ -19,11 +20,14 @@ A FastAPI-based REST API server for the shot-power-scraper screenshot tool. This
 ## Installation
 
 ```bash
-# Install dependencies
-pip install -r requirements-api.txt
+# Install shot-power-scraper with API dependencies
+pip install -e ".[api]"
 
 # Or with uv
-uv pip install -r requirements-api.txt
+uv pip install -e ".[api]"
+
+# Or install from requirements-api.txt
+pip install -r requirements-api.txt
 ```
 
 ## Usage
@@ -115,10 +119,13 @@ Take a screenshot with various options.
 - `skip_wait_for_load`: Skip waiting for page load
 - `trigger_lazy_load`: Trigger lazy loading of images
 - `user_agent`: Custom User-Agent header
+- `output_width`: Resize output to this width in pixels (maintains aspect ratio)
+- `output_format`: Output format: 'png', 'jpeg', or 'webp'
+- `output_quality`: Quality for output format (1-100). JPEG defaults to 85. WebP defaults to lossless; use <100 for lossy
 
 **Note:** Browser visibility (`--headful`) is configured at server startup, not per-request.
 
-**Response:** Binary image data (PNG or JPEG)
+**Response:** Binary image data (PNG, JPEG, or WebP depending on format settings)
 
 ### API Documentation
 
@@ -143,7 +150,7 @@ curl -X POST http://localhost:8000/shot \
   -d '{
     "url": "https://example.com",
     "width": 1920,
-    "height": 1080,
+    "height": 1080
   }' \
   -o fullpage.png
 
@@ -156,6 +163,19 @@ curl -X POST http://localhost:8000/shot \
     "padding": 20
   }' \
   -o header.png
+
+# Capture at high resolution, resize to 300px width, convert to WebP
+curl -X POST http://localhost:8000/shot \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "width": 1200,
+    "height": 800,
+    "output_width": 300,
+    "output_format": "webp",
+    "output_quality": 80
+  }' \
+  -o thumbnail.webp
 ```
 
 ### Using Python
@@ -176,6 +196,22 @@ response = requests.post(
 
 # Save the image
 with open("screenshot.png", "wb") as f:
+    f.write(response.content)
+
+# Take a high-res screenshot and resize/compress for thumbnail
+response = requests.post(
+    "http://localhost:8000/shot",
+    json={
+        "url": "https://example.com",
+        "width": 1920,
+        "height": 1080,
+        "output_width": 400,
+        "output_format": "webp",
+        "output_quality": 85
+    }
+)
+
+with open("thumbnail.webp", "wb") as f:
     f.write(response.content)
 ```
 
