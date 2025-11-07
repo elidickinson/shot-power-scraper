@@ -56,8 +56,8 @@ class HARCollector:
                 try:
                     response_body_result = await page.send(uc.cdp.network.get_response_body(request_id=request_id))
                     self.response_bodies[request_id] = {
-                        'body': response_body_result.body,
-                        'base64Encoded': response_body_result.base64_encoded
+                        'body': response_body_result[0],
+                        'base64Encoded': response_body_result[1]
                     }
                 except Exception as e:
                     request_url = self.requests.get(request_id, {}).get('url', request_id)
