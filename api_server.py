@@ -154,6 +154,7 @@ def process_image(
         output_width: Target width in pixels (maintains aspect ratio)
         output_format: Target format: 'png', 'jpeg', 'webp'
         output_quality: Quality for lossy formats (1-100)
+                       WebP: defaults to lossless if not specified or if 100
 
     Returns:
         Tuple of (processed_image_bytes, content_type)
@@ -205,8 +206,12 @@ def process_image(
         save_kwargs['optimize'] = True
     elif output_format == 'webp':
         content_type = 'image/webp'
-        save_kwargs['quality'] = output_quality if output_quality else 85
-        save_kwargs['method'] = 6  # Best quality/compression trade-off
+        # Use lossless compression by default unless quality < 100 is specified
+        if output_quality is None or output_quality == 100:
+            save_kwargs['lossless'] = True
+        else:
+            save_kwargs['quality'] = output_quality
+            save_kwargs['method'] = 6  # Best quality/compression trade-off
 
     # Save to bytes
     output_buffer = io.BytesIO()
@@ -311,7 +316,7 @@ class ShotRequest(BaseRequest):
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
     output_width: Optional[int] = Field(None, description="Resize output to this width in pixels (maintains aspect ratio)")
     output_format: Optional[str] = Field(None, description="Output format: 'png', 'jpeg', or 'webp'")
-    output_quality: Optional[int] = Field(None, description="Quality for output format (1-100, for jpeg/webp)")
+    output_quality: Optional[int] = Field(None, description="Quality for output format (1-100). JPEG defaults to 85. WebP defaults to lossless; use <100 for lossy")
 
 
     class Config:
@@ -361,7 +366,7 @@ class CaptureRequest(BaseRequest):
     user_agent: Optional[str] = Field(None, description="Custom User-Agent header")
     output_width: Optional[int] = Field(None, description="Resize output to this width in pixels (maintains aspect ratio)")
     output_format: Optional[str] = Field(None, description="Output format: 'png', 'jpeg', or 'webp'")
-    output_quality: Optional[int] = Field(None, description="Quality for output format (1-100, for jpeg/webp)")
+    output_quality: Optional[int] = Field(None, description="Quality for output format (1-100). JPEG defaults to 85. WebP defaults to lossless; use <100 for lossy")
 
     class Config:
         json_schema_extra = {
@@ -615,7 +620,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <div class="form-group"><label for="timeout">Timeout (ms)</label><input type="number" id="timeout" name="timeout" placeholder="30000" min="1000"></div>
         </div>
         <div style="background: #e0e7ff; padding: 12px; border-radius: 6px; margin: 16px 0; font-size: 13px; color: #4338ca; border-left: 3px solid #667eea;">
-          <strong>🎨 Image Processing:</strong> Resize and recompress screenshots after capture. For example, capture at 1200px then output at 300px width as WebP.
+          <strong>🎨 Image Processing:</strong> Resize and recompress screenshots after capture. WebP defaults to lossless compression (use quality &lt;100 for lossy). Example: capture at 1200px then output at 300px width.
         </div>
         <div class="form-row">
           <div class="form-group"><label for="output_width">Output Width (px)</label><input type="number" id="output_width" name="output_width" placeholder="Original" min="1"></div>
@@ -628,7 +633,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <option value="webp">WebP</option>
             </select>
           </div>
-          <div class="form-group"><label for="output_quality">Output Quality (1-100)</label><input type="number" id="output_quality" name="output_quality" placeholder="85" min="1" max="100"></div>
+          <div class="form-group"><label for="output_quality">Output Quality (1-100)</label><input type="number" id="output_quality" name="output_quality" placeholder="WebP: lossless, JPEG: 85" min="1" max="100"></div>
         </div>
         <div class="checkbox-group">
           <input type="checkbox" id="omit_background" name="omit_background">

@@ -121,7 +121,7 @@ Take a screenshot with various options.
 - `user_agent`: Custom User-Agent header
 - `output_width`: Resize output to this width in pixels (maintains aspect ratio)
 - `output_format`: Output format: 'png', 'jpeg', or 'webp'
-- `output_quality`: Quality for output format (1-100, for jpeg/webp)
+- `output_quality`: Quality for output format (1-100). JPEG defaults to 85. WebP defaults to lossless; use <100 for lossy
 
 **Note:** Browser visibility (`--headful`) is configured at server startup, not per-request.
 
