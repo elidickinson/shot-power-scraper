@@ -73,10 +73,6 @@ class ShotConfig:
         self.ad_block = shot.get("ad_block", config_file_settings.get("ad_block", False))
         self.paywall_block = shot.get("paywall_block", config_file_settings.get("paywall_block", False))
         self.user_agent = shot.get("user_agent", config_file_settings.get("user_agent"))
-
-        # Parse ublock_lists from comma-separated string to list
-        ublock_lists_str = shot.get("ublock_lists")
-        self.ublock_lists = [s.strip() for s in ublock_lists_str.split(",")] if ublock_lists_str else None
         self.skip_shot = shot.get("skip_shot", False)
         self.save_html = shot.get("save_html", False)
         self.width = shot.get("width", 1280)
@@ -103,6 +99,7 @@ class ShotConfig:
         self.devtools = shot.get("devtools", False)
         self.browser = shot.get("browser", "chromium")
         self.browser_args = shot.get("browser_args")
+        self.browser_executable_path = shot.get("browser_executable_path")
         self.reduced_motion = shot.get("reduced_motion", False)
         self.bypass_csp = shot.get("bypass_csp", False)
         self.auth_username = shot.get("auth_username")

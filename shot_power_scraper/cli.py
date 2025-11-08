@@ -117,6 +117,7 @@ def common_shot_options(fn):
     click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")(fn)
     click.option("--user-agent", help="User-Agent header to use")(fn)
     click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration (GPU is disabled by default)")(fn)
+    click.option("--browser-executable-path", help="Path to specific browser executable to use")(fn)
     click.option("browser_args", "--browser-arg", multiple=True,
                 help="Additional arguments to pass to the browser")(fn)
     click.option("--browser", "-b", default="chromium", type=click.Choice(BROWSERS, case_sensitive=False),
@@ -136,7 +137,6 @@ def common_shot_options(fn):
     # Blocking options
     click.option("--ad-block/--no-ad-block", default=None,
                 help="Enable ad blocking using built-in filter lists")(fn)
-    click.option("--ublock-lists", help="Comma-separated list of additional uBlock filter lists to enable (e.g. 'annoyances-cookies,annoyances-overlays')")(fn)
     click.option("--paywall-block/--no-paywall-block", default=None,
                 help="Enable paywall bypass using Bypass Paywalls Clean extension")(fn)
 
@@ -148,6 +148,7 @@ def simple_browser_options(fn):
     click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")(fn)
     click.option("--user-agent", help="User-Agent header to use")(fn)
     click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration (GPU is disabled by default)")(fn)
+    click.option("--browser-executable-path", help="Path to specific browser executable to use")(fn)
     click.option("browser_args", "--browser-arg", multiple=True,
                 help="Additional arguments to pass to the browser")(fn)
     click.option("--browser", "-b", default="chromium", type=click.Choice(BROWSERS, case_sensitive=False),
@@ -189,10 +190,10 @@ def cli():
 def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_selectors_all,
          padding, javascript, retina, scale_factor, omit_background, quality,
          interactive, devtools, log_requests, save_html,
-         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
+         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block,
          wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
-         auth_username, auth_password, enable_gpu):
+         auth_username, auth_password, enable_gpu, browser_executable_path):
     """
     Take a single screenshot of a page or portion of a page.
 
@@ -292,10 +293,10 @@ def shot(url, width, height, output, selectors, selectors_all, js_selectors, js_
 @common_shot_options
 def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outputs,
          leave_server, har, har_zip, har_file,
-         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
+         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block,
          wait, wait_for, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
-         auth_username, auth_password, enable_gpu):
+         auth_username, auth_password, enable_gpu, browser_executable_path):
     """
     Take multiple screenshots or PDFs, defined by a YAML file
 
@@ -436,10 +437,10 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
 @click.option("-j", "--javascript", help="Execute this JS prior to taking the snapshot")
 @common_shot_options
 def accessibility(url, output, javascript,
-                 verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
+                 verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block,
                  wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
                  auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
-                 auth_username, auth_password, enable_gpu):
+                 auth_username, auth_password, enable_gpu, browser_executable_path):
     """
     (NOT IMPLEMENTED) Dump the Chromium accessibility tree for the specifed page
 
@@ -461,10 +462,10 @@ def accessibility(url, output, javascript,
 @click.option("--no-response-bodies", is_flag=True, help="Exclude response body content from HAR file (bodies included by default)")
 @common_shot_options
 def har(url, zip_, output, javascript, no_response_bodies,
-       verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
+       verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block,
        wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
-       auth_username, auth_password, enable_gpu):
+       auth_username, auth_password, enable_gpu, browser_executable_path):
     """
     Record a HAR file for the specified page
 
@@ -559,10 +560,10 @@ def har(url, zip_, output, javascript, no_response_bodies,
 )
 @common_shot_options
 def javascript(url, javascript, input, output, raw,
-              verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
+              verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block,
               wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
               auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
-              auth_username, auth_password, enable_gpu):
+              auth_username, auth_password, enable_gpu, browser_executable_path):
     """
     Execute JavaScript against the page and return the result as JSON
 
@@ -635,10 +636,10 @@ def javascript(url, javascript, input, output, raw,
 @click.option("--pdf-css", help="Inject custom CSS for PDF generation")
 @common_shot_options
 def pdf(url, output, javascript, media_screen, landscape, scale, print_background, pdf_css,
-       verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
+       verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block,
        wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
        auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
-       auth_username, auth_password, enable_gpu):
+       auth_username, auth_password, enable_gpu, browser_executable_path):
     """
     Create a PDF of the specified page
 
@@ -704,10 +705,10 @@ def pdf(url, output, javascript, media_screen, landscape, scale, print_backgroun
 )
 @common_shot_options
 def html(url, output, javascript, selector,
-        verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
+        verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block,
         wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
         auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
-        auth_username, auth_password, enable_gpu):
+        auth_username, auth_password, enable_gpu, browser_executable_path):
     """
     Output the final HTML of the specified page
 
@@ -760,10 +761,10 @@ def html(url, output, javascript, selector,
 @click.option("-j", "--javascript", help="Execute this JS prior to capturing the MHTML")
 @common_shot_options
 def mhtml(url, output, javascript,
-         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block, ublock_lists,
+         verbose, debug, silent, log_console, skip, fail, ad_block, paywall_block,
          wait, wait_for, timeout, skip_challenge_page_check, skip_wait_for_load, trigger_lazy_load, no_resize_viewport,
          auth, browser, browser_args, user_agent, headful, reduced_motion, bypass_csp,
-         auth_username, auth_password, enable_gpu):
+         auth_username, auth_password, enable_gpu, browser_executable_path):
     """
     Create an MHTML archive of the specified page
 
@@ -945,7 +946,7 @@ def config_cmd(ad_block, paywall_block, user_agent, enable_gpu, clear, show):
 @click.option("--devtools", is_flag=True, help="Open browser DevTools")
 @simple_browser_options
 @click.option("--log-console", "--console-log", is_flag=True, help="Write console.log() to stderr")
-def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced_motion, log_console):
+def auth(url, context_file, devtools, browser, browser_args, user_agent, reduced_motion, log_console, browser_executable_path):
     """
     Open a browser so user can manually authenticate with the specified site,
     then save the resulting authentication context to a file.

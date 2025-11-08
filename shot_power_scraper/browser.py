@@ -111,37 +111,6 @@ async def create_browser_context(shot_config, extensions=None):
     return browser_obj
 
 
-def customize_ublock_extension(base_path, enable_lists):
-    """Copy uBlock extension and enable specific filter lists"""
-    temp_ext = tempfile.mkdtemp(prefix="ublock_custom_")
-
-    # Copy entire extension to temp directory
-    for item in os.listdir(base_path):
-        src = os.path.join(base_path, item)
-        dst = os.path.join(temp_ext, item)
-        if os.path.isdir(src):
-            shutil.copytree(src, dst)
-        else:
-            shutil.copy2(src, dst)
-
-    # Modify manifest.json to enable requested filter lists
-    manifest_path = os.path.join(temp_ext, 'manifest.json')
-    with open(manifest_path) as f:
-        manifest = json.load(f)
-
-    enabled_count = 0
-    for rule in manifest['declarative_net_request']['rule_resources']:
-        if rule['id'] in enable_lists:
-            rule['enabled'] = True
-            enabled_count += 1
-
-    with open(manifest_path, 'w') as f:
-        json.dump(manifest, f, indent=2)
-
-    if Config.verbose:
-        click.echo(f"Enabled {enabled_count} additional filter lists: {', '.join(enable_lists)}", err=True)
-
-    return temp_ext
 
 
 async def setup_blocking_extensions(extensions, ad_block, paywall_block, ublock_lists=None):
