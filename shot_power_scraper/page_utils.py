@@ -576,7 +576,7 @@ async def trigger_lazy_load(page, timeout_ms=5000):
         await page.scroll_down(200)
         await page.sleep()
         await asyncio.sleep(0.5)
-        at_bottom = await evaluate_js(page, "((document.body || {}).offsetHeight || 0) - (window.innerHeight || 0) <= (window.scrollY || 0)")
+        at_bottom = await evaluate_js(page, "((document.body || {}).offsetHeight || 0) - (window.innerHeight || 0) - 50 <= (window.scrollY || 0)")
         if at_bottom:
             if Config.verbose:
                 click.echo(f"Lazy load scrolled to bottom", err=True)
