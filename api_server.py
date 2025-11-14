@@ -30,6 +30,7 @@ Environment Variables:
     SHOT_API_HEADFUL=1                 # Run browser in headful mode
     SHOT_API_REDUCED_MOTION=1          # Emulate reduced motion
     SHOT_API_USER_AGENT="Custom Agent" # Set custom user agent
+    SHOT_API_BROWSER_EXECUTABLE_PATH="/path/to/chrome"  # Path to browser executable
     SHOT_API_BROWSER_ARGS="--arg1,--arg2"  # Browser args (comma-separated)
     SHOT_API_MAX_CONCURRENT=10         # Max concurrent screenshots per worker
     PRELOAD_BROWSER=true               # Preload browser on startup (default: true)
@@ -415,6 +416,7 @@ async def get_browser(browser_args=None):
         headful = os.getenv("SHOT_API_HEADFUL") == "1"
         reduced_motion = os.getenv("SHOT_API_REDUCED_MOTION") == "1"
         user_agent = os.getenv("SHOT_API_USER_AGENT")
+        browser_executable_path = os.getenv("SHOT_API_BROWSER_EXECUTABLE_PATH")
 
         # Parse browser args from env if not provided
         if not browser_args:
@@ -444,6 +446,10 @@ async def get_browser(browser_args=None):
         # Only set user_agent if provided
         if user_agent:
             config_dict["user_agent"] = user_agent
+
+        # Only set browser_executable_path if provided
+        if browser_executable_path:
+            config_dict["browser_executable_path"] = browser_executable_path
 
         shot_config = ShotConfig(config_dict)
 
@@ -1005,6 +1011,7 @@ async def capture(request: CaptureRequest, fastapi_request: Request):
 @click.option("--reduced-motion", is_flag=True, help="Emulate 'prefers-reduced-motion' media feature")
 @click.option("--user-agent", help="User-Agent header to use")
 @click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration (GPU is disabled by default)")
+@click.option("--browser-executable-path", help="Path to specific browser executable to use")
 @click.option("browser_args", "--browser-arg", multiple=True,
             help="Additional arguments to pass to the browser")
 @click.option("--ad-block/--no-ad-block", default=False, help="Enable ad blocking using built-in filter lists")
@@ -1040,7 +1047,7 @@ async def capture(request: CaptureRequest, fastapi_request: Request):
     help="Maximum concurrent screenshots per worker (default: 10, can be overridden with SHOT_API_MAX_CONCURRENT env var)"
 )
 def main(browser_args, host, port, reload, workers, max_concurrent, user_agent, enable_gpu, headful, reduced_motion,
-         ad_block, paywall_block, trigger_lazy_load):
+         ad_block, paywall_block, trigger_lazy_load, browser_executable_path):
     """Start the Shot Power Scraper API Server"""
     import uvicorn
 
@@ -1076,6 +1083,8 @@ def main(browser_args, host, port, reload, workers, max_concurrent, user_agent, 
         os.environ.setdefault("SHOT_API_BROWSER_ARGS", ",".join(browser_args))
     if user_agent:
         os.environ.setdefault("SHOT_API_USER_AGENT", user_agent)
+    if browser_executable_path:
+        os.environ.setdefault("SHOT_API_BROWSER_EXECUTABLE_PATH", browser_executable_path)
     os.environ.setdefault("SHOT_API_ENABLE_GPU", "1" if enable_gpu else "")
     os.environ.setdefault("SHOT_API_HEADFUL", "1" if headful else "")
     os.environ.setdefault("SHOT_API_REDUCED_MOTION", "1" if reduced_motion else "")

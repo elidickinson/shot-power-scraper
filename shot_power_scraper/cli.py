@@ -28,8 +28,7 @@ def run_browser_command(command_func, shot_config, **kwargs):
                 temp_extensions = await setup_blocking_extensions(
                     extensions,
                     shot_config.ad_block,
-                    shot_config.paywall_block,
-                    shot_config.ublock_lists
+                    shot_config.paywall_block
                 )
 
             # Create browser with shot_config parameters
@@ -342,10 +341,8 @@ def multi(config, retina, scale_factor, timeout, fail_on_error, noclobber, outpu
         extensions = []
         temp_extensions = []
         if ad_block or paywall_block:
-            # Parse ublock_lists if provided
-            ublock_lists_parsed = [s.strip() for s in ublock_lists.split(",")] if ublock_lists else None
             temp_extensions = await setup_blocking_extensions(
-                extensions, ad_block, paywall_block, ublock_lists_parsed
+                extensions, ad_block, paywall_block
             )
 
         # Create browser config for multi command

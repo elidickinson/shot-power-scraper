@@ -5,7 +5,7 @@ import nodriver as uc
 import pathlib
 import tempfile
 import shutil
-import os
+
 
 
 class Config:
@@ -113,7 +113,7 @@ async def create_browser_context(shot_config, extensions=None):
 
 
 
-async def setup_blocking_extensions(extensions, ad_block, paywall_block, ublock_lists=None):
+async def setup_blocking_extensions(extensions, ad_block, paywall_block):
     """Setup blocking extensions based on requested flags"""
     base_extensions_path = pathlib.Path(__file__).parent / 'extensions'
 
@@ -124,16 +124,8 @@ async def setup_blocking_extensions(extensions, ad_block, paywall_block, ublock_
     if ad_block:
         # Use uBlock Lite (Manifest V3) for ad blocking
         ad_extension_base = (base_extensions_path / 'ublock-lite-custom').resolve()
-
-        if ublock_lists:
-            # Customize extension with specific filter lists
-            ad_extension_path = customize_ublock_extension(str(ad_extension_base), ublock_lists)
-            temp_extensions.append(ad_extension_path)
-            extensions.append(ad_extension_path)
-            loaded_extensions.append(f"ad blocking (uBlock Lite + {len(ublock_lists)} custom lists)")
-        else:
-            extensions.append(str(ad_extension_base))
-            loaded_extensions.append("ad blocking (uBlock Lite)")
+        extensions.append(str(ad_extension_base))
+        loaded_extensions.append("ad blocking (uBlock Lite)")
 
     if paywall_block:
         paywall_extension_path = (base_extensions_path / 'bypass-paywalls-chrome-clean-master').resolve()
