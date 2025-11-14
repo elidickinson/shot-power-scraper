@@ -65,15 +65,16 @@ async def create_browser_context(shot_config, extensions=None):
     temp_user_data_dir = tempfile.mkdtemp(prefix="shot_scraper_")
 
     # Create browser config
-    config = uc.Config(user_data_dir=temp_user_data_dir)
-    config.headless = not (shot_config.interactive or shot_config.headful)
-    # config.lang = "en-US"  # Set single language to match legitimate browsers
-    
-    # Set browser executable path if provided
+    # Note: browser_executable_path must be passed to constructor to avoid find_chrome_executable() call
+    config_args = {"user_data_dir": temp_user_data_dir}
     if shot_config.browser_executable_path:
-        config.browser_executable_path = shot_config.browser_executable_path
+        config_args["browser_executable_path"] = shot_config.browser_executable_path
         if Config.verbose:
             click.echo(f"Using custom browser executable: {shot_config.browser_executable_path}", err=True)
+    
+    config = uc.Config(**config_args)
+    config.headless = not (shot_config.interactive or shot_config.headful)
+    # config.lang = "en-US"  # Set single language to match legitimate browsers
 
     # Add --hide-scrollbars when in headless mode
     if config.headless:
