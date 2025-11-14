@@ -872,6 +872,10 @@ def install(browser, browser_args):
     help="Set default GPU enable setting (true/false)"
 )
 @click.option(
+    "--browser-executable-path",
+    help="Set default browser executable path"
+)
+@click.option(
     "--clear",
     is_flag=True,
     help="Clear all configuration settings (delete config file)"
@@ -881,7 +885,7 @@ def install(browser, browser_args):
     is_flag=True,
     help="Show current configuration"
 )
-def config_cmd(ad_block, paywall_block, user_agent, enable_gpu, clear, show):
+def config_cmd(ad_block, paywall_block, user_agent, enable_gpu, browser_executable_path, clear, show):
     """
     Configure default settings for shot-power-scraper
 
@@ -912,6 +916,7 @@ def config_cmd(ad_block, paywall_block, user_agent, enable_gpu, clear, show):
         click.echo(f"paywall_block: {config.get('paywall_block', False)}")
         click.echo(f"user_agent: {config.get('user_agent', 'None')}")
         click.echo(f"enable_gpu: {config.get('enable_gpu', False)}")
+        click.echo(f"browser_executable_path: {config.get('browser_executable_path', 'None')}")
         return
 
     if ad_block is not None:
@@ -930,9 +935,13 @@ def config_cmd(ad_block, paywall_block, user_agent, enable_gpu, clear, show):
         set_config_value('enable_gpu', enable_gpu)
         click.echo(f"Set default enable_gpu to: {enable_gpu}")
 
-    if ad_block is None and paywall_block is None and user_agent is None and enable_gpu is None and not show and not clear:
+    if browser_executable_path is not None:
+        set_config_value('browser_executable_path', browser_executable_path)
+        click.echo(f"Set default browser_executable_path to: {browser_executable_path}")
+
+    if ad_block is None and paywall_block is None and user_agent is None and enable_gpu is None and browser_executable_path is None and not show and not clear:
         click.echo("No configuration changes specified. Use --show to view current settings.")
-        click.echo("Use --ad-block true/false, --paywall-block true/false, --user-agent 'string', --enable-gpu true/false, or --clear to modify settings.")
+        click.echo("Use --ad-block true/false, --paywall-block true/false, --user-agent 'string', --enable-gpu true/false, --browser-executable-path 'path', or --clear to modify settings.")
 
 
 @cli.command()

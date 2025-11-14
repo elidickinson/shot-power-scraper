@@ -68,6 +68,12 @@ async def create_browser_context(shot_config, extensions=None):
     config = uc.Config(user_data_dir=temp_user_data_dir)
     config.headless = not (shot_config.interactive or shot_config.headful)
     # config.lang = "en-US"  # Set single language to match legitimate browsers
+    
+    # Set browser executable path if provided
+    if shot_config.browser_executable_path:
+        config.browser_executable_path = shot_config.browser_executable_path
+        if Config.verbose:
+            click.echo(f"Using custom browser executable: {shot_config.browser_executable_path}", err=True)
 
     # Add --hide-scrollbars when in headless mode
     if config.headless:

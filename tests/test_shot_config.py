@@ -129,3 +129,54 @@ class TestShotConfig:
         config = ShotConfig({"url": "test", "ad_block": False})
         assert config.ad_block is False
         assert config.user_agent == "test-agent"  # Still from config file
+    
+    def test_browser_executable_path_config(self, mocker, tmp_path):
+        """Test that browser_executable_path is loaded from config file and can be overridden"""
+        # Mock config directory
+        mocker.patch("shot_power_scraper.shot_config.get_config_dir", return_value=tmp_path)
+        
+        # Test without config file
+        config = ShotConfig({"url": "test"})
+        assert config.browser_executable_path is None
+        
+        # Create config file with browser path
+        config_file = tmp_path / "config.json"
+        config_file.write_text('{"browser_executable_path": "/usr/bin/google-chrome"}')
+        
+        # Should load from config file
+        config = ShotConfig({"url": "test"})
+        assert config.browser_executable_path == "/usr/bin/google-chrome"
+        
+        # Command line should override config file
+        config = ShotConfig({"url": "test", "browser_executable_path": "/usr/bin/chromium"})
+        assert config.browser_executable_path == "/usr/bin/chromium"
+    
+    @pytest.mark.asyncio
+    async def test_browser_executable_path_passed_to_nodriver(self, mocker):
+        """Test that browser_executable_path is passed to nodriver Config"""
+        # Mock nodriver.start and uc.Config
+        mock_start = mocker.patch("shot_power_scraper.browser.uc.start")
+        mock_config_class = mocker.patch("shot_power_scraper.browser.uc.Config")
+        
+        # Setup mock config instance
+        mock_config = MagicMock()
+        mock_config_class.return_value = mock_config
+        
+        # Import and use the function
+        from shot_power_scraper.browser import create_browser_context
+        from shot_power_scraper.shot_config import ShotConfig
+        
+        # Create a config with browser_executable_path
+        shot_config = ShotConfig({
+            "url": "https://example.com",
+            "browser_executable_path": "/custom/path/to/chrome"
+        })
+        
+        # Call the function
+        await create_browser_context(shot_config)
+        
+        # Verify uc.Config was called
+        mock_config_class.assert_called_once()
+        
+        # Verify the browser_executable_path was set on the config
+        assert mock_config.browser_executable_path == "/custom/path/to/chrome"
